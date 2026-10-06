@@ -1,0 +1,64 @@
+{
+ "$comment": "Модуль 5 «Playwright с нуля»: новые термины и привязка существующих терминов к урокам модуля. После правки: npm run import-glossary.",
+ "playwright-library": {
+  "en": "Playwright Library",
+  "ru": "Библиотека Playwright",
+  "def": "Программный интерфейс для управления браузером без тестового раннера: вы сами запускаете браузер (<code>chromium.launch()</code>), создаёте контекст и страницу и закрываете их. Проверок, отчётов, fixtures и повторов в ней нет.",
+  "aliases": "playwright library, пакет playwright, playwright-core",
+  "lesson": "pw-library-vs-test",
+  "example": "const browser = await chromium.launch();\nconst page = await browser.newPage();\nawait page.goto('http://127.0.0.1:3000/');\nawait browser.close();"
+ },
+ "pw-browser": {
+  "en": "Browser",
+  "ru": "Браузер (объект Browser)",
+  "def": "Объект Playwright, представляющий запущенный процесс браузера (Chromium, Firefox или WebKit). Внутри одного Browser создаются изолированные контексты. В Playwright Test доступен как fixture <code>browser</code> и переиспользуется тестами одного воркера.",
+  "aliases": "browser, fixture browser",
+  "lesson": "pw-context"
+ },
+ "pw-page": {
+  "en": "Page",
+  "ru": "Страница (объект Page)",
+  "def": "Одна вкладка внутри контекста браузера. Через Page открывают адреса (<code>goto</code>), создают локаторы и слушают события страницы. В Playwright Test каждый тест получает свежую страницу в своём контексте — fixture <code>page</code>.",
+  "aliases": "page, вкладка, fixture page",
+  "lesson": "pw-context"
+ },
+ "playwright-browsers": {
+  "en": "Playwright browsers",
+  "ru": "Браузеры Playwright",
+  "def": "Сборки Chromium, Firefox и WebKit, которые скачивает команда <code>npx playwright install</code>. Каждая версия Playwright рассчитана на свои сборки, поэтому после обновления пакета браузеры устанавливают заново.",
+  "aliases": "npx playwright install, браузерные бинарники",
+  "lesson": "pw-install",
+  "example": "npx playwright install chromium"
+ },
+ "locator-filter": {
+  "en": "Locator chaining and filter",
+  "ru": "Уточнение локатора",
+  "def": "Сужение поиска: цепочка (<code>card.getByRole('button')</code> ищет только внутри карточки) и <code>filter()</code> с <code>hasText</code>, <code>hasNotText</code>, <code>has</code>, <code>hasNot</code> или <code>visible</code> оставляет только подходящие элементы.",
+  "aliases": "chaining, filter, цепочка локаторов",
+  "lesson": "pw-locators",
+  "example": "page.getByRole('listitem')\n  .filter({ hasText: 'Блокнот A5' })\n  .getByRole('button', { name: 'В корзину' })"
+ },
+ "expect-poll": {
+  "en": "expect.poll",
+  "ru": "Опрос значения в проверке",
+  "def": "Проверка Playwright Test, которая повторно вызывает вашу функцию и сравнивает результат, пока он не совпадёт или не истечёт таймаут. Нужна для значений, которые не являются локатором: ответ API, запись в базе, файл.",
+  "aliases": "expect.poll, polling",
+  "lesson": "pw-timeouts",
+  "example": "await expect.poll(async () => (await (await page.request.get('/api/cart')).json()).count).toBe(1);"
+ },
+ "playwright-test": { "lesson": "pw-library-vs-test" },
+ "playwright-config": { "lesson": "pw-install" },
+ "headless": { "lesson": "pw-install" },
+ "browser-context": { "lesson": "pw-context" },
+ "locator": { "lesson": "pw-locators" },
+ "test-id": { "lesson": "pw-locators" },
+ "strict-mode": { "lesson": "pw-strict" },
+ "auto-waiting": { "lesson": "pw-autowait" },
+ "actionability": { "lesson": "pw-autowait" },
+ "assertion": { "lesson": "pw-assertions" },
+ "web-first-assertion": { "lesson": "pw-assertions" },
+ "soft-assertion": { "lesson": "pw-assertions" },
+ "explicit-wait": { "lesson": "pw-waits" },
+ "timeout": { "lesson": "pw-timeouts" },
+ "test-retry": { "lesson": "pw-timeouts" }
+}
