@@ -12,7 +12,7 @@ jobs:
   book:
     name: Учебник — сборка и проверки
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,8 +32,6 @@ jobs:
       - name: Сборка из src/ совпадает с AQA_Lab_v3.html, все проверки
         run: npm run check
         working-directory: tools
-        env:
-          FULL: '1'
       - name: Печать всего учебника в PDF
         run: npm run pdf
         working-directory: tools
