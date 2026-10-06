@@ -52,7 +52,7 @@ self.onmessage = async (e: MessageEvent<Req & { base?: string }>) => {
       await p.runPythonAsync(`
 import os, sys, shutil
 shutil.rmtree('/work', ignore_errors=True); os.makedirs('/work')
-for name in [n for n, mod in list(sys.modules.items()) if getattr(mod, '__file__', None) and str(mod.__file__).startswith('/work')]:
+for name in [n for n, mod in list(sys.modules.items()) if getattr(mod, '__file__', None) and str(mod.__file__).startswith(('/work', '/tmp', '/home'))]:
     del sys.modules[name]
 `);
       for (const [n, c] of Object.entries(m.files)) p.FS.writeFile('/work/' + n, c);

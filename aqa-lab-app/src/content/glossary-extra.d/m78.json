@@ -1,0 +1,157 @@
+{
+ "$comment": "Модули 7 (SQL) и 8 (Python): новые термины и привязка терминов v3 к урокам модуля 7.",
+ "null-sql": { "lesson": "sql-null" },
+ "join": { "lesson": "sql-join" },
+ "group-by": { "lesson": "sql-group" },
+ "subquery": { "lesson": "sql-subquery" },
+ "constraint": { "lesson": "sql-constraints" },
+ "primary-key": { "lesson": "sql-constraints" },
+ "foreign-key": { "lesson": "sql-constraints" },
+ "transaction": { "lesson": "sql-transactions" },
+ "acid": { "lesson": "sql-transactions" },
+ "sql-injection": { "lesson": "sql-params" },
+ "order-by": {
+  "en": "ORDER BY",
+  "ru": "Сортировка результата",
+  "def": "Часть <code>SELECT</code>, задающая порядок строк. Без <code>ORDER BY</code> порядок строк не гарантирован. Если по первому ключу возможны равенства, нужен второй ключ (tie-breaker), иначе порядок равных строк случаен.",
+  "aliases": "сортировка, ORDER BY, tie-breaker",
+  "lesson": "sql-select",
+  "example": "SELECT title, price FROM products ORDER BY price DESC, title LIMIT 3;"
+ },
+ "aggregate-function": {
+  "en": "Aggregate function",
+  "ru": "Агрегатная функция",
+  "def": "Функция, которая сводит много строк к одному значению: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>. <code>COUNT(*)</code> считает строки, <code>COUNT(столбец)</code> и остальные агрегаты пропускают <code>NULL</code>.",
+  "aliases": "агрегат, COUNT, SUM, AVG",
+  "lesson": "sql-group",
+  "example": "SELECT order_id, SUM(qty * price) FROM order_items GROUP BY order_id;"
+ },
+ "having": {
+  "en": "HAVING",
+  "ru": "Фильтр групп",
+  "def": "Условие на группы после <code>GROUP BY</code>: в нём можно использовать агрегаты. <code>WHERE</code> отбирает строки до группировки, <code>HAVING</code> — группы после неё.",
+  "aliases": "HAVING",
+  "lesson": "sql-group",
+  "example": "… GROUP BY order_id HAVING SUM(qty * price) > 1000"
+ },
+ "left-join": {
+  "en": "LEFT JOIN",
+  "ru": "Левое внешнее соединение",
+  "def": "Соединение, которое сохраняет все строки левой таблицы; если пары в правой нет, её столбцы заполняются <code>NULL</code>. Нужен, когда отчёт должен включать «пустые» случаи, например пользователей без заказов.",
+  "aliases": "LEFT OUTER JOIN, внешнее соединение",
+  "lesson": "sql-join",
+  "example": "SELECT u.email, o.id FROM users u LEFT JOIN orders o ON o.user_id = u.id;"
+ },
+ "dml": {
+  "en": "DML (Data Manipulation Language)",
+  "ru": "Команды изменения данных",
+  "def": "Часть SQL для изменения строк: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>. В тестах — подготовка и очистка данных. <code>UPDATE</code> и <code>DELETE</code> без <code>WHERE</code> затрагивают все строки таблицы.",
+  "aliases": "INSERT, UPDATE, DELETE",
+  "lesson": "sql-dml",
+  "example": "DELETE FROM orders WHERE status = 'cancelled';"
+ },
+ "upsert": {
+  "en": "Upsert (ON CONFLICT)",
+  "ru": "Вставка или обновление",
+  "def": "Вставка, которая при конфликте уникальности не падает, а ничего не делает или обновляет строку: в PostgreSQL — <code>INSERT … ON CONFLICT (столбец) DO NOTHING | DO UPDATE</code>. Делает подготовку тестовых данных идемпотентной.",
+  "aliases": "ON CONFLICT, INSERT OR UPDATE",
+  "lesson": "sql-constraints",
+  "example": "INSERT INTO products (...) VALUES (...) ON CONFLICT (sku) DO NOTHING;"
+ },
+ "rollback": {
+  "en": "ROLLBACK",
+  "ru": "Откат транзакции",
+  "def": "Команда, отменяющая все изменения текущей транзакции с момента <code>BEGIN</code>. Противоположность <code>COMMIT</code>. Частичный откат — <code>ROLLBACK TO SAVEPOINT</code>.",
+  "aliases": "откат, ROLLBACK, SAVEPOINT",
+  "lesson": "sql-transactions",
+  "example": "BEGIN; UPDATE products SET stock = 0; ROLLBACK; -- остатки прежние"
+ },
+ "parameterized-query": {
+  "en": "Parameterized query",
+  "ru": "Параметризованный запрос",
+  "def": "Запрос, в котором значения заменены плейсхолдерами (<code>$1</code>, <code>$2</code> в PostgreSQL), а сами значения передаются отдельно. База не разбирает значения как SQL, поэтому запрос защищён от SQL-инъекции.",
+  "aliases": "prepared statement, плейсхолдер, $1, bind-параметр",
+  "lesson": "sql-params",
+  "example": "await db.query('SELECT * FROM orders WHERE id = $1', [orderId]);"
+ },
+ "db-index": {
+  "en": "Index (database)",
+  "ru": "Индекс базы данных",
+  "def": "Дополнительная структура (обычно B-tree), по которой база находит строки без полного просмотра таблицы. Ускоряет поиск, но замедляет вставку и занимает место. Используется ли индекс, показывает <code>EXPLAIN</code>.",
+  "aliases": "индекс, CREATE INDEX, EXPLAIN",
+  "lesson": "sql-windows",
+  "example": "CREATE INDEX orders_user_id_idx ON orders (user_id);"
+ },
+ "python-list": {
+  "en": "List (Python)",
+  "ru": "Список",
+  "def": "Изменяемая упорядоченная коллекция Python: <code>[1, 2, 3]</code>. Элементы доступны по индексу с нуля, <code>len()</code> — длина, <code>append()</code> — добавление в конец.",
+  "aliases": "list, список Python",
+  "lesson": "py-lists-dicts",
+  "example": "titles = [\"Блокнот A5\", \"Кружка\"]\ntitles.append(\"Лампа\")"
+ },
+ "python-dict": {
+  "en": "Dictionary (Python)",
+  "ru": "Словарь",
+  "def": "Коллекция пар «ключ → значение»: <code>{\"id\": 101, \"status\": \"paid\"}</code>. Значение по ключу — <code>d[\"id\"]</code> (ошибка <code>KeyError</code>, если ключа нет) или <code>d.get(\"id\")</code> (вернёт <code>None</code>). JSON-объект в Python читается как словарь.",
+  "aliases": "dict, словарь Python",
+  "lesson": "py-lists-dicts",
+  "example": "order = {\"id\": 101, \"status\": \"paid\"}\norder[\"status\"]  # 'paid'"
+ },
+ "f-string": {
+  "en": "f-string",
+  "ru": "Форматированная строка",
+  "def": "Строка с префиксом <code>f</code>, в которую подставляются выражения в фигурных скобках: <code>f\"Итого: {total} ₽\"</code>. После двоеточия задаётся формат: <code>{price:.2f}</code>, <code>{n:,}</code>.",
+  "aliases": "f-строка, форматирование строк",
+  "lesson": "py-strings-numbers",
+  "example": "f\"Заказ №{order_id} на сумму {total:.2f} ₽\""
+ },
+ "list-comprehension": {
+  "en": "List comprehension",
+  "ru": "Генератор списка",
+  "def": "Короткая запись цикла, который строит новый список: <code>[i[\"title\"] for i in items if i[\"qty\"] > 0]</code>.",
+  "aliases": "списковое включение, comprehension",
+  "lesson": "py-conditions-loops",
+  "example": "bad = [i[\"sku\"] for i in items if i[\"qty\"] <= 0]"
+ },
+ "pip": {
+  "en": "pip",
+  "ru": "Менеджер пакетов Python",
+  "def": "Стандартная утилита для установки пакетов Python из PyPI: <code>python -m pip install pytest</code>. Ставит пакеты в активное окружение.",
+  "aliases": "pip install, PyPI",
+  "lesson": "py-venv",
+  "example": "python -m pip install -r requirements.txt"
+ },
+ "requirements-txt": {
+  "en": "requirements.txt",
+  "ru": "Файл зависимостей",
+  "def": "Текстовый файл со списком пакетов и версий (<code>pytest==9.1.1</code>), по которому <code>pip install -r</code> воспроизводит окружение на другой машине и в CI.",
+  "aliases": "requirements, зависимости Python",
+  "lesson": "py-venv",
+  "example": "pytest==9.1.1\nrequests==2.32.5"
+ },
+ "pytest-fixture": {
+  "en": "pytest fixture",
+  "ru": "Фикстура pytest",
+  "def": "Функция с декоратором <code>@pytest.fixture</code>, которая готовит данные или объект для теста. Тест получает её результат, указав имя фикстуры в параметрах. Код после <code>yield</code> выполняется после теста (очистка).",
+  "aliases": "@pytest.fixture, fixture pytest",
+  "lesson": "py-fixtures",
+  "example": "@pytest.fixture\ndef cart():\n    return Cart()\n\ndef test_empty(cart):\n    assert cart.count() == 0"
+ },
+ "pytest-parametrize": {
+  "en": "pytest.mark.parametrize",
+  "ru": "Параметризация теста",
+  "def": "Декоратор pytest, который запускает одну тестовую функцию для нескольких наборов аргументов; каждый набор — отдельный тест в отчёте.",
+  "aliases": "parametrize, параметризация",
+  "lesson": "py-fixtures",
+  "example": "@pytest.mark.parametrize(\"qty, total\", [(1, 390), (2, 780)])\ndef test_total(qty, total): ..."
+ },
+ "float-precision": {
+  "en": "Floating-point precision",
+  "ru": "Точность чисел с плавающей точкой",
+  "def": "Числа <code>float</code> хранятся в двоичном виде приближённо, поэтому <code>0.1 + 0.2 != 0.3</code>. Деньги считают в копейках (целыми) или через <code>decimal.Decimal</code>, а float сравнивают с допуском (<code>pytest.approx</code>, <code>math.isclose</code>).",
+  "aliases": "float, Decimal, округление",
+  "lesson": "py-strings-numbers",
+  "example": "0.1 + 0.2 == 0.3  # False\nDecimal(\"0.1\") + Decimal(\"0.2\") == Decimal(\"0.3\")  # True"
+ }
+}
