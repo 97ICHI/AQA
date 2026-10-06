@@ -207,7 +207,7 @@ table.result td.null { color: var(--faint); font-style: italic; }
 .ll-label { display: block; font-size: .82rem; color: var(--muted); margin-top: 10px; }
 .ll-input { width: calc(100% - 28px); font: .86rem var(--mono); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line2); background: var(--code-bg); color: var(--text); }
 .ll-status { font-size: .88rem; } .ll-status.ok { color: var(--ok); } .ll-status.bad { color: var(--bad); } .ll-status.warn { color: var(--warn); }
-.ll-page { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; background: #fff; color: #1b1f36; font-size: .88rem; }
+.ll-page { color-scheme: light; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; background: #fff; color: #1b1f36; font-size: .88rem; }
 .ll-page h2 { font-size: 1rem; margin: 6px 0; } .ll-page h3 { font-size: .9rem; margin: 4px 0; }
 .ll-page a { color: #1f6fd1; } .ll-page button { font: inherit; font-size: .82rem; padding: 3px 10px; border-radius: 6px; border: 1px solid #b8bedc; background: #eef0fb; color: #1b1f36; }
 .ll-page input[type=search] { font: inherit; padding: 3px 6px; border: 1px solid #b8bedc; border-radius: 5px; }

@@ -8,9 +8,9 @@ const FIXTURE = `
 <h2>Аудио</h2>
 <label for="ll-q">Поиск товара</label> <input id="ll-q" type="search" placeholder="Например, наушники">
 <ul class="ll-list">
-  <li class="ll-card"><img alt="Наушники Pulse" src=""><h3>Наушники Pulse</h3><p>4 990 ₽</p><button type="button">В корзину</button></li>
-  <li class="ll-card"><img alt="Наушники Pulse Pro" src=""><h3>Наушники Pulse Pro</h3><p>7 990 ₽</p><button type="button">В корзину</button></li>
-  <li class="ll-card"><img alt="Кабель USB-C" src=""><h3>Кабель USB-C</h3><p>590 ₽</p><button type="button" aria-label="Добавить кабель в корзину">+</button></li>
+  <li class="ll-card"><img alt="Наушники Pulse" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"><h3>Наушники Pulse</h3><p>4 990 ₽</p><button type="button">В корзину</button></li>
+  <li class="ll-card"><img alt="Наушники Pulse Pro" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"><h3>Наушники Pulse Pro</h3><p>7 990 ₽</p><button type="button">В корзину</button></li>
+  <li class="ll-card"><img alt="Кабель USB-C" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"><h3>Кабель USB-C</h3><p>590 ₽</p><button type="button" aria-label="Добавить кабель в корзину">+</button></li>
 </ul>
 <label><input type="checkbox"> Только в наличии</label>
 <button type="button" data-testid="checkout">Оформить заказ</button>
