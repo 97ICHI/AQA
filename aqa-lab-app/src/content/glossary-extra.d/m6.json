@@ -1,0 +1,34 @@
+{
+ "ui-mode": {
+  "en": "UI Mode",
+  "ru": "UI-режим Playwright",
+  "def": "Интерактивное окно Playwright Test (<code>npx playwright test --ui</code>): список тестов, запуск по одному, шкала времени с DOM-снимками каждого шага, сеть и консоль, режим наблюдения за изменениями файлов.",
+  "aliases": "UI Mode, --ui",
+  "lesson": "pw-debug",
+  "example": "npx playwright test tests/cart.spec.ts --ui"
+ },
+ "playwright-inspector": {
+  "en": "Playwright Inspector",
+  "ru": "Инспектор Playwright",
+  "def": "Окно отладки, которое открывается при <code>--debug</code> или <code>page.pause()</code>: выполнение по шагам, подсветка элемента, найденного локатором, подбор локатора на живой странице.",
+  "aliases": "Inspector, инспектор, page.pause",
+  "lesson": "pw-debug",
+  "example": "npx playwright test -g \"итог корзины\" --debug"
+ },
+ "screenshot-baseline": {
+  "en": "Screenshot baseline",
+  "ru": "Эталонный снимок",
+  "def": "Сохранённый в репозитории скриншот, с которым <code>toHaveScreenshot</code> сравнивает текущий снимок. Создаётся при первом запуске или командой <code>--update-snapshots</code>; зависит от браузера, ОС, шрифтов и размера окна.",
+  "aliases": "baseline, эталон, golden image, snapshot",
+  "lesson": "pw-visual",
+  "example": "tests/cart.spec.ts-snapshots/cart-total-chromium-linux.png"
+ },
+ "partial-mock": {
+  "en": "Partial mock",
+  "ru": "Частичная подмена ответа",
+  "def": "Перехват, при котором запрос всё-таки уходит на настоящий сервер (<code>route.fetch()</code>), а тест меняет только часть ответа — например, одно поле JSON — и отдаёт его странице через <code>route.fulfill({ response, json })</code>.",
+  "aliases": "route.fetch, модификация ответа",
+  "lesson": "pw-mocks",
+  "example": "const response = await route.fetch();\nconst json = await response.json();\nawait route.fulfill({ response, json: { ...json, count: 99 } });"
+ }
+}
