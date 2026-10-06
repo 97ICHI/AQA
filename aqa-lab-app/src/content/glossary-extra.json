@@ -1,0 +1,63 @@
+{
+ "$comment": "Термины приложения, которых нет в глоссарии v3, и переопределения поля lesson. После правки: npm run import-glossary.",
+ "test-case": {
+  "en": "Test case",
+  "ru": "Тестовый сценарий",
+  "def": "Описание одной проверки: исходное состояние, шаги, данные и <b>ожидаемый результат</b>. Автотест — это test case, записанный кодом.",
+  "aliases": "тест-кейс, сценарий",
+  "lesson": "intro-what-is-test",
+  "example": "Дано: в корзине пусто. Шаги: добавить «Блокнот A5» дважды. Ожидается: итог 780 ₽."
+ },
+ "base-url": {
+  "en": "baseURL",
+  "ru": "Базовый адрес",
+  "def": "Настройка Playwright Test (<code>use.baseURL</code>): относительные адреса вроде <code>page.goto('/')</code> и запросы <code>request.get('/api/…')</code> дополняются до полного URL. Позволяет запускать те же тесты на разных стендах.",
+  "aliases": "base url",
+  "lesson": "pw-first-test-lines",
+  "example": "use: { baseURL: 'http://127.0.0.1:3000' }\nawait page.goto('/cart'); // → http://127.0.0.1:3000/cart"
+ },
+ "aqa-runner": {
+  "en": "AQA Lab runner",
+  "ru": "Локальный runner",
+  "def": "Небольшой сервер из этого приложения (<code>npm run runner</code>), который на вашем компьютере запускает настоящий Playwright Test для кода из урока и поднимает учебный магазин. Слушает только 127.0.0.1 и требует токен. Это не песочница.",
+  "aliases": "runner",
+  "lesson": "intro-first-test"
+ },
+ "defect": {
+  "en": "Defect",
+  "ru": "Дефект",
+  "def": "Расхождение фактического поведения системы с ожидаемым (требованием). Падение теста указывает на дефект только если сам тест и окружение исправны.",
+  "aliases": "баг, bug",
+  "lesson": "intro-failure",
+  "example": "Ожидалось: счётчик корзины = 1. Получено: 0 — товар не добавился."
+ },
+ "pytest": {
+  "en": "pytest",
+  "ru": "pytest",
+  "def": "Фреймворк тестирования для Python: функции <code>test_*</code>, обычный <code>assert</code> с подробным сообщением о падении, fixtures и параметризация.",
+  "aliases": "py.test",
+  "lesson": "py-pytest",
+  "example": "def test_total():\n    assert cart_total([{\"price\": 390, \"qty\": 2}]) == 780"
+ },
+ "cte": {
+  "en": "CTE (WITH)",
+  "ru": "Общее табличное выражение",
+  "def": "Именованный подзапрос в начале запроса: <code>WITH paid AS (SELECT …) SELECT … FROM paid</code>. Делает сложный запрос читаемым по шагам.",
+  "aliases": "WITH, common table expression",
+  "lesson": "sql-subquery"
+ },
+ "window-function": {
+  "en": "Window function",
+  "ru": "Оконная функция",
+  "def": "Функция, которая считает значение по набору связанных строк (окну), не схлопывая их, как GROUP BY: <code>ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at)</code>.",
+  "aliases": "OVER, PARTITION BY, ROW_NUMBER",
+  "lesson": "sql-windows"
+ },
+ "virtualenv": {
+  "en": "Virtual environment",
+  "ru": "Виртуальное окружение",
+  "def": "Отдельная папка с интерпретатором Python и пакетами проекта (<code>python -m venv .venv</code>), чтобы зависимости разных проектов не смешивались.",
+  "aliases": "venv, .venv",
+  "lesson": "py-venv"
+ }
+}

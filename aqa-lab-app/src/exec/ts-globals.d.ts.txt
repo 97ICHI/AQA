@@ -1,0 +1,21 @@
+// Глобальные объекты, доступные коду в тренажёре (без DOM: код выполняется в Web Worker).
+interface Console { log(...data: any[]): void; info(...data: any[]): void; warn(...data: any[]): void; error(...data: any[]): void; table(data: any): void; }
+declare var console: Console;
+declare function setTimeout(handler: (...args: any[]) => void, timeout?: number, ...args: any[]): number;
+declare function clearTimeout(id: number | undefined): void;
+declare function setInterval(handler: (...args: any[]) => void, timeout?: number, ...args: any[]): number;
+declare function clearInterval(id: number | undefined): void;
+declare function queueMicrotask(callback: () => void): void;
+declare function structuredClone<T>(value: T): T;
+/** Учебная задержка: Promise, который выполнится через ms миллисекунд. */
+declare function sleep(ms: number): Promise<void>;
+/** Учебный «сервер»: возвращает JSON заказа с задержкой, как настоящий API (данные учебные). */
+declare function fakeFetchOrder(id: number): Promise<unknown>;
+/** Мини-тесты тренажёра: test('название', () => { ... }) — тело может быть async. */
+declare function test(name: string, fn: () => unknown): void;
+/** Сравнивает значения по содержимому (как JSON) и падает с сообщением «ожидалось …, получено …». */
+declare function expectEq(actual: unknown, expected: unknown, message?: string): void;
+/** Падает с сообщением message, если value ложно. */
+declare function expectTrue(value: unknown, message: string): void;
+/** Ожидает, что fn бросит ошибку (или вернёт отклонённый Promise). Используйте с await. */
+declare function expectThrows(fn: () => unknown, message: string): Promise<void>;

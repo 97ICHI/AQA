@@ -1,0 +1,2529 @@
+{
+ "aqa": {
+  "en": "Automation QA",
+  "ru": "Автоматизированное обеспечение качества",
+  "def": "Направление QA, в котором проверки проектируются и выполняются с помощью кода: автотесты, тестовые данные, запуск в CI и анализ результатов.",
+  "aliases": "AQA, автотестировщик, SDET, automation engineer",
+  "lesson": "intro-what-is-test",
+  "v3": {
+   "ch": "aqa-intro",
+   "anchor": "role"
+  }
+ },
+ "regression-testing": {
+  "en": "Regression Testing",
+  "ru": "Регрессионное тестирование",
+  "def": "Повторная проверка уже работающей функциональности после изменений, чтобы убедиться, что ничего не сломалось.",
+  "aliases": "регресс, регрессия",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "regression-smoke"
+  }
+ },
+ "test-automation-roi": {
+  "en": "Test Automation ROI",
+  "ru": "Окупаемость автоматизации",
+  "def": "Отношение выгоды от автоматизации к вложениям: (экономия − затраты) / затраты. Учитывает разработку, поддержку и инфраструктуру.",
+  "aliases": "ROI, окупаемость",
+  "lesson": "intro-what-is-test",
+  "v3": {
+   "ch": "aqa-intro",
+   "anchor": "economics"
+  }
+ },
+ "checking": {
+  "en": "Checking",
+  "ru": "Проверка по известному ожиданию",
+  "def": "Сравнение фактического результата с заранее известным ожидаемым. Всё, что делает автотест, — checking; исследование продукта человеком называют testing.",
+  "aliases": "",
+  "lesson": "intro-what-is-test",
+  "v3": {
+   "ch": "aqa-intro",
+   "anchor": "testing-checking"
+  }
+ },
+ "exploratory-testing": {
+  "en": "Exploratory Testing",
+  "ru": "Исследовательское тестирование",
+  "def": "Тестирование, в котором проектирование, выполнение и анализ проверок идут одновременно, а следующий шаг выбирается по результатам предыдущего.",
+  "aliases": "",
+  "lesson": "intro-what-is-test",
+  "v3": {
+   "ch": "aqa-intro",
+   "anchor": "testing-checking"
+  }
+ },
+ "test-oracle": {
+  "en": "Test Oracle",
+  "ru": "Тестовый оракул",
+  "def": "Источник правильного ожидаемого результата: требования, спецификация, эталонный расчёт, предыдущая версия системы.",
+  "aliases": "оракул",
+  "lesson": "intro-what-is-test",
+  "v3": {
+   "ch": "aqa-intro",
+   "anchor": "testing-checking"
+  },
+  "example": "Сумма заказа = количество × цена из требований, а не «то, что вернул сервер в прошлый раз»."
+ },
+ "unit-testing": {
+  "en": "Unit Testing",
+  "ru": "Модульное тестирование",
+  "def": "Проверка отдельной функции, метода или класса изолированно от сети, базы данных и других компонентов.",
+  "aliases": "юнит-тест, модульный тест",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "unit"
+  }
+ },
+ "integration-testing": {
+  "en": "Integration Testing",
+  "ru": "Интеграционное тестирование",
+  "def": "Проверка совместной работы нескольких компонентов: сервиса и базы данных, двух модулей, сервиса и очереди.",
+  "aliases": "",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "integration"
+  }
+ },
+ "api-testing": {
+  "en": "API Testing",
+  "ru": "Тестирование API",
+  "def": "Проверка системы через программный интерфейс: отправка запросов и проверка статуса, заголовков, тела ответа и побочных эффектов.",
+  "aliases": "",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "api"
+  }
+ },
+ "ui-testing": {
+  "en": "UI Testing",
+  "ru": "Тестирование интерфейса",
+  "def": "Проверка через пользовательский интерфейс в браузере: действия пользователя и видимый результат.",
+  "aliases": "",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "ui"
+  }
+ },
+ "e2e-testing": {
+  "en": "End-to-end Testing",
+  "ru": "Сквозное тестирование",
+  "def": "Проверка полного пользовательского сценария через все слои системы: интерфейс, бэкенд, базу данных и интеграции.",
+  "aliases": "E2E, e2e, сквозной тест",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "e2e"
+  }
+ },
+ "smoke-testing": {
+  "en": "Smoke Testing",
+  "ru": "Дымовое тестирование",
+  "def": "Короткий набор базовых проверок, что система запускается и ключевые функции работают; выполняется сразу после сборки или деплоя.",
+  "aliases": "smoke, смоук",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "regression-smoke"
+  }
+ },
+ "contract-testing": {
+  "en": "Contract Testing",
+  "ru": "Контрактное тестирование",
+  "def": "Проверка, что поставщик API отвечает так, как ожидает потребитель, без развёртывания всей системы.",
+  "aliases": "",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "cdc"
+  }
+ },
+ "test-pyramid": {
+  "en": "Test Automation Pyramid",
+  "ru": "Пирамида автоматизации тестирования",
+  "def": "Эвристика: много быстрых низкоуровневых тестов, меньше интеграционных и API, мало UI и E2E. Проверяйте риск на самом низком надёжном уровне.",
+  "aliases": "пирамида тестирования, testing trophy, ice-cream cone",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-types",
+   "anchor": "pyramid"
+  }
+ },
+ "equivalence-partitioning": {
+  "en": "Equivalence Partitioning",
+  "ru": "Разбиение на классы эквивалентности",
+  "def": "Техника Test Design: входные значения делятся на классы с одинаковым поведением системы, из каждого класса берётся один представитель.",
+  "aliases": "классы эквивалентности, EP",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "ep"
+  }
+ },
+ "boundary-value-analysis": {
+  "en": "Boundary Value Analysis",
+  "ru": "Анализ граничных значений",
+  "def": "Техника Test Design: проверяются значения на границах классов эквивалентности и рядом с ними, где ошибки наиболее вероятны.",
+  "aliases": "BVA, граничные значения",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "bva"
+  },
+  "example": "Для количества 1–10 проверяют 0, 1, 10 и 11."
+ },
+ "decision-table": {
+  "en": "Decision Table",
+  "ru": "Таблица решений",
+  "def": "Таблица, где каждое правило — комбинация условий и соответствующее действие. Помогает найти пропущенные комбинации и минимальный набор тестов.",
+  "aliases": "",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "decision-table"
+  }
+ },
+ "state-transition-testing": {
+  "en": "State Transition Testing",
+  "ru": "Тестирование переходов состояний",
+  "def": "Проверка допустимых и недопустимых переходов объекта между состояниями по событиям: заказ, платёж, учётная запись.",
+  "aliases": "",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "state"
+  }
+ },
+ "negative-testing": {
+  "en": "Negative Testing",
+  "ru": "Негативное тестирование",
+  "def": "Проверка реакции системы на некорректные данные и недопустимые действия: понятная ошибка, правильный код ответа, отсутствие побочных эффектов.",
+  "aliases": "негативные тесты, positive testing",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "positive-negative"
+  }
+ },
+ "risk-based-testing": {
+  "en": "Risk-based Testing",
+  "ru": "Тестирование на основе рисков",
+  "def": "Приоритизация проверок по риску: вероятность дефекта × его влияние на бизнес и пользователей.",
+  "aliases": "",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "risk"
+  }
+ },
+ "data-driven-testing": {
+  "en": "Data-driven Testing",
+  "ru": "Тестирование, управляемое данными",
+  "def": "Подход, при котором одна логика теста выполняется для набора входных данных и ожиданий; каждый набор — отдельный тест в отчёте.",
+  "aliases": "параметризованные тесты, parameterized tests",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "bva-code"
+  }
+ },
+ "test-coverage": {
+  "en": "Test Coverage",
+  "ru": "Тестовое покрытие",
+  "def": "Доля требований, сценариев или рисков, для которых существуют проверки. Считается по трассировке «требование → тесты».",
+  "aliases": "покрытие требований, requirements coverage",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-quality",
+   "anchor": "test-coverage"
+  }
+ },
+ "code-coverage": {
+  "en": "Code Coverage",
+  "ru": "Покрытие кода",
+  "def": "Доля кода приложения, выполненного во время тестов (строки, ветви, функции). Показывает непроверенный код, но не качество проверок.",
+  "aliases": "line coverage, statement coverage, покрытие кода",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-quality",
+   "anchor": "code-coverage"
+  }
+ },
+ "branch-coverage": {
+  "en": "Branch Coverage",
+  "ru": "Покрытие ветвей",
+  "def": "Доля пройденных ветвей условий (if/else, ?:, &amp;&amp;, ||). Строже покрытия строк.",
+  "aliases": "",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-quality",
+   "anchor": "code-coverage"
+  }
+ },
+ "mutation-testing": {
+  "en": "Mutation Testing",
+  "ru": "Мутационное тестирование",
+  "def": "Оценка силы тестов: в код вносятся небольшие изменения (мутанты), и проверяется, падают ли тесты. Доля «убитых» мутантов — mutation score.",
+  "aliases": "Stryker, mutation score",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-quality",
+   "anchor": "mutation"
+  }
+ },
+ "test-maintainability": {
+  "en": "Test Maintainability",
+  "ru": "Поддерживаемость тестов",
+  "def": "Насколько легко понять, изменить и починить тест: читаемость, отсутствие дублирования, устойчивые локаторы, независимость.",
+  "aliases": "",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-quality",
+   "anchor": "maintainability"
+  }
+ },
+ "test-reliability": {
+  "en": "Test Reliability",
+  "ru": "Надёжность тестов",
+  "def": "Способность теста давать одинаковый результат при одинаковом коде и окружении; падать только при реальной проблеме.",
+  "aliases": "",
+  "lesson": "qa-risk",
+  "v3": {
+   "ch": "test-quality",
+   "anchor": "reliability"
+  }
+ },
+ "typescript": {
+  "en": "TypeScript",
+  "ru": "TypeScript (язык)",
+  "def": "Надстройка над JavaScript со статической типизацией. Типы проверяются компилятором tsc до запуска и удаляются при преобразовании в JavaScript.",
+  "aliases": "TS, tsc",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "why"
+  }
+ },
+ "type-annotation": {
+  "en": "Type Annotation",
+  "ru": "Аннотация типа",
+  "def": "Явное указание типа переменной, параметра или результата: <code>let id: number</code>. Там, где тип очевиден из значения, TypeScript выводит его сам.",
+  "aliases": "",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "variables"
+  }
+ },
+ "union-type": {
+  "en": "Union Type",
+  "ru": "Объединение типов",
+  "def": "Тип «одно из»: <code>string | null</code> или <code>'paid' | 'shipped'</code>. Ограничивает допустимые значения и ловит опечатки при компиляции.",
+  "aliases": "",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "typing"
+  }
+ },
+ "interface-ts": {
+  "en": "Interface",
+  "ru": "Интерфейс",
+  "def": "Описание формы объекта в TypeScript: поля и их типы. Используется для тестовых данных, ответов API и параметров.",
+  "aliases": "",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "interfaces"
+  }
+ },
+ "generics": {
+  "en": "Generics",
+  "ru": "Обобщённые типы",
+  "def": "Параметры типа (<code>&lt;T&gt;</code>), позволяющие писать функции и классы, которые работают с любым типом и сохраняют информацию о нём.",
+  "aliases": "",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "typing"
+  }
+ },
+ "type-narrowing": {
+  "en": "Type Narrowing",
+  "ru": "Сужение типа",
+  "def": "Проверки (<code>typeof</code>, <code>instanceof</code>, <code>in</code>, type guard), после которых компилятор знает более точный тип значения.",
+  "aliases": "type guard",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "narrowing"
+  }
+ },
+ "es-module": {
+  "en": "ES Module",
+  "ru": "Модуль ECMAScript",
+  "def": "Файл с собственной областью видимости; обменивается кодом с другими файлами через <code>import</code> и <code>export</code>.",
+  "aliases": "import, export, модуль",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "modules"
+  }
+ },
+ "exception": {
+  "en": "Exception",
+  "ru": "Исключение",
+  "def": "Объект ошибки, выброшенный <code>throw</code>, который прерывает выполнение до ближайшего <code>catch</code>. Неудачная проверка в тесте — тоже исключение.",
+  "aliases": "try catch, throw, Error",
+  "lesson": "ts-js-vs-ts",
+  "v3": {
+   "ch": "ts-basics",
+   "anchor": "errors"
+  }
+ },
+ "event-loop": {
+  "en": "Event Loop",
+  "ru": "Цикл событий",
+  "def": "Механизм однопоточного JavaScript: берёт задачу из очереди, выполняет её до опустошения стека, затем выполняет все микрозадачи и переходит к следующей задаче.",
+  "aliases": "",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "event-loop"
+  }
+ },
+ "call-stack": {
+  "en": "Call Stack",
+  "ru": "Стек вызовов",
+  "def": "Стек функций, выполняемых в данный момент. Каждый вызов добавляет кадр, возврат — снимает. Stack trace — снимок стека в момент ошибки.",
+  "aliases": "",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "event-loop"
+  }
+ },
+ "promise": {
+  "en": "Promise",
+  "ru": "Промис (обещание результата)",
+  "def": "Объект, представляющий результат асинхронной операции: pending, затем fulfilled со значением или rejected с ошибкой.",
+  "aliases": "",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "promise"
+  },
+  "example": "page.goto('/') возвращает Promise; await дожидается загрузки страницы."
+ },
+ "async-await": {
+  "en": "async/await",
+  "ru": "Асинхронные функции и ожидание",
+  "def": "Синтаксис поверх Promise: <code>async</code>-функция возвращает Promise, <code>await</code> приостанавливает её до результата, не блокируя поток.",
+  "aliases": "await, async",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "async-await"
+  },
+  "example": "async ({ page }) => { await page.goto('/'); } — функция ждёт загрузку, прежде чем идти дальше."
+ },
+ "microtask": {
+  "en": "Microtask",
+  "ru": "Микрозадача",
+  "def": "Колбэк Promise или продолжение после <code>await</code>. Все микрозадачи выполняются сразу после текущей задачи, раньше таймеров.",
+  "aliases": "macrotask, task queue, очередь задач",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "event-loop"
+  }
+ },
+ "race-condition": {
+  "en": "Race Condition",
+  "ru": "Состояние гонки",
+  "def": "Ситуация, когда результат зависит от того, какая из параллельных операций завершится первой. Частая причина нестабильных тестов.",
+  "aliases": "гонка",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "race"
+  }
+ },
+ "floating-promise": {
+  "en": "Floating Promise",
+  "ru": "«Висящий» промис",
+  "def": "Promise, который не ожидается <code>await</code> и не обрабатывается. В тестах приводит к действиям после проверки и потерянным ошибкам.",
+  "aliases": "забытый await",
+  "lesson": "ts-async",
+  "v3": {
+   "ch": "async",
+   "anchor": "errors"
+  }
+ },
+ "map-set": {
+  "en": "Map / Set",
+  "ru": "Словарь / Множество",
+  "def": "Коллекции JavaScript: <code>Map</code> хранит пары «ключ → значение» с ключами любого типа, <code>Set</code> — уникальные значения.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "map-set"
+  }
+ },
+ "json": {
+  "en": "JSON",
+  "ru": "JSON (формат данных)",
+  "def": "Текстовый формат обмена данными (объекты, массивы, строки, числа, true/false, null). Основной формат тел запросов и ответов REST API.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "json"
+  }
+ },
+ "oop": {
+  "en": "Object-Oriented Programming",
+  "ru": "Объектно-ориентированное программирование",
+  "def": "Подход, в котором данные и поведение объединяются в объекты (классы). В тестах — page objects, клиенты API, фабрики данных.",
+  "aliases": "ООП, OOP, class, класс",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "oop"
+  }
+ },
+ "composition": {
+  "en": "Composition",
+  "ru": "Композиция",
+  "def": "Построение объекта из других объектов-компонентов («содержит») вместо наследования («является»). Гибче глубоких иерархий.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "composition"
+  }
+ },
+ "dry": {
+  "en": "DRY",
+  "ru": "Не повторяйся",
+  "def": "Don't Repeat Yourself: каждое знание описано в одном месте. В тестах применяется к инфраструктуре: локаторам, клиентам, фикстурам.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "dry"
+  }
+ },
+ "damp": {
+  "en": "DAMP",
+  "ru": "Описательные и осмысленные фразы",
+  "def": "Descriptive And Meaningful Phrases: тело теста должно читаться как самостоятельный сценарий, даже ценой небольшого повтора.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "dry"
+  }
+ },
+ "solid": {
+  "en": "SOLID",
+  "ru": "Принципы SOLID",
+  "def": "Пять принципов проектирования: единственная ответственность, открытость/закрытость, подстановка Лисков, разделение интерфейсов, инверсия зависимостей.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "solid"
+  }
+ },
+ "clean-code": {
+  "en": "Clean Code",
+  "ru": "Чистый код",
+  "def": "Код, который легко читать и менять: понятные имена, маленькие функции, отсутствие магических значений и мёртвого кода.",
+  "aliases": "",
+  "lesson": "ts-arrays-objects",
+  "v3": {
+   "ch": "code-org",
+   "anchor": "clean-code"
+  }
+ },
+ "breakpoint": {
+  "en": "Breakpoint",
+  "ru": "Точка останова",
+  "def": "Отметка на строке кода, перед выполнением которой отладчик останавливает программу, чтобы можно было изучить переменные и стек.",
+  "aliases": "step over, step into, step out",
+  "lesson": "intro-failure",
+  "v3": {
+   "ch": "debugging",
+   "anchor": "breakpoints"
+  }
+ },
+ "stack-trace": {
+  "en": "Stack Trace",
+  "ru": "Трассировка стека",
+  "def": "Список вызовов функций в момент ошибки: верхний кадр — место выброса, ниже — кто его вызвал. Содержит файлы, строки и колонки.",
+  "aliases": "",
+  "lesson": "intro-failure",
+  "v3": {
+   "ch": "debugging",
+   "anchor": "stack"
+  }
+ },
+ "logging": {
+  "en": "Logging",
+  "ru": "Логирование",
+  "def": "Запись событий во время выполнения. В тестах — привязанные к шагам записи с идентификаторами данных, без секретов, прикреплённые к отчёту.",
+  "aliases": "логи, логи тестов",
+  "lesson": "intro-failure",
+  "v3": {
+   "ch": "debugging",
+   "anchor": "logging"
+  }
+ },
+ "debug-mode": {
+  "en": "Debug Mode",
+  "ru": "Режим отладки",
+  "def": "Запуск тестов с паузами и пошаговым выполнением. В Playwright: <code>--debug</code> (Inspector), <code>--ui</code> (UI Mode), <code>page.pause()</code>.",
+  "aliases": "PWDEBUG, Playwright Inspector, UI Mode",
+  "lesson": "intro-failure",
+  "v3": {
+   "ch": "debugging",
+   "anchor": "playwright-debug"
+  }
+ },
+ "trace-viewer": {
+  "en": "Trace Viewer",
+  "ru": "Просмотрщик трассировки",
+  "def": "Инструмент Playwright для разбора записанного прогона: действия, DOM-снимки до и после, скриншоты, сеть, консоль и исходный код.",
+  "aliases": "trace, show-trace, трассировка",
+  "lesson": "intro-failure",
+  "v3": {
+   "ch": "debugging",
+   "anchor": "playwright-debug"
+  }
+ },
+ "client-server": {
+  "en": "Client-server Architecture",
+  "ru": "Клиент-серверная архитектура",
+  "def": "Модель, в которой клиент (браузер, приложение, тест) отправляет запросы, а сервер их обрабатывает и возвращает ответы.",
+  "aliases": "",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "client-server"
+  }
+ },
+ "frontend": {
+  "en": "Frontend",
+  "ru": "Клиентская часть",
+  "def": "Часть приложения, выполняемая в браузере: HTML, CSS, JavaScript. Показывает интерфейс и вызывает backend по HTTP.",
+  "aliases": "фронтенд, SPA",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "client-server"
+  }
+ },
+ "backend": {
+  "en": "Backend",
+  "ru": "Серверная часть",
+  "def": "Серверное приложение: принимает запросы, проверяет права, выполняет бизнес-логику и работает с базой данных.",
+  "aliases": "бэкенд, сервер",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "client-server"
+  }
+ },
+ "dns": {
+  "en": "DNS",
+  "ru": "Система доменных имён",
+  "def": "Domain Name System: переводит доменное имя (shop.example.com) в IP-адрес. Ответы кэшируются на время TTL.",
+  "aliases": "",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "dns"
+  }
+ },
+ "tcp-ip": {
+  "en": "TCP/IP",
+  "ru": "Стек протоколов TCP/IP",
+  "def": "Набор протоколов передачи данных: IP доставляет пакеты между компьютерами, TCP — надёжный упорядоченный поток между процессами (портами).",
+  "aliases": "TCP, IP, порт, ECONNREFUSED",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "tcp-ip"
+  }
+ },
+ "http": {
+  "en": "HTTP",
+  "ru": "Протокол передачи гипертекста",
+  "def": "Протокол «запрос–ответ» без хранения состояния: метод, URL, заголовки и тело запроса; код статуса, заголовки и тело ответа.",
+  "aliases": "",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "anatomy"
+  }
+ },
+ "https-tls": {
+  "en": "HTTPS / TLS",
+  "ru": "Защищённый HTTP",
+  "def": "HTTP поверх TLS: шифрование трафика, проверка подлинности сервера по сертификату и защита целостности данных.",
+  "aliases": "TLS, SSL, сертификат, ignoreHTTPSErrors",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "http-https"
+  }
+ },
+ "cookie": {
+  "en": "Cookie",
+  "ru": "Куки",
+  "def": "Небольшие данные, которые сервер сохраняет в браузере заголовком Set-Cookie; браузер отправляет их в последующих запросах к домену.",
+  "aliases": "куки, Set-Cookie, HttpOnly, SameSite",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "cookies-sessions"
+  }
+ },
+ "session": {
+  "en": "Session",
+  "ru": "Сессия",
+  "def": "Состояние пользователя между запросами. При серверной сессии cookie хранит только идентификатор, а данные лежат на сервере.",
+  "aliases": "",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "cookies-sessions"
+  }
+ },
+ "authentication": {
+  "en": "Authentication",
+  "ru": "Аутентификация",
+  "def": "Проверка, кто обращается к системе: пароль, токен, второй фактор. Неудача обычно — 401 Unauthorized.",
+  "aliases": "AuthN, 401, логин",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "auth"
+  }
+ },
+ "authorization": {
+  "en": "Authorization",
+  "ru": "Авторизация",
+  "def": "Проверка прав уже известного пользователя на действие или ресурс. Неудача обычно — 403 Forbidden.",
+  "aliases": "AuthZ, 403, права доступа, IDOR",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "auth"
+  }
+ },
+ "jwt": {
+  "en": "JWT",
+  "ru": "JSON Web Token",
+  "def": "Подписанный токен с данными пользователя и сроком действия. Сервер проверяет подпись без обращения к хранилищу сессий.",
+  "aliases": "Bearer token, токен",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "web-arch",
+   "anchor": "cookies-sessions"
+  }
+ },
+ "http-method": {
+  "en": "HTTP Method",
+  "ru": "HTTP-метод",
+  "def": "Намерение запроса: GET — получить, POST — создать, PUT — заменить, PATCH — изменить часть, DELETE — удалить, а также HEAD и OPTIONS.",
+  "aliases": "GET, POST, PUT, PATCH, DELETE, verb",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "methods"
+  }
+ },
+ "status-code": {
+  "en": "Status Code",
+  "ru": "Код состояния HTTP",
+  "def": "Трёхзначный код результата: 2xx — успех, 3xx — перенаправление, 4xx — ошибка клиента, 5xx — ошибка сервера.",
+  "aliases": "200, 201, 204, 400, 404, 409, 422, 500, код ответа",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "status-codes"
+  }
+ },
+ "http-header": {
+  "en": "HTTP Header",
+  "ru": "Заголовок HTTP",
+  "def": "Пара «имя: значение» с метаданными запроса или ответа: Content-Type, Authorization, Location, Retry-After. Имена нечувствительны к регистру.",
+  "aliases": "headers, Content-Type, Accept, Authorization",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "headers"
+  }
+ },
+ "rest": {
+  "en": "REST",
+  "ru": "Архитектурный стиль REST",
+  "def": "Representational State Transfer: ресурсы адресуются URL-существительными, действия выражаются методами HTTP, сервер не хранит состояние клиента между запросами.",
+  "aliases": "RESTful, REST API",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "rest"
+  }
+ },
+ "idempotency": {
+  "en": "Idempotency",
+  "ru": "Идемпотентность",
+  "def": "Свойство операции давать одинаковое состояние на сервере при повторах. Идемпотентны GET, PUT, DELETE; POST — нет без Idempotency-Key.",
+  "aliases": "Idempotency-Key, идемпотентный",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "idempotency"
+  },
+  "example": "Повторный DELETE /api/orders/42 не меняет состояние: заказ уже удалён."
+ },
+ "query-parameter": {
+  "en": "Query Parameter",
+  "ru": "Параметр строки запроса",
+  "def": "Пара «ключ=значение» после <code>?</code> в URL: фильтры, сортировка, поиск, пагинация.",
+  "aliases": "query string, параметры запроса",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "params"
+  }
+ },
+ "path-parameter": {
+  "en": "Path Parameter",
+  "ru": "Параметр пути",
+  "def": "Часть пути URL, идентифицирующая ресурс: <code>/orders/{id}</code>.",
+  "aliases": "",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "params"
+  }
+ },
+ "pagination": {
+  "en": "Pagination",
+  "ru": "Постраничная выдача",
+  "def": "Разбиение большого списка на страницы: offset/limit (номер страницы) или курсор (указатель на следующую порцию).",
+  "aliases": "пагинация, cursor, offset, limit",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "pagination"
+  }
+ },
+ "rate-limiting": {
+  "en": "Rate Limiting",
+  "ru": "Ограничение частоты запросов",
+  "def": "Ограничение числа запросов клиента за интервал. При превышении — 429 Too Many Requests и заголовок Retry-After.",
+  "aliases": "429, throttling, лимит запросов",
+  "lesson": "web-http",
+  "v3": {
+   "ch": "http-rest",
+   "anchor": "rate-limit"
+  }
+ },
+ "sql": {
+  "en": "SQL",
+  "ru": "Язык структурированных запросов",
+  "def": "Язык запросов к реляционным базам данных: выборка (SELECT), изменение (INSERT, UPDATE, DELETE) и описание структуры (CREATE, ALTER).",
+  "aliases": "PostgreSQL, запрос, SELECT",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "why"
+  }
+ },
+ "primary-key": {
+  "en": "Primary Key",
+  "ru": "Первичный ключ",
+  "def": "Столбец или набор столбцов, однозначно идентифицирующий строку таблицы: уникален и не может быть NULL.",
+  "aliases": "PK",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "why"
+  }
+ },
+ "foreign-key": {
+  "en": "Foreign Key",
+  "ru": "Внешний ключ",
+  "def": "Столбец, ссылающийся на первичный ключ другой таблицы. База не даёт сослаться на несуществующую строку или удалить строку, на которую есть ссылки.",
+  "aliases": "FK, REFERENCES",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "why"
+  }
+ },
+ "join": {
+  "en": "JOIN",
+  "ru": "Соединение таблиц",
+  "def": "Объединение строк нескольких таблиц по условию. INNER JOIN оставляет совпадения, LEFT JOIN — все строки левой таблицы.",
+  "aliases": "INNER JOIN, LEFT JOIN",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "join"
+  }
+ },
+ "null-sql": {
+  "en": "NULL",
+  "ru": "Отсутствующее значение",
+  "def": "Маркер неизвестного или отсутствующего значения в SQL. Сравнение с NULL даёт NULL; проверять нужно через IS NULL.",
+  "aliases": "IS NULL, COALESCE",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "null"
+  }
+ },
+ "group-by": {
+  "en": "GROUP BY",
+  "ru": "Группировка",
+  "def": "Объединение строк в группы для подсчёта агрегатов (COUNT, SUM, AVG, MIN, MAX). HAVING фильтрует группы после агрегации.",
+  "aliases": "HAVING, агрегатная функция",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "group-by"
+  }
+ },
+ "subquery": {
+  "en": "Subquery",
+  "ru": "Подзапрос",
+  "def": "Запрос внутри другого запроса: скалярный, со списком (IN), проверка существования (EXISTS). CTE (WITH) — именованный подзапрос.",
+  "aliases": "EXISTS, CTE, WITH",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "subquery"
+  }
+ },
+ "constraint": {
+  "en": "Constraint",
+  "ru": "Ограничение целостности",
+  "def": "Правило, которое база проверяет при каждом изменении: PRIMARY KEY, UNIQUE, NOT NULL, FOREIGN KEY, CHECK.",
+  "aliases": "UNIQUE, CHECK, NOT NULL",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "constraints"
+  }
+ },
+ "transaction": {
+  "en": "Transaction",
+  "ru": "Транзакция",
+  "def": "Группа операций, которая выполняется целиком или не выполняется совсем: BEGIN … COMMIT или ROLLBACK.",
+  "aliases": "BEGIN, COMMIT, ROLLBACK",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "transactions"
+  }
+ },
+ "acid": {
+  "en": "ACID",
+  "ru": "Свойства транзакций ACID",
+  "def": "Atomicity, Consistency, Isolation, Durability — гарантии транзакций: всё или ничего, соблюдение ограничений, изоляция параллельных транзакций, сохранность после фиксации.",
+  "aliases": "",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "transactions"
+  }
+ },
+ "sql-injection": {
+  "en": "SQL Injection",
+  "ru": "SQL-инъекция",
+  "def": "Уязвимость, при которой данные пользователя попадают в текст SQL-запроса и меняют его смысл. Защита — параметризованные запросы.",
+  "aliases": "параметризованный запрос, $1",
+  "lesson": "sql-select",
+  "v3": {
+   "ch": "sql",
+   "anchor": "in-tests"
+  }
+ },
+ "git": {
+  "en": "Git",
+  "ru": "Система контроля версий Git",
+  "def": "Распределённая система контроля версий: хранит историю изменений как граф коммитов и позволяет вести параллельную работу в ветках.",
+  "aliases": "",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "basics"
+  }
+ },
+ "commit": {
+  "en": "Commit",
+  "ru": "Коммит",
+  "def": "Снимок состояния проекта с автором, датой, сообщением и ссылкой на родительский коммит.",
+  "aliases": "",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "basics"
+  }
+ },
+ "branch": {
+  "en": "Branch",
+  "ru": "Ветка",
+  "def": "Подвижный указатель на последний коммит линии разработки. Каждая задача ведётся в своей ветке.",
+  "aliases": "",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "basics"
+  }
+ },
+ "merge-request": {
+  "en": "Merge Request",
+  "ru": "Запрос на слияние",
+  "def": "Предложение влить изменения ветки в основную с обсуждением, ревью и проверкой CI. В GitHub называется Pull Request.",
+  "aliases": "MR, Pull Request, PR, code review",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "workflow"
+  }
+ },
+ "rebase": {
+  "en": "Rebase",
+  "ru": "Перебазирование",
+  "def": "Перенос коммитов ветки поверх другого коммита (обычно свежего main) с созданием новых коммитов; даёт линейную историю.",
+  "aliases": "merge, squash",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "merge-rebase"
+  }
+ },
+ "merge-conflict": {
+  "en": "Merge Conflict",
+  "ru": "Конфликт слияния",
+  "def": "Ситуация, когда обе стороны изменили одни и те же строки и Git не может совместить изменения автоматически.",
+  "aliases": "конфликт",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "conflicts"
+  }
+ },
+ "gitignore": {
+  "en": ".gitignore",
+  "ru": "Список игнорируемых файлов",
+  "def": "Файл с шаблонами путей, которые Git не отслеживает: зависимости, отчёты, артефакты, секреты.",
+  "aliases": "",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "gitignore"
+  }
+ },
+ "linux-shell": {
+  "en": "Linux Shell",
+  "ru": "Командная оболочка Linux",
+  "def": "Интерфейс командной строки (bash, sh, zsh) для работы с файлами, процессами, сетью и запуском программ.",
+  "aliases": "bash, терминал, консоль, grep, tail, curl",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "linux"
+  }
+ },
+ "environment-variable": {
+  "en": "Environment Variable",
+  "ru": "Переменная окружения",
+  "def": "Именованное значение, доступное процессу и его дочерним процессам. Основной способ передать конфигурацию и секреты в тесты и CI.",
+  "aliases": "env, process.env, export",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "linux"
+  }
+ },
+ "playwright": {
+  "en": "Playwright",
+  "ru": "Playwright (инструмент)",
+  "def": "Инструмент автоматизации браузеров Chromium, Firefox и WebKit с API для JS/TS, Python, Java и .NET.",
+  "aliases": "",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "what"
+  },
+  "example": "npx playwright test запускает тесты; page.getByRole(...) находит элемент на странице."
+ },
+ "playwright-test": {
+  "en": "Playwright Test",
+  "ru": "Тестовый раннер Playwright",
+  "def": "Раннер <code>@playwright/test</code>: параллельный запуск в воркерах, фикстуры, web-first assertions, ретраи, проекты, отчёты и trace.",
+  "aliases": "@playwright/test, раннер",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "what"
+  }
+ },
+ "browser-context": {
+  "en": "BrowserContext",
+  "ru": "Контекст браузера",
+  "def": "Изолированная сессия внутри браузера со своими cookies, хранилищем, кэшем и разрешениями. Каждый тест получает новый контекст.",
+  "aliases": "context, контекст",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "hierarchy"
+  }
+ },
+ "page-object-pw": {
+  "en": "Page",
+  "ru": "Страница (вкладка)",
+  "def": "Вкладка браузера в контексте. Через неё выполняются навигация, действия и поиск элементов.",
+  "aliases": "",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "hierarchy"
+  }
+ },
+ "worker": {
+  "en": "Worker",
+  "ru": "Воркер (рабочий процесс)",
+  "def": "Отдельный процесс ОС, в котором Playwright Test выполняет тесты. Браузер переиспользуется тестами одного воркера; после падения теста воркер перезапускается.",
+  "aliases": "workers, воркеры, workerIndex",
+  "lesson": "pw-parallel",
+  "v3": {
+   "ch": "parallel",
+   "anchor": "workers"
+  }
+ },
+ "playwright-config": {
+  "en": "playwright.config.ts",
+  "ru": "Конфигурация Playwright",
+  "def": "Файл настроек раннера: каталог тестов, таймауты, ретраи, воркеры, репортеры, опции браузера (use), проекты и webServer.",
+  "aliases": "defineConfig, use, baseURL, projects",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "config"
+  }
+ },
+ "headless": {
+  "en": "Headless Mode",
+  "ru": "Режим без окна",
+  "def": "Запуск браузера без графического окна: быстрее и подходит для CI. Противоположность — headed.",
+  "aliases": "headless, headed",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "cli"
+  }
+ },
+ "cdp": {
+  "en": "Chrome DevTools Protocol",
+  "ru": "Протокол инструментов разработчика Chrome",
+  "def": "Протокол управления Chromium по постоянному соединению; через него Playwright управляет Chromium-браузерами.",
+  "aliases": "CDP",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": "pw-arch",
+   "anchor": "protocol"
+  }
+ },
+ "locator": {
+  "en": "Locator",
+  "ru": "Локатор",
+  "def": "Ленивое описание того, как найти элемент на странице. В Playwright поиск выполняется заново при каждом действии и проверке.",
+  "aliases": "getByRole, селектор",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "what"
+  },
+  "example": "page.getByRole('button', { name: 'Войти' }) — описание кнопки «Войти», по которому Playwright найдёт её при действии."
+ },
+ "accessible-name": {
+  "en": "Accessible Name",
+  "ru": "Доступное имя",
+  "def": "Имя элемента для вспомогательных технологий: из aria-labelledby, aria-label, связанного label, текста или alt. По нему ищет <code>getByRole(..., { name })</code>.",
+  "aliases": "",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "role"
+  },
+  "example": "Имя кнопки <button aria-label=\"Удалить\">🗑</button> — «Удалить», хотя на экране только значок."
+ },
+ "aria-role": {
+  "en": "ARIA Role",
+  "ru": "ARIA-роль",
+  "def": "Назначение элемента для вспомогательных технологий: button, link, textbox, checkbox, heading и др. Бывает явной (атрибут role) и неявной (из тега).",
+  "aliases": "role, роль, accessibility",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "role"
+  }
+ },
+ "test-id": {
+  "en": "Test ID",
+  "ru": "Тестовый идентификатор",
+  "def": "Атрибут разметки для тестов (по умолчанию data-testid). Устойчив к изменениям текста и вёрстки; ищется через <code>getByTestId</code>.",
+  "aliases": "data-testid, getByTestId, testIdAttribute",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "testid"
+  }
+ },
+ "css-selector": {
+  "en": "CSS Selector",
+  "ru": "CSS-селектор",
+  "def": "Выражение выбора элементов по тегам, классам, id, атрибутам и структуре DOM. Проходит через открытый Shadow DOM.",
+  "aliases": "",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "css-xpath"
+  }
+ },
+ "xpath": {
+  "en": "XPath",
+  "ru": "Язык путей XPath",
+  "def": "Язык выбора узлов XML/HTML по пути и условиям. Мощный, но привязан к структуре и не проходит через Shadow DOM.",
+  "aliases": "",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "css-xpath"
+  }
+ },
+ "strict-mode": {
+  "en": "Strict Mode",
+  "ru": "Строгий режим локаторов",
+  "def": "Правило Playwright: действие с локатором, нашедшим больше одного элемента, завершается ошибкой strict mode violation.",
+  "aliases": "strict mode violation",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "strict"
+  },
+  "example": "getByRole('button', { name: 'Удалить' }) нашёл 3 кнопки — действие падает вместо клика по случайной."
+ },
+ "shadow-dom": {
+  "en": "Shadow DOM",
+  "ru": "Теневой DOM",
+  "def": "Инкапсулированное поддерево веб-компонента. Локаторы Playwright проходят через открытый Shadow DOM, XPath — нет.",
+  "aliases": "iframe, frameLocator",
+  "lesson": "web-dom",
+  "v3": {
+   "ch": "locators",
+   "anchor": "frames-shadow"
+  }
+ },
+ "assertion": {
+  "en": "Assertion",
+  "ru": "Проверка (утверждение)",
+  "def": "Сравнение фактического результата с ожидаемым; при несовпадении тест падает. В Playwright — через <code>expect</code>.",
+  "aliases": "expect, проверка",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "assertion"
+  },
+  "example": "await expect(page.getByRole('status')).toHaveText('Заказ создан: 2000 ₽') — тест упадёт, если текст другой."
+ },
+ "web-first-assertion": {
+  "en": "Web-first Assertion",
+  "ru": "Асинхронная проверка с ожиданием",
+  "def": "Проверка локатора или страницы, которая повторяет поиск и сравнение, пока условие не выполнится или не истечёт таймаут: toBeVisible, toHaveText, toHaveURL.",
+  "aliases": "toHaveText, toBeVisible, auto-retrying assertion",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "web-first"
+  },
+  "example": "await expect(locator).toBeVisible() повторяет проверку до таймаута, а не читает состояние один раз."
+ },
+ "auto-waiting": {
+  "en": "Auto-waiting",
+  "ru": "Автоматическое ожидание",
+  "def": "Встроенное ожидание Playwright: перед действием элемент проверяется на готовность (actionability), web-first проверки повторяются до таймаута.",
+  "aliases": "",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "auto-waiting"
+  }
+ },
+ "actionability": {
+  "en": "Actionability Checks",
+  "ru": "Проверки готовности к действию",
+  "def": "Условия, которые Playwright проверяет перед действием: элемент видим, стабилен, получает события, доступен и (для ввода) редактируем.",
+  "aliases": "actionability, force",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "auto-waiting"
+  }
+ },
+ "explicit-wait": {
+  "en": "Explicit Wait",
+  "ru": "Явное ожидание",
+  "def": "Ожидание конкретного события или условия, заданного тестом: ответа сервера, URL, скачивания, значения через expect.poll.",
+  "aliases": "waitForResponse, waitForURL, expect.poll, toPass, waitForTimeout",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "explicit-wait"
+  }
+ },
+ "timeout": {
+  "en": "Timeout",
+  "ru": "Тайм-аут",
+  "def": "Предел времени ожидания. В Playwright: тест — 30 с, expect — 5 с, действие и навигация — без отдельного лимита по умолчанию.",
+  "aliases": "test.setTimeout, test.slow, actionTimeout",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "timeouts"
+  }
+ },
+ "soft-assertion": {
+  "en": "Soft Assertion",
+  "ru": "Мягкая проверка",
+  "def": "Проверка (<code>expect.soft</code>), которая не прерывает тест при неудаче: ошибки собираются, и тест помечается упавшим в конце.",
+  "aliases": "",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "soft"
+  }
+ },
+ "test-retry": {
+  "en": "Test Retry",
+  "ru": "Повтор теста",
+  "def": "Повторный запуск упавшего теста (<code>retries</code>). Прошедший со второй попытки тест получает статус flaky.",
+  "aliases": "retries, ретрай, повторы",
+  "lesson": "pw-actions",
+  "v3": {
+   "ch": "assertions",
+   "anchor": "retries"
+  }
+ },
+ "flaky-test": {
+  "en": "Flaky Test",
+  "ru": "Нестабильный тест",
+  "def": "Тест, который при одинаковом коде и окружении то проходит, то падает. Подрывает доверие к автоматизации.",
+  "aliases": "флаки, нестабильный тест, flaky",
+  "lesson": "pw-timeouts",
+  "v3": {
+   "ch": "flaky",
+   "anchor": "what"
+  },
+  "example": "Тест корзины проходит локально и иногда падает в CI, потому что читает сумму до её пересчёта."
+ },
+ "fixture": {
+  "en": "Fixture",
+  "ru": "Фикстура",
+  "def": "Именованный ресурс, который тест запрашивает в параметрах: фикстура готовит значение, передаёт его через use() и убирает за собой после теста.",
+  "aliases": "test.extend, use, фикстуры",
+  "lesson": "pw-fixtures",
+  "v3": {
+   "ch": "fixtures",
+   "anchor": "fixtures"
+  },
+  "example": "Fixture user создаёт пользователя перед тестом и удаляет его после теста, даже если тест упал."
+ },
+ "hook": {
+  "en": "Hook",
+  "ru": "Хук",
+  "def": "Функция, выполняемая до или после тестов блока: beforeEach, afterEach, beforeAll, afterAll.",
+  "aliases": "beforeEach, afterEach, beforeAll, afterAll",
+  "lesson": "pw-fixtures",
+  "v3": {
+   "ch": "fixtures",
+   "anchor": "hooks"
+  }
+ },
+ "setup-teardown": {
+  "en": "Setup / Teardown",
+  "ru": "Подготовка / Очистка",
+  "def": "Действия до теста (создать данные, открыть страницу) и после него (удалить данные, закрыть ресурсы). Teardown должен выполняться и при падении теста.",
+  "aliases": "",
+  "lesson": "pw-fixtures",
+  "v3": {
+   "ch": "fixtures",
+   "anchor": "why"
+  }
+ },
+ "fixture-scope": {
+  "en": "Fixture Scope",
+  "ru": "Область жизни фикстуры",
+  "def": "Как долго живёт значение фикстуры: test — новое для каждого теста, worker — одно на процесс-воркер.",
+  "aliases": "",
+  "lesson": "pw-fixtures",
+  "v3": {
+   "ch": "fixtures",
+   "anchor": "scope"
+  }
+ },
+ "test-isolation": {
+  "en": "Test Isolation",
+  "ru": "Изоляция тестов",
+  "def": "Независимость тестов: каждый можно запустить отдельно, в любом порядке, параллельно и повторно с тем же результатом.",
+  "aliases": "независимость тестов, изоляция",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "isolation",
+   "anchor": "principles"
+  }
+ },
+ "auto-fixture": {
+  "en": "Auto Fixture",
+  "ru": "Автоматическая фикстура",
+  "def": "Фикстура с опцией auto: true, которая выполняется для каждого теста без явного запроса — например, для сбора логов.",
+  "aliases": "",
+  "lesson": "pw-fixtures",
+  "v3": {
+   "ch": "fixtures",
+   "anchor": "scope"
+  }
+ },
+ "page-object-model": {
+  "en": "Page Object Model",
+  "ru": "Модель объектов страниц",
+  "def": "Паттерн: каждая страница описывается классом с локаторами и действиями пользователя; тесты используют эти методы и не знают о вёрстке.",
+  "aliases": "POM, Page Object, PageObject",
+  "lesson": "ts-classes",
+  "v3": {
+   "ch": "pom",
+   "anchor": "why"
+  },
+  "example": "class CartPage { total = this.page.getByTestId('total'); } — тест обращается к cart.total, а не к селектору."
+ },
+ "page-component": {
+  "en": "Page Component",
+  "ru": "Компонент страницы",
+  "def": "Класс для повторяющейся части интерфейса (шапка, карточка товара, модальное окно), который получает корневой локатор и используется разными страницами.",
+  "aliases": "",
+  "lesson": "ts-classes",
+  "v3": {
+   "ch": "pom",
+   "anchor": "components"
+  }
+ },
+ "separation-of-concerns": {
+  "en": "Separation of Concerns",
+  "ru": "Разделение ответственности",
+  "def": "Принцип: разные задачи — в разных слоях. В тестах: сценарии, фикстуры, страницы, компоненты, API-клиенты и данные меняются независимо.",
+  "aliases": "",
+  "lesson": "ts-classes",
+  "v3": {
+   "ch": "pom",
+   "anchor": "responsibility"
+  }
+ },
+ "storage-state": {
+  "en": "Storage State",
+  "ru": "Сохранённое состояние браузера",
+  "def": "Снимок cookies и localStorage контекста в JSON-файле. Позволяет войти один раз и стартовать тесты уже авторизованными.",
+  "aliases": "storageState, авторизация, setup project",
+  "lesson": "pw-context",
+  "v3": {
+   "ch": "pw-advanced",
+   "anchor": "auth"
+  },
+  "example": "Файл playwright/.auth/user.json хранит cookies входа, чтобы не логиниться в каждом тесте."
+ },
+ "network-interception": {
+  "en": "Network Interception",
+  "ru": "Перехват сетевых запросов",
+  "def": "Перехват запросов страницы (<code>page.route</code>) с возможностью подменить ответ, оборвать запрос, изменить его или модифицировать реальный ответ.",
+  "aliases": "page.route, route.fulfill, route.abort, HAR",
+  "lesson": "pw-context",
+  "v3": {
+   "ch": "pw-advanced",
+   "anchor": "network"
+  }
+ },
+ "project-pw": {
+  "en": "Project",
+  "ru": "Проект Playwright",
+  "def": "Именованная конфигурация запуска набора тестов: браузер, устройство, окружение, роль; проекты могут зависеть друг от друга (setup, teardown).",
+  "aliases": "projects, dependencies",
+  "lesson": "pw-context",
+  "v3": {
+   "ch": "pw-advanced",
+   "anchor": "projects"
+  }
+ },
+ "visual-testing": {
+  "en": "Visual Testing",
+  "ru": "Визуальное тестирование",
+  "def": "Сравнение скриншота страницы или элемента с эталонным снимком (<code>toHaveScreenshot</code>) с допуском и маскированием изменчивых областей.",
+  "aliases": "toHaveScreenshot, скриншот, snapshot",
+  "lesson": "pw-context",
+  "v3": {
+   "ch": "pw-advanced",
+   "anchor": "screenshots"
+  }
+ },
+ "clock-api": {
+  "en": "Clock API",
+  "ru": "Управление временем",
+  "def": "API <code>page.clock</code>: подмена Date и таймеров в браузере, перемотка времени для тестов, зависящих от даты и таймаутов.",
+  "aliases": "page.clock, fake timers",
+  "lesson": "pw-context",
+  "v3": {
+   "ch": "pw-advanced",
+   "anchor": "clock"
+  }
+ },
+ "endpoint": {
+  "en": "Endpoint",
+  "ru": "Конечная точка API",
+  "def": "Комбинация метода и пути, по которой API выполняет операцию: <code>POST /api/orders</code>, <code>GET /api/orders/{id}</code>.",
+  "aliases": "эндпоинт, ручка",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "why"
+  }
+ },
+ "api-authentication": {
+  "en": "API Authentication",
+  "ru": "Аутентификация в API",
+  "def": "Способ подтвердить, кто обращается к API: API key, Basic, Bearer-токен, OAuth 2.0, cookie сессии.",
+  "aliases": "Bearer, Basic auth",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "auth"
+  }
+ },
+ "api-key": {
+  "en": "API Key",
+  "ru": "Ключ API",
+  "def": "Секретная строка, идентифицирующая клиента API; передаётся в заголовке (например, X-API-Key).",
+  "aliases": "",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "auth"
+  }
+ },
+ "oauth2": {
+  "en": "OAuth 2.0",
+  "ru": "Протокол авторизации OAuth 2.0",
+  "def": "Стандарт выдачи токенов доступа. В межсервисном взаимодействии — client credentials: клиент обменивает свой id и секрет на access token.",
+  "aliases": "OAuth, access token, client credentials",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "auth"
+  }
+ },
+ "response-validation": {
+  "en": "Response Validation",
+  "ru": "Проверка ответа",
+  "def": "Послойная проверка ответа API: статус, заголовки, структура (схема), значения и побочные эффекты.",
+  "aliases": "",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "validation"
+  }
+ },
+ "error-handling-api": {
+  "en": "Error Handling",
+  "ru": "Обработка ошибок",
+  "def": "Поведение API при ошибках: правильный код 4xx/5xx, единый формат тела с кодом и полем, отсутствие утечек внутренней информации.",
+  "aliases": "",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "errors"
+  }
+ },
+ "postman": {
+  "en": "Postman",
+  "ru": "Postman (инструмент)",
+  "def": "Инструмент для работы с API: коллекции, окружения, скрипты и проверки; коллекции запускаются из CLI через Newman.",
+  "aliases": "Newman, коллекция",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "postman"
+  }
+ },
+ "api-request-context": {
+  "en": "APIRequestContext",
+  "ru": "HTTP-контекст Playwright",
+  "def": "HTTP-клиент Playwright (фикстура request, page.request, request.newContext): отправка запросов с baseURL, заголовками и cookies без браузера.",
+  "aliases": "request fixture, APIResponse, toBeOK",
+  "lesson": "pw-api",
+  "v3": {
+   "ch": "api-auto",
+   "anchor": "request"
+  }
+ },
+ "api-client": {
+  "en": "API Client",
+  "ru": "Клиент API",
+  "def": "Класс с типизированными методами для эндпоинтов одного ресурса; скрывает пути, формат тела и разбор ответов.",
+  "aliases": "",
+  "lesson": "pw-api",
+  "v3": {
+   "ch": "api-auto",
+   "anchor": "clients"
+  }
+ },
+ "api-fixture": {
+  "en": "API Fixture",
+  "ru": "API-фикстура",
+  "def": "Фикстура, которая даёт тесту авторизованный клиент или созданную через API сущность и удаляет её после теста.",
+  "aliases": "",
+  "lesson": "pw-api",
+  "v3": {
+   "ch": "api-auto",
+   "anchor": "fixtures"
+  }
+ },
+ "test-data-cleanup": {
+  "en": "Test Data Cleanup",
+  "ru": "Очистка тестовых данных",
+  "def": "Удаление данных, созданных тестом. Надёжнее всего — в teardown фикстуры, который выполняется и при падении.",
+  "aliases": "cleanup, teardown, удаление данных",
+  "lesson": "pw-api",
+  "v3": {
+   "ch": "api-auto",
+   "anchor": "fixtures"
+  }
+ },
+ "json-schema": {
+  "en": "JSON Schema",
+  "ru": "Схема JSON",
+  "def": "Стандарт описания структуры JSON: типы, обязательные поля, допустимые значения, форматы, вложенные объекты и массивы.",
+  "aliases": "schema, required, additionalProperties",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "json-schema"
+  }
+ },
+ "schema-validation": {
+  "en": "Schema Validation",
+  "ru": "Проверка по схеме",
+  "def": "Проверка, что данные (обычно ответ API) соответствуют JSON Schema; в TypeScript чаще всего выполняется библиотекой Ajv.",
+  "aliases": "Ajv, валидация схемы",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "validation"
+  }
+ },
+ "openapi": {
+  "en": "OpenAPI",
+  "ru": "Спецификация OpenAPI",
+  "def": "Машиночитаемое описание HTTP API: пути, методы, параметры, тела запросов, ответы по кодам и схемы данных. Ранее называлась Swagger.",
+  "aliases": "Swagger, спецификация API",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "openapi"
+  }
+ },
+ "consumer-driven-contracts": {
+  "en": "Consumer-driven Contracts",
+  "ru": "Контракты, управляемые потребителем",
+  "def": "Подход, при котором потребитель фиксирует свои ожидания от API в контракте, а поставщик проверяет, что их выполняет.",
+  "aliases": "CDC, consumer, provider",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "cdc"
+  }
+ },
+ "pact": {
+  "en": "Pact",
+  "ru": "Pact (инструмент)",
+  "def": "Инструмент consumer-driven contract testing: тесты потребителя создают pact-файл, брокер хранит контракты, провайдер их проверяет, can-i-deploy разрешает деплой.",
+  "aliases": "Pact Broker, can-i-deploy",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "cdc"
+  }
+ },
+ "backward-compatibility": {
+  "en": "Backward Compatibility",
+  "ru": "Обратная совместимость",
+  "def": "Свойство новой версии API работать со старыми клиентами. Удаление и переименование полей, смена типов ломают совместимость.",
+  "aliases": "breaking change, версионирование API",
+  "lesson": "ts-unknown",
+  "v3": {
+   "ch": "contracts",
+   "anchor": "compatibility"
+  }
+ },
+ "test-double": {
+  "en": "Test Double",
+  "ru": "Тестовый дублёр",
+  "def": "Общее название подмен реальной зависимости в тесте: dummy, stub, spy, mock, fake.",
+  "aliases": "дублёр, подмена",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "test-doubles"
+  }
+ },
+ "stub": {
+  "en": "Stub",
+  "ru": "Заглушка",
+  "def": "Test double, который возвращает заранее заданные ответы, чтобы код мог выполниться в нужном сценарии.",
+  "aliases": "стаб, stubbing",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "test-doubles"
+  }
+ },
+ "mock-object": {
+  "en": "Mock Object",
+  "ru": "Мок-объект",
+  "def": "Test double, который заранее знает ожидаемые вызовы (сколько раз, с какими аргументами) и проверяет их.",
+  "aliases": "",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "test-doubles"
+  }
+ },
+ "spy": {
+  "en": "Spy",
+  "ru": "Шпион",
+  "def": "Test double, который записывает вызовы зависимости для последующей проверки в тесте.",
+  "aliases": "",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "test-doubles"
+  }
+ },
+ "fake": {
+  "en": "Fake",
+  "ru": "Упрощённая реализация",
+  "def": "Test double с работающей, но упрощённой логикой: in-memory база, локальный SMTP, фейковый платёжный шлюз.",
+  "aliases": "",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "test-doubles"
+  }
+ },
+ "mocking": {
+  "en": "Mocking",
+  "ru": "Подмена зависимостей",
+  "def": "Замена реальной зависимости (сервиса, ответа сети, модуля) управляемой подменой ради скорости, стабильности и проверки редких сценариев.",
+  "aliases": "моки, mock, замокать",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "why"
+  }
+ },
+ "service-virtualization": {
+  "en": "Service Virtualization",
+  "ru": "Виртуализация сервисов",
+  "def": "Мок-сервер, имитирующий внешний сервис по сети (WireMock, MSW, Mockoon, Prism), чтобы тестировать систему без реальных соседей.",
+  "aliases": "мок-сервер, WireMock, MSW",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "levels"
+  }
+ },
+ "test-data-management": {
+  "en": "Test Data Management",
+  "ru": "Управление тестовыми данными",
+  "def": "Подходы к созданию, хранению, изоляции и удалению тестовых данных: создание в тесте, сиды, генерация, обезличенные копии, снимки.",
+  "aliases": "TDM, тестовые данные, seed, Faker",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "tdm"
+  }
+ },
+ "determinism": {
+  "en": "Determinism",
+  "ru": "Детерминированность",
+  "def": "Свойство теста давать одинаковый результат при одинаковом коде и данных: контролируемые время, случайность, внешние сервисы и данные.",
+  "aliases": "",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "mocking",
+   "anchor": "determinism"
+  }
+ },
+ "test-framework": {
+  "en": "Test Framework",
+  "ru": "Тестовый фреймворк (проекта)",
+  "def": "Код проекта вокруг инструмента: конфигурация, фикстуры, клиенты API, page objects, фабрики данных, отчётность — общий язык предметной области для тестов.",
+  "aliases": "фреймворк автотестов",
+  "lesson": "ts-modules",
+  "v3": {
+   "ch": "project-arch",
+   "anchor": "what"
+  }
+ },
+ "project-structure": {
+  "en": "Project Structure",
+  "ru": "Структура проекта",
+  "def": "Раскладка репозитория автотестов по слоям: tests, fixtures, api, pages, components, data, schemas, config, utils.",
+  "aliases": "",
+  "lesson": "ts-modules",
+  "v3": {
+   "ch": "project-arch",
+   "anchor": "structure"
+  }
+ },
+ "config-management": {
+  "en": "Configuration Management",
+  "ru": "Управление конфигурацией",
+  "def": "Получение настроек окружения (адреса, учётные данные, флаги) из одного модуля с проверкой обязательных значений и типами.",
+  "aliases": "env.ts, конфигурация окружений",
+  "lesson": "ts-modules",
+  "v3": {
+   "ch": "project-arch",
+   "anchor": "config"
+  }
+ },
+ "helper-utility": {
+  "en": "Helper / Utility",
+  "ru": "Хелпер / Утилита",
+  "def": "Helper — вспомогательная функция, знающая предметную область (создать оплаченный заказ); utility — общая функция без знания продукта (форматирование, генерация строк).",
+  "aliases": "",
+  "lesson": "ts-modules",
+  "v3": {
+   "ch": "project-arch",
+   "anchor": "helpers"
+  }
+ },
+ "lint": {
+  "en": "Linter",
+  "ru": "Статический анализатор кода",
+  "def": "Инструмент (ESLint), находящий ошибки и нарушения правил без запуска: забытые await, test.only, waitForTimeout, неиспользуемый код.",
+  "aliases": "ESLint, eslint-plugin-playwright, Prettier",
+  "lesson": "ts-modules",
+  "v3": {
+   "ch": "project-arch",
+   "anchor": "quality"
+  }
+ },
+ "test-environment": {
+  "en": "Test Environment",
+  "ru": "Тестовое окружение",
+  "def": "Развёрнутая система для выполнения тестов: локальная, эфемерная в CI, preview на MR, общий staging.",
+  "aliases": "стенд, staging, окружение",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "isolation",
+   "anchor": "environments"
+  }
+ },
+ "ephemeral-environment": {
+  "en": "Ephemeral Environment",
+  "ru": "Временное окружение",
+  "def": "Окружение, которое создаётся под конкретный прогон или Merge Request и удаляется после: чистые данные и полная изоляция между прогонами.",
+  "aliases": "preview environment, review app",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "isolation",
+   "anchor": "environments"
+  }
+ },
+ "secrets-management": {
+  "en": "Secrets Management",
+  "ru": "Управление секретами",
+  "def": "Хранение и передача паролей, токенов и ключей вне репозитория: защищённые переменные CI, Vault; маскирование в логах и регулярная ротация.",
+  "aliases": "секреты, Vault, CI variables",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "isolation",
+   "anchor": "config-secrets"
+  }
+ },
+ "dotenv": {
+  "en": "dotenv",
+  "ru": "Загрузка .env-файла",
+  "def": "Пакет, загружающий переменные из файла .env в process.env. По умолчанию не перезаписывает уже заданные переменные окружения.",
+  "aliases": ".env, .env.example",
+  "lesson": "pw-data",
+  "v3": {
+   "ch": "isolation",
+   "anchor": "config-secrets"
+  }
+ },
+ "parallel-execution": {
+  "en": "Parallel Execution",
+  "ru": "Параллельное выполнение",
+  "def": "Одновременный запуск тестов в нескольких воркерах на одной машине и/или в нескольких шардах на разных машинах.",
+  "aliases": "параллельный запуск, параллелизм",
+  "lesson": "pw-parallel",
+  "v3": {
+   "ch": "parallel",
+   "anchor": "workers"
+  }
+ },
+ "fully-parallel": {
+  "en": "fullyParallel",
+  "ru": "Полностью параллельный режим",
+  "def": "Опция Playwright, при которой между воркерами распределяются отдельные тесты, а не файлы.",
+  "aliases": "describe.configure, mode serial, mode parallel",
+  "lesson": "pw-parallel",
+  "v3": {
+   "ch": "parallel",
+   "anchor": "workers"
+  }
+ },
+ "sharding": {
+  "en": "Test Sharding",
+  "ru": "Шардирование тестов",
+  "def": "Разбиение набора на части (<code>--shard=2/4</code>), выполняемые на разных машинах; отчёты затем объединяются.",
+  "aliases": "shard, шард",
+  "lesson": "pw-parallel",
+  "v3": {
+   "ch": "parallel",
+   "anchor": "sharding"
+  }
+ },
+ "shared-state": {
+  "en": "Shared State",
+  "ru": "Общее состояние",
+  "def": "Данные или ресурсы, которые несколько тестов читают и изменяют одновременно: один аккаунт, глобальная настройка, файл, порт. Источник гонок при параллельном запуске.",
+  "aliases": "",
+  "lesson": "pw-parallel",
+  "v3": {
+   "ch": "parallel",
+   "anchor": "shared-state"
+  }
+ },
+ "merge-reports": {
+  "en": "Merge Reports",
+  "ru": "Объединение отчётов",
+  "def": "Сборка единого отчёта из blob-отчётов шардов командой <code>npx playwright merge-reports</code>.",
+  "aliases": "blob reporter",
+  "lesson": "pw-parallel",
+  "v3": {
+   "ch": "parallel",
+   "anchor": "sharding"
+  }
+ },
+ "reporter": {
+  "en": "Reporter",
+  "ru": "Репортер",
+  "def": "Компонент раннера, который превращает результаты прогона в отчёт: list, html, junit, json, blob, allure-playwright.",
+  "aliases": "отчёт, HTML report, JUnit",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "reporters"
+  }
+ },
+ "allure-report": {
+  "en": "Allure Report",
+  "ru": "Отчёт Allure",
+  "def": "Инструмент отчётности: шаги, вложения, история и тренды прогонов, категории падений, метки feature/severity/owner.",
+  "aliases": "Allure, allure-playwright, Allure TestOps",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "allure"
+  }
+ },
+ "test-step": {
+  "en": "Test Step",
+  "ru": "Шаг теста",
+  "def": "Именованная группа действий (<code>test.step</code>), которая отображается в отчёте и trace и показывает, на каком этапе произошло падение.",
+  "aliases": "",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "steps"
+  }
+ },
+ "attachment": {
+  "en": "Attachment",
+  "ru": "Вложение",
+  "def": "Данные, приложенные к результату теста (<code>testInfo.attach</code>): JSON ответа, лог, скриншот, файл.",
+  "aliases": "",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "steps"
+  }
+ },
+ "structured-logging": {
+  "en": "Structured Logging",
+  "ru": "Структурированное логирование",
+  "def": "Логи в машиночитаемом формате (JSON) с постоянными полями: время, уровень, тест, шаг, идентификаторы — без секретов.",
+  "aliases": "",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "logging"
+  }
+ },
+ "test-artifacts": {
+  "en": "Test Artifacts",
+  "ru": "Артефакты тестов",
+  "def": "Файлы, сохраняемые при прогоне для диагностики и отчётности: скриншоты, видео, trace, вложения, отчёты.",
+  "aliases": "артефакты, screenshot, video",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "artifacts"
+  }
+ },
+ "correlation-id": {
+  "en": "Correlation ID",
+  "ru": "Сквозной идентификатор запроса",
+  "def": "Идентификатор (X-Request-Id, traceparent), который передаётся через все сервисы и позволяет найти запрос в их логах.",
+  "aliases": "X-Request-Id, trace id, traceparent",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "logging"
+  }
+ },
+ "failure-triage": {
+  "en": "Failure Triage",
+  "ru": "Разбор падений",
+  "def": "Классификация упавших тестов: дефект продукта, ошибка теста, нестабильность, проблема окружения или данных — с соответствующим действием.",
+  "aliases": "triage, анализ падений",
+  "lesson": "pw-debug",
+  "v3": {
+   "ch": "reporting",
+   "anchor": "triage"
+  }
+ },
+ "docker-image": {
+  "en": "Docker Image",
+  "ru": "Образ Docker",
+  "def": "Неизменяемый шаблон из слоёв файловой системы с программой, зависимостями и настройками запуска; из него создаются контейнеры.",
+  "aliases": "образ, image, слой",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "images"
+  }
+ },
+ "container": {
+  "en": "Container",
+  "ru": "Контейнер",
+  "def": "Запущенный из образа изолированный процесс со своей файловой системой, сетью и переменными окружения; использует ядро хоста.",
+  "aliases": "контейнер, docker run",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "images"
+  }
+ },
+ "dockerfile": {
+  "en": "Dockerfile",
+  "ru": "Инструкция сборки образа",
+  "def": "Файл с инструкциями FROM, WORKDIR, COPY, RUN, ENV, CMD, по которым собирается образ; каждая инструкция — кэшируемый слой.",
+  "aliases": ".dockerignore, docker build",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "dockerfile"
+  }
+ },
+ "docker-compose": {
+  "en": "Docker Compose",
+  "ru": "Оркестрация контейнеров Compose",
+  "def": "Инструмент описания и запуска многоконтейнерного окружения в одном YAML-файле: сервисы, сети, тома, зависимости и проверки готовности.",
+  "aliases": "compose, docker-compose.yml, depends_on",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "compose"
+  }
+ },
+ "volume": {
+  "en": "Volume",
+  "ru": "Том",
+  "def": "Хранилище данных вне файловой системы контейнера: bind mount каталога хоста или именованный том Docker.",
+  "aliases": "bind mount, том",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "volumes"
+  }
+ },
+ "docker-network": {
+  "en": "Docker Network",
+  "ru": "Сеть Docker",
+  "def": "Виртуальная сеть контейнеров; в сети Compose сервисы доступны друг другу по именам сервисов.",
+  "aliases": "host.docker.internal, сеть",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "networks"
+  }
+ },
+ "healthcheck": {
+  "en": "Healthcheck",
+  "ru": "Проверка готовности",
+  "def": "Команда, по которой Docker определяет, готов ли сервис принимать запросы; используется в depends_on с condition: service_healthy.",
+  "aliases": "health check, readiness, pg_isready",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "compose"
+  }
+ },
+ "docker-registry": {
+  "en": "Container Registry",
+  "ru": "Реестр образов",
+  "def": "Хранилище образов Docker: Docker Hub, GitLab Container Registry, mcr.microsoft.com. Образ адресуется именем и тегом.",
+  "aliases": "registry, Docker Hub, тег образа",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "images"
+  }
+ },
+ "continuous-integration": {
+  "en": "Continuous Integration",
+  "ru": "Непрерывная интеграция",
+  "def": "Практика частого слияния изменений в общую ветку с автоматической сборкой и тестами на каждое изменение.",
+  "aliases": "CI, CI/CD",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "ci-cd"
+  }
+ },
+ "continuous-delivery": {
+  "en": "Continuous Delivery",
+  "ru": "Непрерывная поставка",
+  "def": "Каждое изменение, прошедшее pipeline, готово к выпуску; релиз в продакшен выполняется по решению человека.",
+  "aliases": "",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "ci-cd"
+  }
+ },
+ "continuous-deployment": {
+  "en": "Continuous Deployment",
+  "ru": "Непрерывное развёртывание",
+  "def": "Каждое изменение, прошедшее pipeline, автоматически выпускается в продакшен без ручного шага.",
+  "aliases": "",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "ci-cd"
+  }
+ },
+ "pipeline": {
+  "en": "Pipeline",
+  "ru": "Конвейер CI/CD",
+  "def": "Набор задач, сгруппированных в стадии или граф зависимостей, который выполняется автоматически при изменениях, по расписанию или вручную.",
+  "aliases": "пайплайн, конвейер, stages",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "pipeline"
+  }
+ },
+ "ci-job": {
+  "en": "CI Job",
+  "ru": "Задача CI",
+  "def": "Отдельный шаг pipeline (lint, тесты, сборка, деплой), выполняемый на runner, обычно в Docker-образе, с артефактами и кэшем.",
+  "aliases": "job, задача, needs, rules",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "pipeline"
+  }
+ },
+ "ci-runner": {
+  "en": "CI Runner",
+  "ru": "Исполнитель задач CI",
+  "def": "Машина или контейнер, на которых выполняются задачи pipeline (GitLab Runner, GitHub-hosted runner).",
+  "aliases": "runner, агент, executor",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "pipeline"
+  }
+ },
+ "quality-gate": {
+  "en": "Quality Gate",
+  "ru": "Ворота качества",
+  "def": "Автоматическое обязательное условие пропуска изменения дальше: зелёные тесты, ноль ошибок линтера, порог нестабильности или покрытия.",
+  "aliases": "required checks, protected branch",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "quality-gates"
+  }
+ },
+ "gitlab-ci": {
+  "en": "GitLab CI",
+  "ru": "GitLab CI/CD",
+  "def": "Встроенная система CI/CD GitLab; pipeline описывается в <code>.gitlab-ci.yml</code>: stages, jobs, rules, artifacts, parallel.",
+  "aliases": ".gitlab-ci.yml",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "gitlab"
+  }
+ },
+ "github-actions": {
+  "en": "GitHub Actions",
+  "ru": "GitHub Actions",
+  "def": "Система автоматизации GitHub: workflows в <code>.github/workflows</code>, jobs, steps, matrix, secrets и артефакты.",
+  "aliases": "workflow, matrix",
+  "lesson": "pw-ci",
+  "v3": {
+   "ch": "cicd",
+   "anchor": "github"
+  }
+ },
+ "test-execution-time": {
+  "en": "Test Execution Time",
+  "ru": "Время выполнения тестов",
+  "def": "Длительность прогона набора. Для шарда ограничена снизу самым долгим тестом; для pipeline включает очередь, подготовку и сбор отчёта.",
+  "aliases": "",
+  "lesson": "mid-speed",
+  "v3": {
+   "ch": "optimization",
+   "anchor": "time"
+  }
+ },
+ "test-prioritization": {
+  "en": "Test Prioritization",
+  "ru": "Приоритизация тестов",
+  "def": "Выбор, какие тесты запускать раньше и какие — на каком событии: smoke первым, наборы по тегам и рискам, изменённые тесты, быстрый провал.",
+  "aliases": "only-changed, last-failed, max-failures, test impact analysis",
+  "lesson": "mid-speed",
+  "v3": {
+   "ch": "optimization",
+   "anchor": "prioritization"
+  }
+ },
+ "feedback-loop": {
+  "en": "Feedback Loop",
+  "ru": "Цикл обратной связи",
+  "def": "Время от изменения кода до результата проверок, на который можно опереться. Чем короче, тем дешевле исправление.",
+  "aliases": "время обратной связи",
+  "lesson": "mid-speed",
+  "v3": {
+   "ch": "optimization",
+   "anchor": "time"
+  }
+ },
+ "pipeline-optimization": {
+  "en": "Pipeline Optimization",
+  "ru": "Оптимизация pipeline",
+  "def": "Сокращение времени CI: кэш и готовые образы, граф needs, параллельные задачи, запуск по изменениям, отмена устаревших pipeline.",
+  "aliases": "",
+  "lesson": "mid-speed",
+  "v3": {
+   "ch": "optimization",
+   "anchor": "pipeline"
+  }
+ },
+ "order-dependency": {
+  "en": "Test Order Dependency",
+  "ru": "Зависимость от порядка тестов",
+  "def": "Ситуация, когда результат теста зависит от того, какие тесты выполнялись до него и что они оставили в системе.",
+  "aliases": "",
+  "lesson": "pw-timeouts",
+  "v3": {
+   "ch": "flaky",
+   "anchor": "causes"
+  }
+ },
+ "test-quarantine": {
+  "en": "Test Quarantine",
+  "ru": "Карантин тестов",
+  "def": "Временная изоляция нестабильного теста от блокирующих наборов с задачей, владельцем и сроком; тест продолжает запускаться в неблокирующей задаче.",
+  "aliases": "@quarantine, карантин, test.fixme",
+  "lesson": "pw-timeouts",
+  "v3": {
+   "ch": "flaky",
+   "anchor": "quarantine"
+  }
+ },
+ "flaky-rate": {
+  "en": "Flaky Rate",
+  "ru": "Доля нестабильности",
+  "def": "Доля прогонов, в которых тест был нестабилен (упал и прошёл при повторе). Метрика для отдельных тестов и набора.",
+  "aliases": "",
+  "lesson": "pw-timeouts",
+  "v3": {
+   "ch": "flaky",
+   "anchor": "detection"
+  }
+ },
+ "repeat-each": {
+  "en": "Repeat Each",
+  "ru": "Многократный повтор теста",
+  "def": "Опция <code>--repeat-each=N</code>: каждый тест выполняется N раз; используется для поиска нестабильности и burn-in новых тестов.",
+  "aliases": "burn-in, --repeat-each",
+  "lesson": "pw-timeouts",
+  "v3": {
+   "ch": "flaky",
+   "anchor": "detection"
+  }
+ },
+ "aqa-system-design": {
+  "en": "AQA System Design",
+  "ru": "Проектирование автоматизации тестирования",
+  "def": "Проектирование автоматизации как системы: цели, уровни, стек, архитектура, данные, окружения, CI, отчёты и поддержка доверия к результатам.",
+  "aliases": "test automation strategy, стратегия автоматизации",
+  "lesson": "mid-design",
+  "v3": {
+   "ch": "aqa-design",
+   "anchor": "what"
+  }
+ },
+ "test-strategy": {
+  "en": "Test Strategy",
+  "ru": "Стратегия тестирования",
+  "def": "Документ и договорённость о подходе к тестированию: цели, область, уровни, наборы, инструменты, данные, окружения, quality gates и роли.",
+  "aliases": "",
+  "lesson": "mid-design",
+  "v3": {
+   "ch": "aqa-design",
+   "anchor": "strategy-doc"
+  }
+ },
+ "eventual-consistency": {
+  "en": "Eventual Consistency",
+  "ru": "Согласованность в конечном счёте",
+  "def": "Изменение становится наблюдаемым не мгновенно; тест ждёт конечное состояние с ограниченным timeout.",
+  "aliases": "",
+  "lesson": "qa-negative",
+  "v3": {
+   "ch": "api-basics",
+   "anchor": "eventual"
+  }
+ },
+ "readiness": {
+  "en": "Readiness",
+  "ru": "Готовность принимать запросы",
+  "def": "Проверяемая готовность приложения обслужить нужный запрос; отличается от факта запуска процесса.",
+  "aliases": "",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": "docker",
+   "anchor": "readiness-network"
+  }
+ },
+ "runtime-validation": {
+  "en": "Runtime Validation",
+  "ru": "Проверка данных во время выполнения",
+  "def": "Проверка реального JSON или другого значения по схеме; TypeScript-типы её не выполняют.",
+  "aliases": "",
+  "lesson": "pw-api",
+  "v3": {
+   "ch": "api-auto",
+   "anchor": "layers"
+  }
+ },
+ "elapsed-time": {
+  "en": "Elapsed Time",
+  "ru": "Прошедшее время",
+  "def": "Время с запуска процесса; отличается от накопленного процессорного времени.",
+  "aliases": "",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "linux-diagnostics"
+  }
+ },
+ "har": {
+  "en": "HAR",
+  "ru": "Архив HTTP-сессии",
+  "def": "Формат данных о сетевых запросах браузера; может содержать чувствительные сведения.",
+  "aliases": "",
+  "lesson": "proj-env",
+  "v3": {
+   "ch": "workstation-tech",
+   "anchor": "devtools"
+  }
+ },
+ "severity": {
+  "en": "Severity",
+  "ru": "Серьёзность дефекта",
+  "def": "Степень влияния дефекта на систему или пользователя.",
+  "aliases": "",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "defect-evidence"
+  }
+ },
+ "priority": {
+  "en": "Priority",
+  "ru": "Приоритет исправления",
+  "def": "Очередность работы над дефектом с учётом бизнес-контекста.",
+  "aliases": "",
+  "lesson": "qa-expected",
+  "v3": {
+   "ch": "test-design",
+   "anchor": "defect-evidence"
+  }
+ },
+ "run-id": {
+  "en": "Run ID",
+  "ru": "Идентификатор запуска",
+  "def": "Уникальная метка запуска для изоляции данных, диагностики и безопасного cleanup.",
+  "aliases": "",
+  "lesson": "pw-fixtures",
+  "v3": {
+   "ch": "fixtures",
+   "anchor": "cleanup-limits"
+  }
+ },
+ "cpu-time": {
+  "en": "CPU Time",
+  "ru": "Процессорное время",
+  "def": "Накопленное время использования процессора; не равно времени жизни процесса.",
+  "aliases": "",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": "git-linux",
+   "anchor": "linux-diagnostics"
+  }
+ },
+ "quality-evidence": {
+  "en": "Quality Evidence",
+  "ru": "Свидетельства качества",
+  "def": "Артефакты и наблюдения, позволяющие оценить проверки, дефекты и ограничения.",
+  "aliases": "",
+  "lesson": "iv-final",
+  "v3": {
+   "ch": "competence",
+   "anchor": "evidence"
+  }
+ },
+ "test-case": {
+  "aliases": "тест-кейс, сценарий",
+  "lesson": "intro-what-is-test",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Test case",
+  "ru": "Тестовый сценарий",
+  "def": "Описание одной проверки: исходное состояние, шаги, данные и <b>ожидаемый результат</b>. Автотест — это test case, записанный кодом.",
+  "example": "Дано: в корзине пусто. Шаги: добавить «Блокнот A5» дважды. Ожидается: итог 780 ₽."
+ },
+ "base-url": {
+  "aliases": "base url",
+  "lesson": "pw-first-test-lines",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "baseURL",
+  "ru": "Базовый адрес",
+  "def": "Настройка Playwright Test (<code>use.baseURL</code>): относительные адреса вроде <code>page.goto('/')</code> и запросы <code>request.get('/api/…')</code> дополняются до полного URL. Позволяет запускать те же тесты на разных стендах.",
+  "example": "use: { baseURL: 'http://127.0.0.1:3000' }\nawait page.goto('/cart'); // → http://127.0.0.1:3000/cart"
+ },
+ "aqa-runner": {
+  "aliases": "runner",
+  "lesson": "intro-first-test",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "AQA Lab runner",
+  "ru": "Локальный runner",
+  "def": "Небольшой сервер из этого приложения (<code>npm run runner</code>), который на вашем компьютере запускает настоящий Playwright Test для кода из урока и поднимает учебный магазин. Слушает только 127.0.0.1 и требует токен. Это не песочница."
+ },
+ "defect": {
+  "aliases": "баг, bug",
+  "lesson": "intro-failure",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Defect",
+  "ru": "Дефект",
+  "def": "Расхождение фактического поведения системы с ожидаемым (требованием). Падение теста указывает на дефект только если сам тест и окружение исправны.",
+  "example": "Ожидалось: счётчик корзины = 1. Получено: 0 — товар не добавился."
+ },
+ "pytest": {
+  "aliases": "py.test",
+  "lesson": "py-pytest",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "pytest",
+  "ru": "pytest",
+  "def": "Фреймворк тестирования для Python: функции <code>test_*</code>, обычный <code>assert</code> с подробным сообщением о падении, fixtures и параметризация.",
+  "example": "def test_total():\n    assert cart_total([{\"price\": 390, \"qty\": 2}]) == 780"
+ },
+ "cte": {
+  "aliases": "WITH, common table expression",
+  "lesson": "sql-subquery",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "CTE (WITH)",
+  "ru": "Общее табличное выражение",
+  "def": "Именованный подзапрос в начале запроса: <code>WITH paid AS (SELECT …) SELECT … FROM paid</code>. Делает сложный запрос читаемым по шагам."
+ },
+ "window-function": {
+  "aliases": "OVER, PARTITION BY, ROW_NUMBER",
+  "lesson": "sql-windows",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Window function",
+  "ru": "Оконная функция",
+  "def": "Функция, которая считает значение по набору связанных строк (окну), не схлопывая их, как GROUP BY: <code>ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at)</code>."
+ },
+ "virtualenv": {
+  "aliases": "venv, .venv",
+  "lesson": "py-venv",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Virtual environment",
+  "ru": "Виртуальное окружение",
+  "def": "Отдельная папка с интерпретатором Python и пакетами проекта (<code>python -m venv .venv</code>), чтобы зависимости разных проектов не смешивались."
+ }
+}

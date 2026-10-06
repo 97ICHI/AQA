@@ -1,0 +1,17 @@
+{
+ "locator": "page.getByRole('button', { name: 'Войти' }) — описание кнопки «Войти», по которому Playwright найдёт её при действии.",
+ "assertion": "await expect(page.getByRole('status')).toHaveText('Заказ создан: 2000 ₽') — тест упадёт, если текст другой.",
+ "flaky-test": "Тест корзины проходит локально и иногда падает в CI, потому что читает сумму до её пересчёта.",
+ "web-first-assertion": "await expect(locator).toBeVisible() повторяет проверку до таймаута, а не читает состояние один раз.",
+ "fixture": "Fixture user создаёт пользователя перед тестом и удаляет его после теста, даже если тест упал.",
+ "promise": "page.goto('/') возвращает Promise; await дожидается загрузки страницы.",
+ "async-await": "async ({ page }) => { await page.goto('/'); } — функция ждёт загрузку, прежде чем идти дальше.",
+ "playwright": "npx playwright test запускает тесты; page.getByRole(...) находит элемент на странице.",
+ "accessible-name": "Имя кнопки <button aria-label=\"Удалить\">🗑</button> — «Удалить», хотя на экране только значок.",
+ "strict-mode": "getByRole('button', { name: 'Удалить' }) нашёл 3 кнопки — действие падает вместо клика по случайной.",
+ "test-oracle": "Сумма заказа = количество × цена из требований, а не «то, что вернул сервер в прошлый раз».",
+ "boundary-value-analysis": "Для количества 1–10 проверяют 0, 1, 10 и 11.",
+ "idempotency": "Повторный DELETE /api/orders/42 не меняет состояние: заказ уже удалён.",
+ "storage-state": "Файл playwright/.auth/user.json хранит cookies входа, чтобы не логиниться в каждом тесте.",
+ "page-object-model": "class CartPage { total = this.page.getByTestId('total'); } — тест обращается к cart.total, а не к селектору."
+}
