@@ -1,6 +1,6 @@
 // Локальный runner: запускает настоящий Playwright Test для кода из приложения AQA Lab.
 // Слушает только 127.0.0.1. Принимает запросы с токеном (печатается при старте) и только с разрешённых Origin.
-// ВАЖНО: это не песочница. Код ученика выполняется с правами текущего пользователя. Ограничения: таймаут, отдельная папка, один запуск за раз.
+// ВАЖНО: это не песочница. Код ученика выполняется с правами текущего пользователя. Ограничения: таймаут, отдельная папка, запуски строго по очереди.
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
@@ -22,6 +22,7 @@ const WORK = path.join(here, '.work');
 const MAX_BODY = 200 * 1024;
 const MAX_TIMEOUT = 120_000;
 let current = null; // { child, aborted } — текущий запуск (все варианты)
+let queue = Promise.resolve();
 
 const strip = (s) => String(s || '').replace(/\u001b\[[0-9;]*m/g, '');
 function cors(req, res) {
@@ -90,27 +91,36 @@ const server = http.createServer(async (req, res) => {
   if (!authed) return json(res, 401, { error: 'нужен токен runner' });
   if (req.method === 'POST' && url.pathname === '/stop') { if (current) { current.aborted = true; current.child?.kill('SIGKILL'); } return json(res, 200, { stopped: !!current }); }
   if (req.method === 'POST' && url.pathname === '/run') {
-    if (current) return json(res, 409, { error: 'уже идёт запуск — дождитесь окончания или остановите его' });
     let raw = '';
     for await (const c of req) { raw += c; if (raw.length > MAX_BODY) return json(res, 413, { error: 'слишком большой код' }); }
     let b; try { b = JSON.parse(raw); } catch { return json(res, 400, { error: 'invalid JSON' }); }
     const variants = Array.isArray(b.variants) ? b.variants.filter((v) => typeof v === 'string') : [];
     if (typeof b.code !== 'string' || !variants.length || variants.some((v) => !VARIANTS[v])) return json(res, 400, { error: 'нужны code и variants из списка: ' + Object.keys(VARIANTS).join(', ') });
     const timeoutMs = Math.min(Number(b.timeoutMs) || 30000, MAX_TIMEOUT);
+    // запуски выполняются строго по очереди
+    const prev = queue;
+    let release;
+    queue = new Promise((r) => (release = r));
+    await prev;
     current = { child: null, aborted: false };
-    const runs = [];
-    try {
-      for (const v of variants) {
-        const r = await runVariant(b.code, v, timeoutMs);
-        runs.push(r);
-        if (r.aborted) break;
-      }
-    } catch (err) { current = null; return json(res, 500, { error: String(err?.message || err), runs }); }
-    current = null;
-    return json(res, 200, { runs });
+    try { return await runAll(res, b.code, variants, timeoutMs); } finally { current = null; release(); }
   }
   json(res, 404, { error: 'not found' });
 });
+
+async function runAll(res, code, variants, timeoutMs) {
+  {
+    const runs = [];
+    try {
+      for (const v of variants) {
+        const r = await runVariant(code, v, timeoutMs);
+        runs.push(r);
+        if (r.aborted) break;
+      }
+    } catch (err) { return json(res, 500, { error: String(err?.message || err), runs }); }
+    return json(res, 200, { runs });
+  }
+}
 
 if (existsSync(WORK)) await rm(WORK, { recursive: true, force: true });
 server.listen(PORT, '127.0.0.1', () => {

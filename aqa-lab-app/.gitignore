@@ -6,3 +6,4 @@ public/v3/
 test-results/
 playwright-report/
 runner/.work/
+dist-*/

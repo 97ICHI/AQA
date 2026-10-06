@@ -21,6 +21,9 @@ for (const [id, g] of Object.entries(book.glossary)) {
 // Термины, которых нет в v3, и уточнения связи «термин → урок» — в glossary-extra.json (тот же формат; поля перекрывают импорт).
 const extraPath = path.join(here, '../src/content/glossary-extra.json');
 const extra = fs.existsSync(extraPath) ? JSON.parse(fs.readFileSync(extraPath, 'utf8')) : {};
+// дополнительные файлы по модулям: src/content/glossary-extra.d/*.json
+const extraDir = path.join(here, '../src/content/glossary-extra.d');
+if (fs.existsSync(extraDir)) for (const f of fs.readdirSync(extraDir).filter((f) => f.endsWith('.json')).sort()) Object.assign(extra, JSON.parse(fs.readFileSync(path.join(extraDir, f), 'utf8')));
 for (const [id, g] of Object.entries(extra)) {
   if (id.startsWith('$')) continue;
   out[id] = { aliases: '', lesson: null, v3: { ch: null, anchor: null }, ...(out[id] || {}), ...g };

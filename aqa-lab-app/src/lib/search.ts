@@ -25,7 +25,9 @@ export async function buildIndex() {
       const clean = para.replace(/```[\s\S]*?```/g, ' ').replace(/\[\[([^|\]]+)\|?([^\]]*)\]\]/g, (_, id, lab) => lab || GLOSSARY[id]?.en || id).replace(/[#*`>_:]/g, ' ').replace(/\s+/g, ' ').trim();
       if (clean.length > 30) idx.push({ kind: 'text', title: clean.slice(0, 160), where: l.title, href: `#/l/${l.id}`, text: norm(clean), w: 1 });
     }
-    for (const m of t.matchAll(/```(?:text|ts|bash)[^\n]*\n([\s\S]*?)```/g)) for (const line of m[1].split('\n')) if (/Error|ERROR|Ошибка|error TS|expect\(|Timeout|violation/.test(line)) idx.push({ kind: 'text', title: line.trim().slice(0, 160), where: `Ошибка в уроке «${l.title}»`, href: `#/l/${l.id}`, text: norm(line), w: 3 });
+    const outputs = [...t.matchAll(/```(?:text|ts|bash|py|sql)[^\n]*\n([\s\S]*?)```/g)].map((m) => m[1]);
+    for (const m of t.matchAll(/```widget\n([\s\S]*?)```/g)) { try { const w = JSON.parse(m[1]); if (w.recorded?.output) outputs.push(w.recorded.output); } catch { /* проверяется в check-content */ } }
+    for (const out of outputs) for (const line of out.split('\n')) if (/Error|ERROR|Ошибка|error TS|expect\(|Timeout|violation|Expected|Received|Traceback|assert/.test(line)) idx.push({ kind: 'text', title: line.trim().slice(0, 160), where: `Ошибка в уроке «${l.title}»`, href: `#/l/${l.id}`, text: norm(line), w: 3 });
   }
   for (const [id, g] of Object.entries(GLOSSARY)) idx.push({ kind: 'term', title: `${g.en} — ${g.ru}`, where: 'Глоссарий', href: `#/glossary/${id}`, text: norm(`${g.en} ${g.ru} ${g.aliases} ${g.def.replace(/<[^>]+>/g, '')}`), w: 8 });
   for (const e of EXERCISES) idx.push({ kind: 'exercise', title: e.title, where: 'Задание', href: `#/l/${e.lesson}/ex-${e.id}`, text: norm(e.title + ' ' + e.goal), w: 7 });

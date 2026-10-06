@@ -99,3 +99,34 @@ jobs:
       - name: Очистка
         if: always()
         run: docker compose down --volumes
+
+  app:
+    name: Приложение AQA Lab — контент, типы, сборка, e2e, задания
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: aqa-lab-app
+    env:
+      AQA_RUNNER_TOKEN: ci-runner-token
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: aqa-lab-app/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Проверка контента (термины, виджеты, задания)
+        run: npm run test:content
+      - name: Типы и сборка
+        run: npm run build
+      - name: Runner Playwright в фоне
+        run: |
+          nohup npm run runner > runner.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -H "x-runner-token: $AQA_RUNNER_TOKEN" http://127.0.0.1:7357/health && break; sleep 1; done
+      - name: e2e интерфейса и самопроверка всех заданий (эталон проходит, стартовый код — нет)
+        run: npm run test:e2e
+      - if: failure()
+        run: cat runner.log
