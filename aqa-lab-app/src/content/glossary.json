@@ -3280,5 +3280,101 @@
   "ru": "Точность чисел с плавающей точкой",
   "def": "Числа <code>float</code> хранятся в двоичном виде приближённо, поэтому <code>0.1 + 0.2 != 0.3</code>. Деньги считают в копейках (целыми) или через <code>decimal.Decimal</code>, а float сравнивают с допуском (<code>pytest.approx</code>, <code>math.isclose</code>).",
   "example": "0.1 + 0.2 == 0.3  # False\nDecimal(\"0.1\") + Decimal(\"0.2\") == Decimal(\"0.3\")  # True"
+ },
+ "code-review": {
+  "aliases": "ревью, code review, рецензирование",
+  "lesson": "proj-git",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Code review",
+  "ru": "Ревью кода",
+  "def": "Проверка изменений коллегами до слияния в основную ветку: правильность, читаемость, стабильность тестов, отсутствие лишнего (<code>test.only</code>, отладочный код). Обычно проходит в merge request.",
+  "example": "Замечание ревьюера: «waitForTimeout(500) заменить на expect(...).toHaveText — на медленном стенде тест упадёт»."
+ },
+ "devtools": {
+  "aliases": "devtools, инструменты разработчика, F12",
+  "lesson": "proj-env",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "DevTools",
+  "ru": "Инструменты разработчика",
+  "def": "Встроенные в браузер инструменты (F12): вкладки <b>Network</b> (запросы, коды ответа, тела), <b>Console</b> (ошибки JavaScript), <b>Elements</b> (DOM), <b>Application</b> (cookie, localStorage). Главный инструмент ручной диагностики веб-приложения.",
+  "example": "Network: POST /api/cart → 200, тело {\"count\":0} — сервер ответил успехом, но товар не добавил."
+ },
+ "json-report": {
+  "aliases": "json reporter, results.json",
+  "lesson": "proj-reports",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "JSON report",
+  "ru": "JSON-отчёт Playwright",
+  "def": "Отчёт репортера <code>json</code>: дерево наборов (<code>suites</code>) и тестов (<code>specs[].tests[]</code>) с итоговым статусом (<code>expected</code>, <code>unexpected</code>, <code>flaky</code>, <code>skipped</code>), попытками и ошибками, плюс сводка <code>stats</code>. Используется для сводок, quality gate и статистики нестабильности.",
+  "example": "reporter: [['json', { outputFile: 'reports/results.json' }]]"
+ },
+ "exit-code": {
+  "aliases": "exit status, код завершения, $?",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Exit code",
+  "ru": "Код возврата",
+  "def": "Число, которым процесс сообщает результат: <code>0</code> — успех, любое другое — ошибка. CI считает шаг упавшим по ненулевому коду; <code>npx playwright test</code> возвращает 1, если есть упавшие тесты.",
+  "example": "docker compose up --exit-code-from tests; status=$?  # сохранить код до очистки"
+ },
+ "exponential-backoff": {
+  "aliases": "backoff, экспоненциальная задержка, retry with backoff",
+  "lesson": "proj-docker",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Exponential backoff",
+  "ru": "Нарастающая пауза между повторами",
+  "def": "Стратегия повторов, при которой пауза растёт с каждой попыткой (например, 100, 200, 400 мс) до предела числа попыток. Даёт сервису время восстановиться и не заваливает его запросами. Повторять безопасно только идемпотентные операции.",
+  "example": "Ожидание /ready: 5 попыток с паузами 0,5 → 1 → 2 → 4 с."
+ },
+ "breaking-change": {
+  "aliases": "несовместимое изменение, ломающее изменение",
+  "lesson": "mid-contracts",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Breaking change",
+  "ru": "Несовместимое изменение",
+  "def": "Изменение API, после которого существующие клиенты перестают работать: удаление или переименование поля, смена типа (<code>number</code> → <code>string</code>), новое обязательное поле запроса. Добавление необязательного поля в ответ к таким изменениям не относится.",
+  "example": "total: 780 → total: \"780.00\" — тип поля изменился, клиенты, складывающие суммы, сломаются."
+ },
+ "star-method": {
+  "aliases": "STAR, situation task action result",
+  "lesson": "iv-scenarios",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "STAR",
+  "ru": "Схема ответа STAR",
+  "def": "Структура рассказа о рабочем опыте на интервью: <b>S</b>ituation (ситуация), <b>T</b>ask (задача), <b>A</b>ction (ваши действия), <b>R</b>esult (измеримый результат). Помогает отвечать коротко и по делу.",
+  "example": "Ночная регрессия падала через раз (S); нужно было вернуть доверие к прогону (T); нашёл гонку по trace и заменил паузы ожиданиями (A); доля красных прогонов упала с 30 % до 2 % (R)."
+ },
+ "acceptance-criteria": {
+  "aliases": "AC, критерии готовности, definition of done",
+  "lesson": "iv-final",
+  "v3": {
+   "ch": null,
+   "anchor": null
+  },
+  "en": "Acceptance criteria",
+  "ru": "Критерии приёмки",
+  "def": "Проверяемые условия, при выполнении которых задача считается сделанной. Формулируются до начала работы и однозначно: «тест падает на дефекте X», а не «тесты хорошие».",
+  "example": "Сценарий заказа проходит на ok, slow, markup-change и падает на cart-not-add, wrong-total, order-user."
  }
 }

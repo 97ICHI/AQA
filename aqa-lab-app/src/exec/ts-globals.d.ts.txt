@@ -19,3 +19,6 @@ declare function expectEq(actual: unknown, expected: unknown, message?: string):
 declare function expectTrue(value: unknown, message: string): void;
 /** Ожидает, что fn бросит ошибку (или вернёт отклонённый Promise). Используйте с await. */
 declare function expectThrows(fn: () => unknown, message: string): Promise<void>;
+/** URL и URLSearchParams (есть в Worker; объявлены здесь, т. к. тренажёр подключает только lib.es2022). */
+declare class URLSearchParams { constructor(init?: string | Record<string, string> | [string, string][]); get(name: string): string | null; getAll(name: string): string[]; has(name: string): boolean; set(name: string, value: string): void; append(name: string, value: string): void; delete(name: string): void; toString(): string; forEach(cb: (value: string, key: string) => void): void; entries(): IterableIterator<[string, string]>; keys(): IterableIterator<string>; [Symbol.iterator](): IterableIterator<[string, string]>; }
+declare class URL { constructor(url: string, base?: string | URL); href: string; origin: string; protocol: string; host: string; hostname: string; port: string; pathname: string; search: string; hash: string; readonly searchParams: URLSearchParams; toString(): string; }

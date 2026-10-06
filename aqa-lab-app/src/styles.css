@@ -270,3 +270,5 @@ table.result td.null { color: var(--faint); font-style: italic; }
   .tab-task .pane-code, .tab-code .pane-task, .tab-result .pane-task { display: block !important; }
   body { background: #fff; color: #000; }
 }
+.tested-code { margin: 6px 0; font-size: .9rem; } .tested-code summary { cursor: pointer; color: var(--muted); }
+.tested-code pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; max-height: 360px; }

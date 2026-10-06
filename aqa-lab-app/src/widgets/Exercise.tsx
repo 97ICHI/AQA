@@ -66,6 +66,10 @@ export function Exercise({ ex }: { ex: Ex }) {
         <div className="ex-task pane-task">
           <p dangerouslySetInnerHTML={{ __html: renderInline(ex.goal) }} />
           {ex.kind === 'sql' && <p className="muted small">Проверка: ваш запрос и эталон выполняются на {ex.datasets.length} {ex.datasets.length === 1 ? 'наборе' : 'наборах'} данных; {ex.ordered ? 'порядок строк важен' : 'порядок строк не важен'}, имена столбцов не сравниваются.</p>}
+          {(ex.kind === 'ts-test' || ex.kind === 'py-test') && (
+            <details className="tested-code"><summary>Код, который вы тестируете ({ex.kind === 'ts-test' ? 'app.ts' : 'shop.py'}, исправная версия)</summary>
+              <pre><code dangerouslySetInnerHTML={{ __html: highlight(ex.good, LANG[ex.kind]) }} /></pre></details>
+          )}
           {(ex.kind === 'ts-test' || ex.kind === 'py-test') && <p className="muted small">Проверка: ваши тесты запускаются на исправной версии (должны пройти) и на {ex.broken.length} версиях с дефектами (каждая должна быть поймана).</p>}
           {ex.kind === 'pw' && <p className="muted small">Проверка: тест запускается настоящим Playwright на учебном магазине — исправном и с включёнными дефектами.</p>}
         </div>

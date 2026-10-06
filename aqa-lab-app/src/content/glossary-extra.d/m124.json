@@ -1,0 +1,69 @@
+{
+ "$comment": "Модули 1, 2, 4: новые термины и привязка существующих терминов к урокам, где они вводятся.",
+ "expected-result": {
+  "en": "Expected result",
+  "ru": "Ожидаемый результат",
+  "def": "То, что должно получиться по требованию, записанное <b>до</b> запуска проверки: конкретное значение, текст, код ответа или состояние. Проверка сравнивает с ним фактический результат.",
+  "aliases": "ожидание, expected",
+  "lesson": "qa-expected",
+  "example": "Дано: 2 × «Блокнот A5» по 390 ₽, без промокода. Ожидается: к оплате 1079 ₽ (780 + доставка 299)."
+ },
+ "requirement": {
+  "en": "Requirement",
+  "ru": "Требование",
+  "def": "Описание того, как система должна себя вести: правило, ограничение или пользовательский сценарий. Источник ожидаемых результатов для проверок.",
+  "aliases": "требования, спецификация",
+  "lesson": "qa-expected",
+  "example": "Доставка 299 ₽; бесплатно, если сумма товаров после скидки не меньше 3000 ₽."
+ },
+ "false-failure": {
+  "en": "False failure",
+  "ru": "Ложное падение",
+  "def": "Падение теста, когда приложение работает правильно: ошибка в самом тесте (неверный локатор, неверное ожидание), в данных или в окружении. Противоположная беда — тест, который проходит при дефекте.",
+  "aliases": "ложное срабатывание, false positive, ошибка теста",
+  "lesson": "intro-failure",
+  "example": "Локатор ищет кнопку «Добавить в корзину», а на странице она называется «В корзину» — тест падает по таймауту при исправном магазине."
+ },
+ "positive-testing": {
+  "en": "Positive testing",
+  "ru": "Позитивное тестирование",
+  "def": "Проверка того, что система правильно работает на допустимых данных и разрешённых действиях. Дополняется негативными проверками.",
+  "aliases": "позитивная проверка, happy path",
+  "lesson": "qa-negative",
+  "example": "Промокод SPRING на сумму 2000 ₽ даёт 1800 ₽."
+ },
+ "dom": {
+  "en": "DOM (Document Object Model)",
+  "ru": "Объектная модель документа",
+  "def": "Дерево объектов, которое браузер строит из HTML: у каждого элемента есть родитель, дети, атрибуты и текст. Скрипты страницы и Playwright работают с DOM, а не с исходным HTML-текстом.",
+  "aliases": "DOM-дерево",
+  "lesson": "web-dom",
+  "example": "<li> карточки — ребёнок <ul aria-label=\"Товары\">, а кнопка «В корзину» — ребёнок <li>."
+ },
+ "accessibility-tree": {
+  "en": "Accessibility tree",
+  "ru": "Дерево доступности",
+  "def": "Упрощённое дерево, которое браузер строит из DOM для вспомогательных технологий: у каждого узла есть роль, доступное имя и состояние. По нему ищет <code>getByRole</code>.",
+  "aliases": "accessibility tree, a11y tree",
+  "lesson": "web-dom",
+  "example": "button \"В корзину\" внутри listitem внутри list \"Товары\"."
+ },
+ "http-body": {
+  "en": "Request / response body",
+  "ru": "Тело запроса или ответа",
+  "def": "Данные после заголовков HTTP-сообщения. Формат описывает заголовок <code>Content-Type</code>; в API это чаще всего JSON. У GET-запроса тела обычно нет.",
+  "aliases": "тело, body, payload",
+  "lesson": "web-http",
+  "example": "POST /api/cart с телом {\"productId\": 3, \"qty\": 2}"
+ },
+ "equivalence-partitioning": { "lesson": "qa-boundaries" },
+ "boundary-value-analysis": { "lesson": "qa-boundaries" },
+ "negative-testing": { "lesson": "qa-negative" },
+ "risk-based-testing": { "lesson": "qa-risk" },
+ "status-code": { "lesson": "web-status" },
+ "idempotency": { "lesson": "web-status" },
+ "cookie": { "lesson": "web-auth" },
+ "session": { "lesson": "web-auth" },
+ "authentication": { "lesson": "web-auth" },
+ "authorization": { "lesson": "web-auth" }
+}

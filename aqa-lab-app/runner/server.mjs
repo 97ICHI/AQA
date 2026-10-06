@@ -42,8 +42,9 @@ function collect(suite, out = [], prefix = []) {
   for (const s of suite.suites || []) collect(s, out, s.title && !s.title.endsWith('.ts') ? [...prefix, s.title] : prefix);
   for (const spec of suite.specs || []) for (const t of spec.tests || []) {
     const r = t.results?.[t.results.length - 1] || {};
-    const err = r.error || r.errors?.[0];
-    out.push({ title: [...prefix, spec.title].join(' › '), status: r.status || 'skipped', duration: r.duration || 0, error: err ? strip(err.message || err.value || '').split('\n').slice(0, 18).join('\n') : undefined });
+    // при таймауте теста r.error — лишь «Test timeout … exceeded», а полезная часть (какой локатор ждали) — в r.errors[1]
+    const errs = (r.errors?.length ? r.errors : r.error ? [r.error] : []).map((e) => strip(e.message || e.value || '').split('\n').slice(0, 18).join('\n'));
+    out.push({ title: [...prefix, spec.title].join(' › '), status: r.status || 'skipped', duration: r.duration || 0, error: errs.length ? errs.join('\n\n') : undefined });
   }
   return out;
 }

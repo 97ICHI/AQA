@@ -66,7 +66,7 @@
 
 ### Глобальные функции TS-тренажёра
 
-Код выполняется в Web Worker (без DOM, без `document`, без реальной сети). Доступны: `console.*`, таймеры, `sleep(ms)`, `fakeFetchOrder(id)` (Promise с учебным JSON заказа через 50 мс; для id 42 `total` — строка `'9980'`, для остальных — число 2990), а для проверок: `test(name, fn)`, `expectEq(actual, expected, msg?)` (сравнение как JSON), `expectTrue(v, msg)`, `await expectThrows(fn, msg)`. Компилятор: TypeScript 5.9, `strict`, ES2022, модули ES.
+Код выполняется в Web Worker (без DOM, без `document`, без реальной сети). Доступны: `console.*`, таймеры, `URL`/`URLSearchParams`, `sleep(ms)`, `fakeFetchOrder(id)` (Promise с учебным JSON заказа через 50 мс; для id 42 `total` — строка `'9980'`, для остальных — число 2990), а для проверок: `test(name, fn)`, `expectEq(actual, expected, msg?)` (сравнение как JSON), `expectTrue(v, msg)`, `await expectThrows(fn, msg)`. Компилятор: TypeScript 5.9, `strict`, ES2022, модули ES.
 
 ### Python-тренажёр
 
