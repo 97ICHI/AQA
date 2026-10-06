@@ -26,7 +26,7 @@ md.inline.ruler.before('link', 'term', (state, silent) => {
   const end = src.indexOf(']]', pos + 2);
   if (end < 0) return false;
   const body = src.slice(pos + 2, end);
-  const [id, label] = body.split('|');
+  const [id, label] = body.split(/\\?\|/); // в таблицах Markdown разделитель экранируется: [[id\|текст]]
   if (!/^[a-z0-9-]+$/.test(id)) return false;
   if (!silent) {
     const tok = state.push('html_inline', '', 0);

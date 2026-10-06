@@ -34,10 +34,10 @@ for (const f of fs.readdirSync(lessonsDir).filter((f) => f.endsWith('.md'))) {
   const t = fs.readFileSync(path.join(lessonsDir, f), 'utf8');
   if (!lessonIds.has(id)) errors.push(`${f}: урока ${id} нет в course.ts`);
   if (!/^:::why/m.test(t)) errors.push(`${f}: нет блока :::why`);
-  if (/^# /m.test(t)) errors.push(`${f}: заголовок H1 задаётся из course.ts — используйте ##`);
+  if (/^# /m.test(t.replace(/^```[\s\S]*?^```/gm, ''))) errors.push(`${f}: заголовок H1 задаётся из course.ts — используйте ##`);
   const opens = (t.match(/^:::\w+/gm) || []).length, closes = (t.match(/^:::\s*$/gm) || []).length;
   if (opens !== closes) errors.push(`${f}: незакрытый блок ::: (${opens} открытых, ${closes} закрытых)`);
-  for (const m of t.matchAll(/\[\[([^|\]]+)(?:\|[^\]]*)?\]\]/g)) if (!glossary[m[1]]) errors.push(`${f}: термин [[${m[1]}]] не найден в глоссарии`);
+  for (const m of t.matchAll(/\[\[([^|\]\\]+)(?:\\?\|[^\]]*)?\]\]/g)) if (!glossary[m[1]]) errors.push(`${f}: термин [[${m[1]}]] не найден в глоссарии`);
   for (const m of t.matchAll(/```widget\n([\s\S]*?)```/g)) {
     let w; try { w = JSON.parse(m[1]); } catch (err) { errors.push(`${f}: некорректный JSON виджета: ${err.message}`); continue; }
     if (w.type === 'exercise') { used.add(w.id); if (!exById.has(w.id)) errors.push(`${f}: задание ${w.id} не найдено`); else if (exById.get(w.id).lesson !== id) errors.push(`${f}: задание ${w.id} принадлежит уроку ${exById.get(w.id).lesson}`); }
