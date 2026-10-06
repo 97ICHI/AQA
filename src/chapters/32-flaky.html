@@ -1,0 +1,221 @@
+<article class="chapter" id="/flaky" data-chapter="flaky" data-section="infra" aria-labelledby="h1-flaky"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 30 · Раздел VII · Инфраструктура и CI/CD</div><h1 class="ch-title" id="h1-flaky" tabindex="-1">Flaky Tests и диагностика</h1><p class="ch-lead">Что делает тест нестабильным: гонки, неправильные ожидания, зависимость от порядка, данные, окружение, сеть и внешние сервисы. Как обнаружить, воспроизвести, расследовать и исправить нестабильность, и как управлять ею на уровне команды.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 10 мин чтения</span><span class="lvl" title="Уровень">M–M+</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/assertions">Assertions и ожидания</a><a href="#/parallel">Параллельность</a><a href="#/reporting">Reporting и Logging</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Нестабильный тест — это тест, у которого есть неучтённая переменная: время, порядок, данные, окружение. Задача расследования — найти эту переменную и взять её под контроль. Перезапуск лишь бросает кости ещё раз.</p><p class="idea-goal"><strong>Цель главы:</strong> систематически классифицировать причины нестабильности, воспроизводить её, исправлять по причине и выстроить процесс работы с flaky-тестами в команде.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Flaky-тест проходит и падает без изменений кода. Причина всегда конкретна: гонка, ожидание, общий ресурс, данные, окружение или внешняя зависимость — и иногда реальный дефект продукта.</p><h3>Главное</h3><ul class="recall-points"><li>Обнаружение: статус flaky при ретраях, <code>--repeat-each</code>, история прогонов, доля flaky как метрика.</li><li>Воспроизведение: повтор, больше воркеров, медленная машина (CPU), задержка сети через <code>page.route</code>, образ CI, тот же seed и данные.</li><li>Расследование: сравнить trace упавшей и успешной попытки — где состояния разошлись.</li><li>Типовые исправления: web-first assertions вместо однократных чтений, ожидание событий до действия, изоляция данных, контроль времени и внешних сервисов.</li><li>Карантин: нестабильный тест выносится из блокирующего набора с задачей, владельцем и сроком; не удаляется молча и не скрывается ретраями навсегда.</li><li>Flaky rate считают с явным знаменателем; нестабильность может быть дефектом продукта; успешные повторы не доказывают стабильность.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Flaky Test</dt><dd>Тест, который при одинаковом коде и окружении то проходит, то падает. Подрывает доверие к автоматизации.</dd></div><div><dt>Race Condition</dt><dd>Ситуация, когда результат зависит от того, какая из параллельных операций завершится первой. Частая причина нестабильных тестов.</dd></div><div><dt>Test Order Dependency</dt><dd>Ситуация, когда результат теста зависит от того, какие тесты выполнялись до него и что они оставили в системе.</dd></div><div><dt>Flaky Rate</dt><dd>Доля прогонов, в которых тест был нестабилен (упал и прошёл при повторе). Метрика для отдельных тестов и набора.</dd></div><div><dt>Repeat Each</dt><dd>Опция <code>--repeat-each=N</code>: каждый тест выполняется N раз; используется для поиска нестабильности и burn-in новых тестов.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Ретраи, <code>force: true</code>, большие таймауты и <code>waitForTimeout</code> скрывают симптом. Без поиска причины нестабильность вернётся в другом тесте или в продакшене.</p><div class="recall-links"><a href="#/flaky/what">Что такое Flaky Test →</a><a href="#/flaky/causes">Основные причины →</a><a href="#/flaky/detection">Обнаружение →</a><a href="#/flaky/reproduce">Воспроизведение →</a><a href="#/flaky/investigate">Расследование →</a><a href="#/flaky/fixes">Исправления по причинам →</a><a href="#/flaky/quarantine">Карантин и процесс →</a><a href="#/flaky/metrics-defined">Измеримые критерии стабильности →</a><a href="#/flaky/example">Пример: расследование «плавающей» корзины →</a><a href="#/flaky/mistakes">Типичные ошибки →</a><a href="#/flaky/interview">Что важно для собеседования →</a><a href="#/flaky/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/flaky/what">Что такое Flaky Test</a><a href="#/flaky/causes">Основные причины</a><a href="#/flaky/detection">Обнаружение</a><a href="#/flaky/reproduce">Воспроизведение</a><a href="#/flaky/investigate">Расследование</a><a href="#/flaky/fixes">Исправления по причинам</a><a href="#/flaky/quarantine">Карантин и процесс</a><a href="#/flaky/metrics-defined">Измеримые критерии стабильности</a><a href="#/flaky/example">Пример: расследование «плавающей» корзины</a><a href="#/flaky/mistakes">Типичные ошибки</a><a href="#/flaky/interview">Что важно для собеседования</a><a href="#/flaky/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/flaky/what" data-anchor="what">Что такое Flaky Test<a class="h-anchor" href="#/flaky/what" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="flaky-test" aria-expanded="false">Flaky Test</button> — тест, который при неизменном коде продукта, коде теста и окружении иногда проходит, иногда падает. Его цена выше, чем кажется:</p>
+<ul>
+<li><strong>Потеря доверия.</strong> Команда привыкает перезапускать красные прогоны и пропускает реальные дефекты.</li>
+<li><strong>Время.</strong> Разбор ложных падений, перезапуски <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button>, ожидание.</li>
+<li><strong>Скрытые дефекты.</strong> Часть «нестабильных тестов» — реальные гонки в продукте, которые пользователи тоже встречают.</li>
+</ul>
+<p>Математика из <a href="#/test-quality/reliability">главы 4</a>: при доле ложных падений <code>p</code> на тест вероятность зелёного прогона из <code>N</code> тестов — <code>(1 − p)^N</code>. Даже редкие флаки в большом наборе делают красным почти каждый прогон.</p>
+<h2 id="/flaky/causes" data-anchor="causes">Основные причины<a class="h-anchor" href="#/flaky/causes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Причина</th>
+<th>Механизм</th>
+<th>Типичный симптом</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><button type="button" class="term" data-term="race-condition" aria-expanded="false">Race Condition</button> в тесте</td>
+<td>Проверка или действие до того, как приложение обновилось</td>
+<td>Старое значение, «элемент не найден», клик не сработал</td>
+</tr>
+<tr>
+<td>Некорректные ожидания</td>
+<td><code>waitForTimeout</code>, однократное чтение, ожидание ответа после действия</td>
+<td>Падает на медленном агенте</td>
+</tr>
+<tr>
+<td><button type="button" class="term" data-term="order-dependency" aria-expanded="false">Test Order Dependency</button></td>
+<td>Тест использует состояние, оставленное другим тестом</td>
+<td>Падает при запуске отдельно, в другом порядке, на ретрае</td>
+</tr>
+<tr>
+<td>Проблемы тестовых данных</td>
+<td>Общие аккаунты, фиксированные значения, чужие изменения, истёкшие данные</td>
+<td>409, «чужие» данные, падение после полуночи или в конце месяца</td>
+</tr>
+<tr>
+<td>Нестабильное окружение</td>
+<td>Перегруженный стенд, деплой во время прогона, нехватка ресурсов агента</td>
+<td>502/503/504, таймауты сразу во многих тестах</td>
+</tr>
+<tr>
+<td>Сетевые ошибки</td>
+<td>Обрывы, <button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button>, медленные ответы, лимиты</td>
+<td><code>ECONNRESET</code>, <code>ERR_NAME_NOT_RESOLVED</code>, 429</td>
+</tr>
+<tr>
+<td>Внешние зависимости</td>
+<td>Платёжные песочницы, карты, почта, SMS</td>
+<td>Падают только тесты с интеграцией</td>
+</tr>
+<tr>
+<td>Время и локаль</td>
+<td>Даты относительно «сейчас», часовые пояса, локализованный формат</td>
+<td>Падает в определённое время или на определённом агенте</td>
+</tr>
+<tr>
+<td>Анимации и оверлеи</td>
+<td>Элемент перекрыт тостом, баннером cookies, модальным окном</td>
+<td><code>intercepts pointer events</code></td>
+</tr>
+<tr>
+<td>Ресурсы агента</td>
+<td>Слишком много воркеров для CPU и памяти</td>
+<td>Медленно всё и везде, таймауты</td>
+</tr>
+<tr>
+<td>Дефект продукта</td>
+<td>Реальная гонка в приложении: двойной клик, параллельные запросы</td>
+<td>Воспроизводится и вручную при быстрых действиях</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/flaky/detection" data-anchor="detection">Обнаружение<a class="h-anchor" href="#/flaky/detection" aria-label="Ссылка на раздел">#</a></h2>
+<ul>
+<li><strong>Статус flaky.</strong> С <code>retries</code> <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> помечает тест, прошедший со второй попытки, как flaky — это главный источник данных в CI.</li>
+<li><strong><button type="button" class="term" data-term="repeat-each" aria-expanded="false">Repeat Each</button>.</strong> <code>npx playwright test tests/cart.spec.ts --repeat-each=20 --workers=4</code> — быстрый способ проверить подозрительный тест или новый тест перед слиянием.</li>
+<li><strong>История.</strong> Allure, TestOps, собственный дашборд по JSON-отчётам: какие тесты бывали flaky за последние N прогонов.</li>
+<li><strong><button type="button" class="term" data-term="flaky-rate" aria-expanded="false">Flaky Rate</button></strong> — доля прогонов, в которых тест был flaky или упал и прошёл при перезапуске. Метрика для всего набора и для отдельных тестов.</li>
+</ul>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">playwright.config.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defineConfig</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">defineConfig</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">retries</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.CI</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">0</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">failOnFlakyTests</span><span class="o">:</span><span class="w"> </span><span class="o">!!</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">STRICT_FLAKY</span><span class="p">,</span><span class="w">   </span><span class="c1">// для критичного набора: flaky = провал</span>
+<span class="w">  </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">trace</span><span class="o">:</span><span class="w"> </span><span class="s1">'on-first-retry'</span><span class="w"> </span><span class="p">},</span><span class="w">               </span><span class="c1">// trace как раз для расследования флаков</span>
+<span class="w">  </span><span class="nx">reporter</span><span class="o">:</span><span class="w"> </span><span class="p">[[</span><span class="s1">'list'</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="s1">'json'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">outputFile</span><span class="o">:</span><span class="w"> </span><span class="s1">'results/results.json'</span><span class="w"> </span><span class="p">}]],</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="/flaky/reproduce" data-anchor="reproduce">Воспроизведение<a class="h-anchor" href="#/flaky/reproduce" aria-label="Ссылка на раздел">#</a></h2>
+<p>Нестабильность часто проявляется только при определённых условиях. Способы их создать:</p>
+<div class="code"><div class="code-head"><span class="code-lang">Shell</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>tests/cart.spec.ts:31<span class="w"> </span>--repeat-each<span class="o">=</span><span class="m">30</span><span class="w">                  </span><span class="c1"># повтор одного теста</span>
+npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>tests/cart<span class="w"> </span>--repeat-each<span class="o">=</span><span class="m">10</span><span class="w"> </span>--workers<span class="o">=</span><span class="m">8</span><span class="w"> </span>--fully-parallel<span class="w"> </span><span class="c1"># параллельное давление</span>
+npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--project<span class="o">=</span>chromium<span class="w"> </span>--grep<span class="w"> </span>@cart<span class="w"> </span>--retries<span class="o">=</span><span class="m">0</span><span class="w">             </span><span class="c1"># без маскировки ретраями</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/repro-slow-network.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'корзина при медленном ответе API'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Искусственная задержка ответа делает гонку воспроизводимой</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="s1">'**/api/cart/**'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">route</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="mf">1500</span><span class="p">));</span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">route</span><span class="p">.</span><span class="k">continue</span><span class="p">();</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/cart'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Увеличить количество'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'cart-total'</span><span class="p">)).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="s1">'9 980 ₽'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Ещё способы: замедление CPU через CDP-сессию в Chromium (<code>Emulation.setCPUThrottlingRate</code>), запуск в Docker-образе CI с теми же лимитами ресурсов, тот же seed и те же данные, запуск в обратном порядке или по одному.</p>
+<h2 id="/flaky/investigate" data-anchor="investigate">Расследование<a class="h-anchor" href="#/flaky/investigate" aria-label="Ссылка на раздел">#</a></h2>
+<ol>
+<li><strong>Собрать артефакты</strong> упавших попыток: trace, скриншоты, логи, <button type="button" class="term" data-term="correlation-id" aria-expanded="false">Correlation ID</button>.</li>
+<li><strong>Сравнить</strong> trace упавшей и успешной попытки: на каком шаге состояние страницы или ответы сети разошлись.</li>
+<li><strong>Сформулировать гипотезу</strong> («проверка выполняется до ответа <code>/api/cart</code>»).</li>
+<li><strong>Подтвердить</strong>: сделать условие воспроизводимым (задержка ответа, параллельный запуск, другой порядок) — тест должен падать стабильно.</li>
+<li><strong>Исправить причину</strong>, а не симптом.</li>
+<li><strong>Проверить</strong>: <code>--repeat-each</code> с теми же условиями, что воспроизводили падение.</li>
+</ol>
+<div class="sim-mount" data-sim="flaky-debugger"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Flaky Test Debugger: учебные расследования — код теста, история запусков, лог и фрагмент trace. Выберите наиболее вероятную причину нестабильности и получите техническое объяснение и исправление.</div></div>
+<h2 id="/flaky/fixes" data-anchor="fixes">Исправления по причинам<a class="h-anchor" href="#/flaky/fixes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Причина</th>
+<th>Исправление</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Однократное чтение</td>
+<td><code>await expect(locator).toHaveText(...)</code> (<a href="#/assertions/web-first">глава 15</a>)</td>
+</tr>
+<tr>
+<td>Ожидание ответа после действия</td>
+<td><button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button> <code>waitForResponse</code> до действия</td>
+</tr>
+<tr>
+<td>Пауза <code>waitForTimeout</code></td>
+<td>Ожидание состояния или события</td>
+</tr>
+<tr>
+<td>Порядок тестов</td>
+<td>Свои данные в фикстурах, нет общего изменяемого состояния (<a href="#/fixtures/isolation">глава 16</a>)</td>
+</tr>
+<tr>
+<td>Общий аккаунт или данные</td>
+<td>Аккаунт на тест/воркер, уникальные значения (<a href="#/parallel/shared-state">глава 25</a>)</td>
+</tr>
+<tr>
+<td>Время</td>
+<td><code>page.clock</code>, данные относительно «сейчас», фиксированный часовой пояс</td>
+</tr>
+<tr>
+<td>Оверлеи</td>
+<td>Состояние без оверлея (<button type="button" class="term" data-term="cookie" aria-expanded="false">Cookie</button> согласия заранее), <code>addLocatorHandler</code></td>
+</tr>
+<tr>
+<td>Внешние сервисы</td>
+<td>Мок-сервер или песочница; интеграцию — в отдельный набор</td>
+</tr>
+<tr>
+<td>Окружение</td>
+<td><button type="button" class="term" data-term="healthcheck" aria-expanded="false">Healthcheck</button> перед тестами, мониторинг стенда, не деплоить во время регрессии</td>
+</tr>
+<tr>
+<td>Ресурсы агента</td>
+<td>Меньше воркеров или мощнее агент</td>
+</tr>
+<tr>
+<td>Дефект продукта</td>
+<td>Баг-репорт с условиями воспроизведения; в тесте — ссылка и <code>test.fail()</code> до исправления</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/flaky/quarantine" data-anchor="quarantine">Карантин и процесс<a class="h-anchor" href="#/flaky/quarantine" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-quarantine" aria-expanded="false">Test Quarantine</button> — временная изоляция нестабильного теста от блокирующих наборов, чтобы он не мешал команде, но и не потерялся:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/quarantine-example.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'экспорт отчёта в Excel'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'@quarantine'</span><span class="p">],</span><span class="w"> </span><span class="nx">annotation</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'issue'</span><span class="p">,</span><span class="w"> </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s1">'QA-512: гонка при генерации файла'</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/reports'</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">download</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForEvent</span><span class="p">(</span><span class="s1">'download'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Экспорт в Excel'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">((</span><span class="k">await</span><span class="w"> </span><span class="nx">download</span><span class="p">).</span><span class="nx">suggestedFilename</span><span class="p">()).</span><span class="nx">toMatch</span><span class="p">(</span><span class="sr">/\.xlsx$/</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Shell</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--grep-invert<span class="w"> </span>@quarantine<span class="w">   </span><span class="c1"># блокирующий набор без карантина</span>
+npx<span class="w"> </span>playwright<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--grep<span class="w"> </span>@quarantine<span class="w">          </span><span class="c1"># отдельная неблокирующая задача: следить за состоянием</span>
+</code></pre></div>
+<p>Правила процесса:</p>
+<ol>
+<li><strong>Задача и владелец</strong> для каждого теста в карантине.</li>
+<li><strong>Срок</strong>: исправить или удалить осознанно через N дней.</li>
+<li><strong>Тест продолжает запускаться</strong> в неблокирующей задаче — видно, исправился ли он.</li>
+<li><strong>Лимит</strong>: если карантин растёт, это сигнал о системной проблеме (окружение, архитектура данных).</li>
+<li><strong>Профилактика</strong>: ESLint-правила (<code>no-wait-for-timeout</code>, <code>missing-playwright-await</code>), чек-лист ревью, burn-in — новые и изменённые тесты в MR запускаются с <code>--repeat-each</code>.</li>
+</ol>
+<p><code>test.fixme()</code> и <code>test.skip()</code> подходят для известных временных ситуаций, но тест в них не выполняется — без задачи и срока такие тесты «умирают» навсегда.</p>
+<h2 id="/flaky/metrics-defined" data-anchor="metrics-defined">Измеримые критерии стабильности<a class="h-anchor" href="#/flaky/metrics-defined" aria-label="Ссылка на раздел">#</a></h2><p>Выберите знаменатель явно. Например: <button type="button" class="term" data-term="flaky-rate" aria-expanded="false">Flaky Rate</button> = число test cases, упавших сначала и прошедших при retry, / число выполненных test cases за период. Это не доля всех падений и не доля запусков CI. Дополнительно отслеживайте first-attempt failure rate и постоянные падения.</p><p>У quarantine есть владелец, задача, дата пересмотра, причина и критерий возврата. Критичный сценарий временно замените другой проверкой. Зелёный прогон после исключения проблемных тестов не доказывает улучшение продукта.</p><p>20 успешных повторов — полезный smoke на стабильность, но не доказательство отсутствия flaky. При нуле ошибок грубая верхняя 95% оценка вероятности ошибки около 3/n применима лишь для независимых сопоставимых запусков; реальные запуски часто зависимы.</p><h2 id="/flaky/example" data-anchor="example">Пример: расследование «плавающей» корзины<a class="h-anchor" href="#/flaky/example" aria-label="Ссылка на раздел">#</a></h2>
+<p>Тест «удаление товара обновляет сумму» flaky в 4% прогонов.</p>
+<ol>
+<li><strong>История</strong>: падает только в CI, только при <code>workers ≥ 4</code>.</li>
+<li><strong>Trace упавшей попытки</strong>: после клика «Удалить» сумма на мгновение верная, затем меняется на большую. В сети — <code>GET /api/cart</code> возвращает <strong>два</strong> товара.</li>
+<li><strong>Гипотеза</strong>: другой тест в это время добавляет товар в корзину того же пользователя.</li>
+<li><strong>Подтверждение</strong>: тест и <code>cart-add.spec.ts</code> используют одного пользователя из общего <code>storageState</code>; при запуске двух файлов с <code>--repeat-each=20 --workers=2</code> падение воспроизводится в каждом третьем повторе.</li>
+<li><strong>Исправление</strong>: аккаунт на воркер через <code>parallelIndex</code> + фикстура пустой корзины перед тестом.</li>
+<li><strong>Проверка</strong>: <code>--repeat-each=50 --workers=8</code> — ноль падений.</li>
+</ol>
+<p>Ретраи прятали эту проблему месяцами, а «исправление» таймаутом ничего бы не дало.</p>
+<h2 id="/flaky/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/flaky/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>«Просто увеличим таймаут»</span></div><div class="callout-body"><p>Если причина — гонка за данные или порядок, таймаут не поможет. Если причина — ожидание, нужен правильный вид ожидания, а не более длинный.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Ретраи как постоянное решение</span></div><div class="callout-body"><p>Тест с ретраями «зелёный», но статус flaky в отчётах игнорируется. Нестабильность растёт, пока ретраи перестают спасать.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Удалить нестабильный тест молча</span></div><div class="callout-body"><p>Если тест проверял важный риск, риск остался без проверки. Удаление — осознанное решение с заменой проверки или принятием риска.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Считать любую нестабильность проблемой теста</span></div><div class="callout-body"><p>Гонка в приложении проявляется у пользователей так же: двойной заказ, неверная сумма при быстрых действиях. Сначала убедитесь, что приложение ведёт себя корректно.</p></div></div>
+<h2 id="/flaky/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/flaky/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="fl-causes" data-level="J" data-topic="Отладка и диагностика"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Какие причины flaky-тестов вы знаете?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Гонки (проверка или действие до обновления приложения), неправильные ожидания (паузы, однократное чтение, ожидание ответа после действия), зависимость от порядка и общего состояния, проблемы тестовых данных, нестабильное окружение и ресурсы агента, сетевые ошибки и лимиты, внешние зависимости, время и локаль, анимации и оверлеи. И реальные гонки в продукте.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="fl-investigate" data-level="M" data-topic="Отладка и диагностика"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как вы расследуете нестабильный тест?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Собираю данные: история падений, условия (только CI, только при нескольких воркерах, время суток), trace упавшей и успешной попытки. Сравниваю, где разошлось состояние. Формулирую гипотезу и делаю её воспроизводимой: <code>--repeat-each</code>, больше воркеров, задержка ответа через <code>page.route</code>, образ CI, другой порядок. Исправляю причину, подтверждаю исправление тем же способом воспроизведения.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="fl-retries" data-level="M" data-topic="Отладка и диагностика"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Почему ретраи не решают проблему flaky-тестов?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Ретраи скрывают симптом: тест зелёный, но причина (гонка, общие данные, дефект продукта) остаётся и проявляется чаще по мере роста набора. Они удлиняют прогон и могут маскировать реальные периодические дефекты. Ретраи допустимы как страховка в CI при обязательном отслеживании статуса flaky, карантине и задачах на исправление.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="fl-process" data-level="M+" data-topic="Отладка и диагностика"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Как выстроить в команде процесс работы с нестабильными тестами?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Метрика доли flaky по набору и тестам с дашбордом; trace при первом повторе; правило: flaky-тест получает задачу и владельца в течение дня, при невозможности быстрого исправления — карантин (отдельный тег и неблокирующая задача) со сроком; лимит размера карантина; профилактика — ESLint-правила, чек-лист ревью, burn-in новых тестов с <code>--repeat-each</code>; разбор системных причин (окружение, данные) на ретроспективах.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="mp-flaky-rate-policy" data-level="M+" data-topic="Отладка и диагностика"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Доля flaky-тестов в pipeline выросла до 8%, команда начала нажимать «перезапустить». Ваш план на две недели?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Сначала данные: выгрузить историю результатов (JSON-отчёты или Allure) и найти, какие тесты дают основную долю нестабильности, — обычно 10–20 тестов дают большую часть падений. Сгруппировать по причинам: окружение (массовые 502 в одно время), данные, ожидания, порядок. Проблемы окружения передать владельцам стенда с доказательствами. Самые частые тесты — в карантин с тикетом и владельцем, чтобы вернуть доверие к воротам; карантин ограничен по сроку. Параллельно чинить причины по убыванию вклада, проверяя исправление через --repeat-each в условиях CI. Ввести метрику <button type="button" class="term" data-term="flaky-rate" aria-expanded="false">Flaky Rate</button> на дашборде и правило: новый тест проходит --repeat-each перед слиянием.</p><h4>Частая ошибка</h4><div class="iq-mistake">Увеличить retries до 3 и считать проблему решённой: нестабильность скрыта, время прогона выросло.</div><h4>Пример</h4><p><code>npx playwright test tests/cart --repeat-each=30 --workers=8 --retries=0</code></p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/flaky/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/flaky/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="flaky:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Тест падает только при запуске всего набора и проходит, если запустить его отдельно. Наиболее вероятная причина?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Зависимость от состояния, оставленного другими тестами, или общие данные</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Ошибка в Playwright</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Неправильный локатор</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Недостаточный таймаут expect</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Изменение результата в зависимости от состава и порядка запуска — признак зависимости от общего состояния.</p></div></div><div class="quiz" data-qid="flaky:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Как сделать гонку «проверка до ответа сервера» воспроизводимой?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Добавить задержку ответа через <code>page.route</code> и запустить тест повторно</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Увеличить таймаут</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Запустить в headed-режиме</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Отключить ретраи</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Искусственно замедленный ответ превращает редкую гонку в стабильное падение — его можно исправить и проверить исправление.</p></div></div><div class="quiz" data-qid="flaky:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Что правильнее всего сделать с нестабильным тестом, который сейчас нельзя исправить?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>Оставить с <code>retries: 5</code></span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Удалить</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="1"><span class="quiz-mark"></span><span>Перенести в карантин с задачей, владельцем и сроком, продолжая запускать в неблокирующей задаче</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Обернуть проверки в try/catch</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Карантин убирает помеху для команды и сохраняет видимость проблемы до исправления.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Как отличить нестабильность теста от нестабильности продукта?</span></summary><div class="check-body"><p>Изучить trace и логи: если тест проверяет раньше, чем приложение закончило корректную операцию, — проблема теста. Если приложение в итоге приходит к неверному состоянию (двойной заказ, неверная сумма, ошибка сервера) при определённом тайминге — это гонка в продукте. Проверка: воспроизвести вручную или через API теми же быстрыми действиями.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Зачем запускать новые тесты в MR с <code>--repeat-each</code>?</span></summary><div class="check-body"><p>Однократное прохождение не доказывает стабильность. Повтор 10–20 раз (с несколькими воркерами) выявляет большинство гонок и зависимостей до того, как тест попадёт в основной набор и начнёт мешать команде. Это называют burn-in.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/optimization"><small>← Назад</small><span>Оптимизация</span></a><a class="foot-link next" href="#/aqa-design"><small>Дальше →</small><span>AQA System Design</span></a></div></footer></article><hr class="nojs-sep">

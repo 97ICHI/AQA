@@ -1,0 +1,254 @@
+[
+ {
+  "kind": "text",
+  "path": "shell/head.html"
+ },
+ {
+  "kind": "text",
+  "path": "css/fonts.css"
+ },
+ {
+  "kind": "text",
+  "path": "css/app.css"
+ },
+ {
+  "kind": "text",
+  "path": "shell/body-open.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/00-intro.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/01-first-run.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/02-aqa-intro.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/03-test-types.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/04-test-design.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/05-test-quality.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/06-ts-basics.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/07-async.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/08-code-org.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/09-debugging.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/10-web-arch.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/11-http-rest.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/12-sql.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/13-git-linux.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/14-workstation-tech.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/15-pw-arch.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/16-locators.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/17-assertions.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/18-fixtures.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/19-pom.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/20-pw-advanced.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/21-api-basics.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/22-api-auto.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/23-contracts.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/24-mocking.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/25-project-arch.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/26-isolation.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/27-parallel.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/28-reporting.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/29-docker.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/30-cicd.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/31-optimization.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/32-flaky.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/33-aqa-design.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/34-shop-e2e.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/35-competence.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/36-alt-stacks.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/37-glossary.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/38-interview.html"
+ },
+ {
+  "kind": "chapter",
+  "path": "chapters/39-about.html"
+ },
+ {
+  "kind": "text",
+  "path": "shell/body-close.html"
+ },
+ {
+  "kind": "book",
+  "path": "book.json"
+ },
+ {
+  "kind": "text",
+  "path": "shell/script-open.html"
+ },
+ {
+  "kind": "text",
+  "path": "js/00-icons.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/01-core.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/02-sims-00-minisql.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/03-sims-01-basics.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/04-sims-02-prog.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/05-sims-03-shopapi.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/06-sims-04-tech.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/07-sims-05-locator.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/08-sims-06-ui.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/09-sims-07-api.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/10-sims-08-arch.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/11-sims-09-infra.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/12-sims-10-design.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/13-refs.js"
+ },
+ {
+  "kind": "text",
+  "path": "js/14-app.js"
+ },
+ {
+  "kind": "text",
+  "path": "shell/tail.html"
+ }
+]

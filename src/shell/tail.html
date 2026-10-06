@@ -1,0 +1,37 @@
+</script>
+<script>
+(function(){
+ 'use strict';
+ var KEY='aqalab:practice', OLD='aqalab:skills-v2', STEPS=['junior','middle','middle-plus'], done={};
+ function read(k){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:null;}catch(e){return null;}}
+ done=read(KEY)||read(OLD)||{};
+ function summary(extra){
+   var out=document.getElementById('practice-summary'); if(!out) return;
+   var n=STEPS.filter(function(k){return done[k];}).length;
+   out.textContent='Практических этапов отмечено: '+n+' из 3. Это самооценка, а не подтверждение квалификации.'+(extra||'');
+ }
+ function sync(){
+   document.querySelectorAll('[data-practice-step]').forEach(function(x){x.checked=!!done[x.dataset.practiceStep];});
+   summary();
+ }
+ function save(){
+   try{localStorage.setItem(KEY,JSON.stringify(done));}
+   catch(e){summary(' Отметки не сохранены: хранилище браузера недоступно.');}
+ }
+ document.addEventListener('change',function(e){
+   var t=e.target; if(t.matches&&t.matches('[data-practice-step]')){done[t.dataset.practiceStep]=t.checked;sync();save();}
+ });
+ document.addEventListener('click',function(e){
+   if(e.target.closest('[data-practice-reset]')){done={};sync();save();return;}
+   var mutate=e.target.closest('[data-lab-mutate]'); if(!mutate) return;
+   var lab=mutate.closest('.dom-lab'), dom=lab.querySelector('[data-lab-dom]'), button=dom.querySelector('button');
+   if(dom.firstElementChild===button){var w=document.createElement('div');w.className='new-wrapper';button.replaceWith(w);w.append(button);mutate.textContent='Убрать обёртку';}
+   else{dom.append(button);dom.querySelector('.new-wrapper').remove();mutate.textContent='Добавить обёртку';}
+   var css=dom.querySelectorAll(':scope > button').length;
+   var role=Array.from(dom.querySelectorAll('button')).filter(function(x){return x.getAttribute('aria-label')==='Войти';}).length;
+   lab.querySelector('[data-lab-result]').textContent='CSS по прямому потомку: '+css+' совпадений. Кнопка с доступным именем «Войти»: '+role+' совпадение.';
+ });
+ sync();
+})();
+</script></body>
+</html>

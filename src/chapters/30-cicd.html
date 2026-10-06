@@ -1,0 +1,273 @@
+<article class="chapter" id="/cicd" data-chapter="cicd" data-section="infra" aria-labelledby="h1-cicd"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 28 · Раздел VII · Инфраструктура и CI/CD</div><h1 class="ch-title" id="h1-cicd" tabindex="-1">CI/CD</h1><p class="ch-lead">Continuous Integration, Continuous Delivery и Continuous Deployment; pipeline, stages и jobs; GitLab CI и GitHub Actions; quality gates и артефакты. Где именно в конвейере выполняются автотесты и как их результат превращается в решение «можно сливать» или «можно выпускать».</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 9 мин чтения</span><span class="lvl" title="Уровень">M</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/docker">Docker</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Автотесты приносят пользу, только когда запускаются автоматически на каждое изменение и их результат блокирует слияние или релиз. CI/CD-pipeline — то место, где тесты становятся воротами качества, а не отчётом, который кто-то иногда смотрит.</p><p class="idea-goal"><strong>Цель главы:</strong> встроить разные наборы автотестов в pipeline на нужных этапах, настроить артефакты и quality gates в GitLab CI и GitHub Actions.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core"><button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> — последовательность стадий из задач; быстрые проверки идут раньше и на каждое изменение, медленные — позже и реже. Красный результат тестов должен блокировать слияние или деплой.</p><h3>Главное</h3><ul class="recall-points"><li>CI — частое слияние изменений с автоматической сборкой и тестами; <button type="button" class="term" data-term="continuous-delivery" aria-expanded="false">Continuous Delivery</button> — каждое изменение готово к релизу, релиз по кнопке; <button type="button" class="term" data-term="continuous-deployment" aria-expanded="false">Continuous Deployment</button> — релиз автоматически.</li><li>Стадии: lint/typecheck → unit → build → API/компонентные → деплой на стенд → smoke → UI/E2E-регрессия → отчёт.</li><li><button type="button" class="term" data-term="gitlab-ci" aria-expanded="false">GitLab CI</button>: <code>.gitlab-ci.yml</code>, stages, jobs, <code>image</code>, <code>rules</code>, <code>parallel</code> для шардов, <code>artifacts</code> (с <code>when: always</code>) и <code>reports: junit</code>.</li><li><button type="button" class="term" data-term="github-actions" aria-expanded="false">GitHub Actions</button>: workflows в <code>.github/workflows</code>, jobs, <code>strategy.matrix</code> для шардов, <code>upload-artifact</code> / <code>download-artifact</code>.</li><li>Quality gate — условие, при невыполнении которого pipeline не пропускает изменение: упавшие тесты, ошибки линтера, порог нестабильности, покрытие.</li><li>Артефакты (JUnit XML, отчёт, trace, скриншоты) сохраняются и при падении, но <code>always</code>-шаги и cleanup не должны скрывать код возврата тестов.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Continuous Integration</dt><dd>Практика частого слияния изменений в общую ветку с автоматической сборкой и тестами на каждое изменение.</dd></div><div><dt>Continuous Delivery</dt><dd>Каждое изменение, прошедшее pipeline, готово к выпуску; релиз в продакшен выполняется по решению человека.</dd></div><div><dt>Continuous Deployment</dt><dd>Каждое изменение, прошедшее pipeline, автоматически выпускается в продакшен без ручного шага.</dd></div><div><dt>Pipeline</dt><dd>Набор задач, сгруппированных в стадии или граф зависимостей, который выполняется автоматически при изменениях, по расписанию или вручную.</dd></div><div><dt>CI Job</dt><dd>Отдельный шаг pipeline (lint, тесты, сборка, деплой), выполняемый на runner, обычно в Docker-образе, с артефактами и кэшем.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Pipeline, который можно «пропустить» при красных тестах, превращает тесты в рекомендацию. Сделайте проверки обязательными (protected branches, required checks).</p><div class="recall-links"><a href="#/cicd/ci-cd">CI, Continuous Delivery и Continuous Deployment →</a><a href="#/cicd/pipeline">Pipeline: стадии, задачи, артефакты →</a><a href="#/cicd/gitlab">GitLab CI →</a><a href="#/cicd/github">GitHub Actions →</a><a href="#/cicd/quality-gates">Quality Gates →</a><a href="#/cicd/artifacts">Test Artifacts в CI →</a><a href="#/cicd/pr-pipeline">PR-конвейер и сохранение диагностических артефактов →</a><a href="#/cicd/example">Пример: от ручного запуска к воротам →</a><a href="#/cicd/mistakes">Типичные ошибки →</a><a href="#/cicd/interview">Что важно для собеседования →</a><a href="#/cicd/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/cicd/ci-cd">CI, Continuous Delivery и Continuous Deployment</a><a href="#/cicd/pipeline">Pipeline: стадии, задачи, артефакты</a><a href="#/cicd/gitlab">GitLab CI</a><a href="#/cicd/github">GitHub Actions</a><a href="#/cicd/quality-gates">Quality Gates</a><a href="#/cicd/artifacts">Test Artifacts в CI</a><a href="#/cicd/pr-pipeline">PR-конвейер и сохранение диагностических артефактов</a><a href="#/cicd/example">Пример: от ручного запуска к воротам</a><a href="#/cicd/mistakes">Типичные ошибки</a><a href="#/cicd/interview">Что важно для собеседования</a><a href="#/cicd/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/cicd/ci-cd" data-anchor="ci-cd">CI, Continuous Delivery и Continuous Deployment<a class="h-anchor" href="#/cicd/ci-cd" aria-label="Ссылка на раздел">#</a></h2>
+<ul>
+<li><strong><button type="button" class="term" data-term="continuous-integration" aria-expanded="false">Continuous Integration</button> (CI)</strong> — разработчики часто вливают изменения в общую ветку, и каждое изменение автоматически собирается и проверяется. Цель — узнавать о проблемах через минуты после изменения.</li>
+<li><strong><button type="button" class="term" data-term="continuous-delivery" aria-expanded="false">Continuous Delivery</button></strong> — продолжение CI: каждое изменение, прошедшее <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button>, <strong>готово к выпуску</strong> — собрано, проверено, развёрнуто на стенд. Сам релиз в продакшен — решение человека (кнопка).</li>
+<li><strong><button type="button" class="term" data-term="continuous-deployment" aria-expanded="false">Continuous Deployment</button></strong> — каждое прошедшее Pipeline изменение <strong>автоматически</strong> выпускается в продакшен. Требует очень высокого доверия к автоматическим проверкам.</li>
+</ul>
+<p>Чем дальше по этой цепочке, тем больше ответственность автотестов: при Continuous Deployment между коммитом и пользователями нет ручной проверки вообще.</p>
+<h2 id="/cicd/pipeline" data-anchor="pipeline">Pipeline: стадии, задачи, артефакты<a class="h-anchor" href="#/cicd/pipeline" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> — набор <button type="button" class="term" data-term="ci-job" aria-expanded="false">CI Job</button> (задач), сгруппированных в стадии. Задачи одной стадии выполняются параллельно, стадии — последовательно (или по графу зависимостей <code>needs</code>). Задачи выполняются на <button type="button" class="term" data-term="ci-runner" aria-expanded="false">CI Runner</button> (агентах), часто внутри Docker-образа.</p>
+<p>Типичное место автотестов в Pipeline продукта:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Стадия</th>
+<th>Задачи</th>
+<th>Время</th>
+<th>Когда</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>verify</td>
+<td>lint, typecheck тестов и кода</td>
+<td>1–2 мин</td>
+<td>Каждый push</td>
+</tr>
+<tr>
+<td>unit</td>
+<td>unit-тесты с покрытием</td>
+<td>1–5 мин</td>
+<td>Каждый push</td>
+</tr>
+<tr>
+<td>build</td>
+<td>сборка образа приложения</td>
+<td>3–5 мин</td>
+<td>Каждый push</td>
+</tr>
+<tr>
+<td>integration</td>
+<td>API- и интеграционные тесты в эфемерном окружении (Compose)</td>
+<td>5–10 мин</td>
+<td>Каждый MR</td>
+</tr>
+<tr>
+<td>deploy:staging</td>
+<td>деплой на стенд</td>
+<td>2–5 мин</td>
+<td>После слияния в main</td>
+</tr>
+<tr>
+<td>smoke</td>
+<td>smoke-тесты на стенде</td>
+<td>2–5 мин</td>
+<td>После каждого деплоя</td>
+</tr>
+<tr>
+<td>e2e</td>
+<td>UI/E2E-регрессия, шардирование</td>
+<td>10–20 мин</td>
+<td>После деплоя / перед релизом</td>
+</tr>
+<tr>
+<td>report</td>
+<td>сборка и публикация отчёта</td>
+<td>1–2 мин</td>
+<td>Всегда (<code>when: always</code>)</td>
+</tr>
+<tr>
+<td>nightly</td>
+<td>полная кросс-браузерная регрессия</td>
+<td>часы</td>
+<td>По расписанию</td>
+</tr>
+</tbody>
+</table></div>
+<div class="sim-mount" data-sim="pipeline-visualizer"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>CI/CD Pipeline Visualizer: запустите учебный Pipeline, внедрите падение в любую задачу, включите allow_failure, ретраи, шардирование или граф needs — и посмотрите, какие задачи выполнятся, какие артефакты сохранятся и пройдёт ли Quality Gate.</div></div>
+<h2 id="/cicd/gitlab" data-anchor="gitlab">GitLab CI<a class="h-anchor" href="#/cicd/gitlab" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="gitlab-ci" aria-expanded="false">GitLab CI</button> настраивается файлом <code>.gitlab-ci.yml</code> в корне репозитория:</p>
+<div class="code"><div class="code-head"><span class="code-lang">YAML</span><span class="code-title">.gitlab-ci.yml</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="nt">stages</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">verify</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">test</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">report</span><span class="p p-Indicator">]</span>
+
+<span class="nt">default</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mcr.microsoft.com/playwright:v1.58.2-noble</span>
+<span class="w">  </span><span class="nt">cache</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> files</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">package-lock.json</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">.npm/</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">before_script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm ci --cache .npm --prefer-offline</span>
+
+<span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">BASE_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://staging.shop.example.com</span><span class="w">    </span><span class="c1"># не секрет; секреты — в Settings → CI/CD → Variables</span>
+
+<span class="nt">lint</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">verify</span>
+<span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm run typecheck</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm run lint</span>
+<span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$CI_PIPELINE_SOURCE == "merge_request_event"</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH</span>
+
+<span class="nt">api-tests</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright test --project=api</span>
+<span class="w">  </span><span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w">                     </span><span class="c1"># сохранить и при падении</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">playwright-report/</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">test-results/</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">reports</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">junit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results/junit.xml</span><span class="w">       </span><span class="c1"># тесты отобразятся в MR</span>
+<span class="w">    </span><span class="nt">expire_in</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7 days</span>
+
+<span class="nt">e2e-tests</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">  </span><span class="nt">parallel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">                        </span><span class="c1"># 4 шарда</span>
+<span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright test --project=ui --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL</span>
+<span class="w">  </span><span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">blob-report/</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">expire_in</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7 days</span>
+<span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$CI_PIPELINE_SOURCE == "schedule"</span>
+
+<span class="nt">merge-report</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">report</span>
+<span class="w">  </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">  </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">e2e-tests</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright merge-reports --reporter html ./blob-report</span>
+<span class="w">  </span><span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span>
+<span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">playwright-report/</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">expire_in</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">14 days</span>
+</code></pre></div>
+<p>Ключевые элементы:</p>
+<ul>
+<li><code>image</code> — Docker-образ, в котором выполняется задача (браузеры уже внутри).</li>
+<li><code>cache</code> — кэш npm между запусками ускоряет установку.</li>
+<li><code>rules</code> — когда задача запускается: MR, main, расписание, ручной запуск.</li>
+<li><code>parallel</code> + <code>$CI_NODE_INDEX/$CI_NODE_TOTAL</code> — шардирование.</li>
+<li><code>artifacts</code> с <code>when: always</code> — отчёты сохраняются и при красном результате; <code>reports: junit</code> показывает упавшие тесты прямо в <button type="button" class="term" data-term="merge-request" aria-expanded="false">Merge Request</button>.</li>
+<li><code>needs</code> — граф зависимостей: задача стартует, как только готовы нужные ей задачи, не дожидаясь всей стадии.</li>
+</ul>
+<h2 id="/cicd/github" data-anchor="github">GitHub Actions<a class="h-anchor" href="#/cicd/github" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="github-actions" aria-expanded="false">GitHub Actions</button> — workflows в <code>.github/workflows/*.yml</code>:</p>
+<div class="code"><div class="code-head"><span class="code-lang">YAML</span><span class="code-title">.github/workflows/e2e.yml</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">e2e</span>
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">schedule</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">'0</span><span class="nv"> </span><span class="s">2</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*'</span><span class="w">          </span><span class="c1"># ночная регрессия</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">container</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mcr.microsoft.com/playwright:v1.58.2-noble</span>
+<span class="w">      </span><span class="nt">options</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--ipc=host</span>
+<span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">fail-fast</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">            </span><span class="c1"># не останавливать остальные шарды при падении одного</span>
+<span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">shard</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-node@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> node-version</span><span class="p">:</span><span class="w"> </span><span class="nv">22</span><span class="p p-Indicator">,</span><span class="nt"> cache</span><span class="p">:</span><span class="w"> </span><span class="nv">npm</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm ci</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright test --shard=${{ matrix.shard }}/4</span>
+<span class="w">        </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">BASE_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ vars.STAGING_URL }}</span>
+<span class="w">          </span><span class="nt">ADMIN_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.ADMIN_PASSWORD }}</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/upload-artifact@v4</span>
+<span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ !cancelled() }}</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blob-report-${{ matrix.shard }}</span>
+<span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blob-report</span>
+<span class="w">          </span><span class="nt">retention-days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
+
+<span class="w">  </span><span class="nt">report</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ !cancelled() }}</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-node@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> node-version</span><span class="p">:</span><span class="w"> </span><span class="nv">22</span><span class="p p-Indicator">,</span><span class="nt"> cache</span><span class="p">:</span><span class="w"> </span><span class="nv">npm</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm ci</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/download-artifact@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="nv">all-blob-reports</span><span class="p p-Indicator">,</span><span class="nt"> pattern</span><span class="p">:</span><span class="w"> </span><span class="nv">blob-report-*</span><span class="p p-Indicator">,</span><span class="nt"> merge-multiple</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npx playwright merge-reports --reporter html ./all-blob-reports</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/upload-artifact@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">html-report</span><span class="p p-Indicator">,</span><span class="nt"> path</span><span class="p">:</span><span class="w"> </span><span class="nv">playwright-report</span><span class="p p-Indicator">,</span><span class="nt"> retention-days</span><span class="p">:</span><span class="w"> </span><span class="nv">14</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</code></pre></div>
+<p>Версии действий (<code>@v4</code>) периодически обновляются — сверяйтесь с их репозиториями. Секреты передаются через <code>secrets.*</code> и автоматически маскируются в логах.</p>
+<h2 id="/cicd/quality-gates" data-anchor="quality-gates">Quality Gates<a class="h-anchor" href="#/cicd/quality-gates" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="quality-gate" aria-expanded="false">Quality Gate</button> — автоматическое условие пропуска изменения дальше:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ворота</th>
+<th>Где</th>
+<th>Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Слияние MR</td>
+<td>Protected <button type="button" class="term" data-term="branch" aria-expanded="false">Branch</button> + required <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button></td>
+<td>Все обязательные задачи зелёные, есть одобрение ревью</td>
+</tr>
+<tr>
+<td>Качество кода тестов</td>
+<td>verify</td>
+<td>Ноль ошибок <code>tsc</code> и ESLint</td>
+</tr>
+<tr>
+<td>Регрессия</td>
+<td>test</td>
+<td>Ноль упавших тестов (не «95% прошло»)</td>
+</tr>
+<tr>
+<td>Нестабильность</td>
+<td>test / report</td>
+<td>Доля flaky ниже порога, иначе предупреждение или красный статус (<code>failOnFlakyTests</code>)</td>
+</tr>
+<tr>
+<td>Покрытие</td>
+<td>unit</td>
+<td>Не ниже порога и не ниже, чем в main (для изменённых файлов)</td>
+</tr>
+<tr>
+<td>Деплой в прод</td>
+<td>после staging</td>
+<td>Smoke и регрессия на staging зелёные</td>
+</tr>
+</tbody>
+</table></div>
+<p>Принцип: ворота должны быть <strong>обязательными</strong> и <strong>доверенными</strong>. Если тесты часто ложно падают, команда начнёт обходить ворота — поэтому стабильность набора (<a href="#/flaky">глава 30</a>) — условие существования quality gates.</p>
+<h2 id="/cicd/artifacts" data-anchor="artifacts">Test Artifacts в CI<a class="h-anchor" href="#/cicd/artifacts" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-artifacts" aria-expanded="false">Test Artifacts</button>, которые стоит сохранять:</p>
+<ul>
+<li><strong>JUnit XML</strong> — для отображения результатов в интерфейсе GitLab/GitHub.</li>
+<li><strong>HTML-отчёт <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> / Allure</strong> — для разбора; публикуется на GitLab Pages, в S3 или как артефакт.</li>
+<li><strong>trace, скриншоты, видео</strong> упавших тестов.</li>
+<li><strong>Логи приложения</strong> из эфемерного окружения (<code>docker compose logs &gt; app.log</code>).</li>
+</ul>
+<p>Срок хранения (<code>expire_in</code>, <code>retention-days</code>) — компромисс между удобством разбора и местом в хранилище.</p>
+<h2 id="/cicd/pr-pipeline" data-anchor="pr-pipeline">PR-конвейер и сохранение диагностических артефактов<a class="h-anchor" href="#/cicd/pr-pipeline" aria-label="Ссылка на раздел">#</a></h2><p>Типичный конвейер проверки pull request для TypeScript-проекта: линтер, typecheck, окружение через Compose с проверкой <button type="button" class="term" data-term="readiness" aria-expanded="false">Readiness</button>, тесты и отчёт. Ruff — линтер для Python и относится к дополнительному <a href="#/alt-stacks/python-backend">Python-маршруту</a>.</p><div class="table-wrap"><table><thead><tr><th>Этап</th><th>При успехе</th><th>При падении</th></tr></thead><tbody><tr><td>Lint и typecheck</td><td>Перейти к окружению</td><td>Остановить дальнейший запуск; сохранить лог</td></tr><tr><td>Окружение и Readiness</td><td>Запустить тесты</td><td>Сохранить Compose logs и состояние</td></tr><tr><td>Тесты</td><td>Сохранить результат</td><td>Сохранить trace/screenshots/logs</td></tr><tr><td>Отчёт</td><td>Сохранить HTML/Allure artifact</td><td>Не превращать ошибку отчётности в зелёный тестовый статус</td></tr><tr><td>Cleanup</td><td>Удалить ресурсы этого запуска</td><td>Сохранить первичную ошибку и сообщить ошибку cleanup</td></tr></tbody></table></div><p>Учебный проект из главы <a href="#/first-run/starter">«Первый запуск»</a> содержит такой workflow для <button type="button" class="term" data-term="github-actions" aria-expanded="false">GitHub Actions</button>: ESLint, typecheck, Compose, тесты, генерация Allure, артефакты с условием <code>always()</code>, логи и cleanup. Его запуск в GitHub в этом учебнике не проверялся — см. <a href="#/about/limits">«О учебнике»</a>.</p><div class="code"><div class="code-head"><span class="code-lang">Bash</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>docker compose up --build --abort-on-container-exit --exit-code-from tests
+# Далее сохраните logs и отчёты, затем выполните cleanup.
+# В shell сохраните код первого запуска до остальных команд.</code></pre></div><p>Для Allure добавьте совместимый <button type="button" class="term" data-term="reporter" aria-expanded="false">Reporter</button> и сгенерируйте allure-results при выполнении тестов. После запуска Allure CLI создаёт отдельный HTML report; публикуйте его как artifact независимо от успеха тестов. GitHub Pages — отдельная публикация с permissions и правилами доступа, а не обязательная часть PR-проверки. Публичный отчёт не должен содержать секреты.</p><p>В учебный проект включён <code>package-lock.json</code>. Используйте npm ci для воспроизводимой установки. При обновлении зависимостей измените и сохраните lockfile. Cache ускоряет получение зависимостей; artifacts сохраняют результаты работы. Секреты поступают из защищённой конфигурации CI, не из примеров в HTML.</p><h2 id="/cicd/example" data-anchor="example">Пример: от ручного запуска к воротам<a class="h-anchor" href="#/cicd/example" aria-label="Ссылка на раздел">#</a></h2>
+<p>Было: автотесты запускает QA вручную перед релизом раз в две недели; падения разбираются в день релиза.</p>
+<p>Стало:</p>
+<ol>
+<li><strong>MR</strong>: lint + typecheck + API-тесты в Compose-окружении (8 минут). Обязательная проверка — без неё MR не сливается.</li>
+<li><strong>main</strong>: деплой на staging → smoke (3 минуты) → UI-регрессия в 4 шардах (12 минут). Красный результат блокирует кнопку «в прод».</li>
+<li><strong>Ночью</strong>: полная кросс-браузерная регрессия, Allure-отчёт с историей, уведомление в чат.</li>
+<li><strong>Метрики</strong>: время до обратной связи на MR и доля нестабильных тестов на дашборде команды.</li>
+</ol>
+<p>Регрессии стали находиться в день изменения, а релиз перестал быть «днём разбора падений».</p>
+<h2 id="/cicd/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/cicd/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Артефакты только при успехе</span></div><div class="callout-body"><p>По умолчанию GitLab сохраняет артефакты успешных задач. Без <code>when: always</code> отчёт упавших тестов — самый нужный — пропадёт.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>allow_failure: true</code> для тестов «временно»</span></div><div class="callout-body"><p>Задача становится жёлтой, на неё перестают смотреть, «временно» длится месяцами. Нестабильные тесты — в карантин с задачами, а не весь набор в необязательные.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Секреты в <code>.gitlab-ci.yml</code></span></div><div class="callout-body"><p>Файл виден всем с доступом к репозиторию. Секреты — в защищённых маскируемых переменных CI или во внешнем хранилище.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Весь набор на каждый push</span></div><div class="callout-body"><p>Час E2E на каждый коммит — разработчики перестают ждать результат. Распределите наборы по этапам: быстрые — часто, медленные — реже.</p></div></div>
+<h2 id="/cicd/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/cicd/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="ci-where-tests" data-level="J" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Где в CI/CD pipeline запускаются автотесты?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>На нескольких этапах: lint и проверка типов — на каждый push; unit и API/компонентные — на каждый MR (часто в эфемерном окружении); smoke — сразу после деплоя на стенд; UI/E2E-регрессия — после деплоя на staging или перед релизом; полная кросс-браузерная регрессия — по расписанию. Быстрые и стабильные — раньше и чаще, медленные — позже.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="ci-delivery-deployment" data-level="J" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Чем отличаются CI, Continuous Delivery и Continuous Deployment?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>CI — частое слияние изменений с автоматической сборкой и тестами. <button type="button" class="term" data-term="continuous-delivery" aria-expanded="false">Continuous Delivery</button> — каждое прошедшее <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> изменение готово к релизу, выпуск по кнопке. Continuous Deployment — выпуск автоматически, без ручного шага. С каждым шагом растут требования к надёжности автотестов.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="ci-gitlab-config" data-level="M" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как вы настроите запуск Playwright-тестов в GitLab CI?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Задача в образе <code>mcr.microsoft.com/playwright</code> той же версии, кэш npm по <code>package-lock.json</code>, <code>npm ci</code>, запуск нужного проекта; <code>rules</code> для MR, main и расписания; <code>parallel: N</code> и <code>--shard=$CI_NODE_INDEX/$CI_NODE_TOTAL</code> для шардов с blob-репортером и отдельной задачей <code>merge-reports</code>; <code>artifacts: when: always</code> для отчётов и trace, <code>reports: junit</code> для отображения в MR; секреты — в защищённых переменных.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="ci-quality-gates" data-level="M+" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Какие quality gates вы бы настроили и как поддерживать доверие к ним?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Обязательный Pipeline для слияния в main (protected <button type="button" class="term" data-term="branch" aria-expanded="false">Branch</button>), ноль ошибок типов и линтера, ноль упавших тестов в обязательных наборах, smoke и регрессия на staging перед продом, контроль нестабильности (отчёт о flaky, порог, <code>failOnFlakyTests</code> для критичного набора). Доверие — через стабильность: карантин нестабильных тестов с задачами и сроками, разбор каждого ложного падения, быстрые наборы на MR.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/cicd/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/cicd/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="cicd:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Чем Continuous Delivery отличается от Continuous Deployment?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Это синонимы</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Delivery не использует тесты</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Deployment не использует CI</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>При Delivery изменение готово к релизу, но выпускается по решению человека; при Deployment — автоматически</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Continuous Deployment убирает ручной шаг перед продакшеном, поэтому требует максимального доверия к автотестам.</p></div></div><div class="quiz" data-qid="cicd:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Что делает <code>artifacts: when: always</code> в GitLab CI?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Сохраняет артефакты и при падении задачи</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Перезапускает упавшую задачу</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Хранит артефакты вечно</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Запускает задачу всегда</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Отчёты и trace особенно нужны именно при падении.</p></div></div><div class="quiz" data-qid="cicd:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Как в GitLab CI разделить UI-тесты на 4 шарда?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span><code>stages: [shard1, shard2, shard3, shard4]</code></span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Создать 4 одинаковых файла конфигурации</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span><code>parallel: 4</code> и <code>--shard=$CI_NODE_INDEX/$CI_NODE_TOTAL</code></span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span><code>workers: 4</code></span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p><code>parallel</code> создаёт N копий задачи с переменными индекса и общего числа.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Какие наборы тестов вы бы запускали на MR, а какие — после деплоя?</span></summary><div class="check-body"><p>На MR — быстрые и изолированные: lint и typecheck, unit, API-тесты и компонентные или ключевые UI-тесты в эфемерном окружении; они должны укладываться в 10–15 минут. После деплоя на staging — smoke (готовность стенда) и UI/E2E-регрессия с реальными интеграциями. Ночью — полная кросс-браузерная регрессия и долгие сценарии.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему quality gate бесполезен при нестабильном наборе тестов?</span></summary><div class="check-body"><p>Если тесты часто краснеют без причины, команда начинает перезапускать <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> или делать проверки необязательными, и ворота перестают защищать. Ворота работают, только когда красный результат почти всегда означает реальную проблему.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/docker"><small>← Назад</small><span>Docker</span></a><a class="foot-link next" href="#/optimization"><small>Дальше →</small><span>Оптимизация</span></a></div></footer></article><hr class="nojs-sep">

@@ -1,0 +1,103 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  book:
+    name: Учебник — сборка и проверки
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            tools/package-lock.json
+            aqa-lab-starter/package-lock.json
+      # playwright-core из учебного проекта нужен проверке таблицы actionability и мутационной проверке
+      - run: npm ci
+        working-directory: aqa-lab-starter
+      - run: npm ci
+        working-directory: tools
+      - run: npx playwright install --with-deps chromium
+        working-directory: tools
+      - name: Сборка из src/ совпадает с AQA_Lab_v3.html, все проверки
+        run: npm run check
+        working-directory: tools
+        env:
+          FULL: '1'
+      - name: Печать всего учебника в PDF
+        run: npm run pdf
+        working-directory: tools
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AQA_Lab_v3-pdf
+          path: dist/AQA_Lab_v3.pdf
+          if-no-files-found: error
+
+  starter:
+    name: Учебный проект — lint, typecheck, тесты, контролируемое падение
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: aqa-lab-starter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: aqa-lab-starter/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:api
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Контролируемое падение
+        run: node ../tools/mutation-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: starter-playwright-report
+          path: |
+            aqa-lab-starter/playwright-report/
+            aqa-lab-starter/test-results/
+          if-no-files-found: ignore
+
+  docker:
+    name: Учебный проект — Docker Compose
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: aqa-lab-starter
+    steps:
+      - uses: actions/checkout@v4
+      - name: Запуск окружения и тестов (код возврата — код сервиса tests)
+        run: docker compose up --build --abort-on-container-exit --exit-code-from tests
+      - name: Логи Compose
+        if: always()
+        run: docker compose logs --no-color > compose.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docker-diagnostics
+          path: |
+            aqa-lab-starter/playwright-report/
+            aqa-lab-starter/test-results/
+            aqa-lab-starter/allure-results/
+            aqa-lab-starter/compose.log
+          if-no-files-found: warn
+      - name: Очистка
+        if: always()
+        run: docker compose down --volumes

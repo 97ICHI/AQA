@@ -1,0 +1,224 @@
+<article class="chapter" id="/test-quality" data-chapter="test-quality" data-section="basics" aria-labelledby="h1-test-quality"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 4 · Раздел I · Основы автоматизации</div><h1 class="ch-title" id="h1-test-quality" tabindex="-1">Качество и эффективность автотестов</h1><p class="ch-lead">Test Coverage и Code Coverage, поддерживаемость, надёжность, время выполнения, нестабильность и окупаемость: как оценивать набор автотестов и почему «много тестов и высокий coverage» ещё не означает высокое качество.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 10 мин чтения</span><span class="lvl" title="Уровень">J–M</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/aqa-intro">Введение в AQA</a><a href="#/test-types">Виды тестирования</a><a href="#/test-design">Test Design</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Набор автотестов хорош, если он быстро и надёжно сообщает о существенных регрессиях и недорого обходится в поддержке. Количество тестов и процент покрытия — лишь косвенные признаки.</p><p class="idea-goal"><strong>Цель главы:</strong> оценивать набор по нескольким метрикам одновременно и объяснять, почему 100% coverage не гарантирует отсутствие дефектов.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Качество набора тестов складывается из того, какие риски он покрывает, насколько ему можно доверять, как быстро он отвечает и сколько стоит его поддержка.</p><h3>Главное</h3><ul class="recall-points"><li><button type="button" class="term" data-term="test-coverage" aria-expanded="false">Test Coverage</button> — доля требований или рисков, для которых есть проверки; <button type="button" class="term" data-term="code-coverage" aria-expanded="false">Code Coverage</button> — доля кода, выполненного во время тестов.</li><li>Code Coverage показывает, что код <strong>выполнялся</strong>, но не то, что результат <strong>проверялся</strong>: тест без assertions даёт покрытие без защиты.</li><li>Branch coverage строже line coverage; mutation testing проверяет, ловят ли тесты намеренно внесённые ошибки.</li><li>Надёжность: вероятность зелёного прогона набора из N тестов при отсутствии дефектов ≈ (1 − p)^N, где p — доля ложных падений теста.</li><li>Ретраи повышают долю зелёных прогонов, но скрывают нестабильность и увеличивают время.</li><li>Поддерживаемость: понятные имена, отсутствие дублирования, устойчивые локаторы, независимость тестов.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Test Coverage</dt><dd>Доля требований, сценариев или рисков, для которых существуют проверки. Считается по трассировке «требование → тесты».</dd></div><div><dt>Code Coverage</dt><dd>Доля кода приложения, выполненного во время тестов (строки, ветви, функции). Показывает непроверенный код, но не качество проверок.</dd></div><div><dt>Branch Coverage</dt><dd>Доля пройденных ветвей условий (if/else, ?:, &amp;&amp;, ||). Строже покрытия строк.</dd></div><div><dt>Mutation Testing</dt><dd>Оценка силы тестов: в код вносятся небольшие изменения (мутанты), и проверяется, падают ли тесты. Доля «убитых» мутантов — mutation score.</dd></div><div><dt>Test Maintainability</dt><dd>Насколько легко понять, изменить и починить тест: читаемость, отсутствие дублирования, устойчивые локаторы, независимость.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Метрика, ставшая целью, перестаёт быть хорошей метрикой: требование «80% coverage любой ценой» порождает тесты без проверок.</p><div class="recall-links"><a href="#/test-quality/what-is-good">Что значит «хорошие автотесты» →</a><a href="#/test-quality/test-coverage">Test Coverage →</a><a href="#/test-quality/code-coverage">Code Coverage →</a><a href="#/test-quality/reliability">Надёжность и нестабильность →</a><a href="#/test-quality/execution-time">Время выполнения →</a><a href="#/test-quality/maintainability">Поддерживаемость →</a><a href="#/test-quality/metrics">Метрики набора и ROI →</a><a href="#/test-quality/example">Пример: две команды →</a><a href="#/test-quality/mistakes">Типичные ошибки →</a><a href="#/test-quality/interview">Что важно для собеседования →</a><a href="#/test-quality/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/test-quality/what-is-good">Что значит «хорошие автотесты»</a><a href="#/test-quality/test-coverage">Test Coverage</a><a href="#/test-quality/code-coverage">Code Coverage</a><a href="#/test-quality/reliability">Надёжность и нестабильность</a><a href="#/test-quality/execution-time">Время выполнения</a><a href="#/test-quality/maintainability">Поддерживаемость</a><a href="#/test-quality/metrics">Метрики набора и ROI</a><a href="#/test-quality/example">Пример: две команды</a><a href="#/test-quality/mistakes">Типичные ошибки</a><a href="#/test-quality/interview">Что важно для собеседования</a><a href="#/test-quality/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/test-quality/what-is-good" data-anchor="what-is-good">Что значит «хорошие автотесты»<a class="h-anchor" href="#/test-quality/what-is-good" aria-label="Ссылка на раздел">#</a></h2>
+<p>Набор автотестов — продукт для команды. Его «пользователи» — разработчики и тестировщики, которые по результатам решают, можно ли сливать изменения и выпускать релиз. Хороший набор:</p>
+<ol>
+<li><strong>Ловит существенные регрессии</strong> — покрывает важные риски, а не просто много кода.</li>
+<li><strong>Не врёт</strong> — падает только при реальных проблемах (высокая <button type="button" class="term" data-term="test-reliability" aria-expanded="false">Test Reliability</button>).</li>
+<li><strong>Отвечает быстро</strong> — сигнал приходит, пока разработчик помнит контекст изменения.</li>
+<li><strong>Понятен при падении</strong> — по отчёту ясно, что сломалось и где.</li>
+<li><strong>Дёшев в поддержке</strong> — изменение интерфейса не требует правки десятков файлов (<button type="button" class="term" data-term="test-maintainability" aria-expanded="false">Test Maintainability</button>).</li>
+</ol>
+<p>Ни одна метрика по отдельности это не измеряет. Дальше разберём каждую и её слепые зоны.</p>
+<h2 id="/test-quality/test-coverage" data-anchor="test-coverage">Test Coverage<a class="h-anchor" href="#/test-quality/test-coverage" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-coverage" aria-expanded="false">Test Coverage</button> — доля требований, пользовательских сценариев или рисков, для которых есть проверки. Её считают по трассировке «требование → тесты»: в тест-менеджменте (TestRail, Allure TestOps, Xray) или по тегам в коде.</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/checkout.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'оплата картой создаёт заказ'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">tag</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'@checkout'</span><span class="p">,</span><span class="w"> </span><span class="s1">'@REQ-142'</span><span class="p">]</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/checkout'</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// ...</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'heading'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Заказ оформлен'</span><span class="w"> </span><span class="p">})).</span><span class="nx">toBeVisible</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Теги позволяют запускать подмножества (<code>npx playwright test --grep @checkout</code>) и строить отчёт о покрытии требований.</p>
+<p>Слепая зона: «требование покрыто» не говорит, <strong>насколько хорошо</strong>. Один позитивный тест и двадцать проверок с граничными значениями засчитываются одинаково.</p>
+<h2 id="/test-quality/code-coverage" data-anchor="code-coverage">Code Coverage<a class="h-anchor" href="#/test-quality/code-coverage" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="code-coverage" aria-expanded="false">Code Coverage</button> показывает, какая доля кода приложения выполнилась во время тестов. Основные виды:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Вид</th>
+<th>Что считает</th>
+<th>Слабость</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Line / Statement</td>
+<td>Выполненные строки (инструкции)</td>
+<td>Не видит невыполненные ветви условий в одной строке</td>
+</tr>
+<tr>
+<td><button type="button" class="term" data-term="branch-coverage" aria-expanded="false">Branch Coverage</button></td>
+<td>Пройденные ветви <code>if</code>/<code>else</code>, <code>?:</code>, <code>&amp;&amp;</code>, <code>||</code></td>
+<td>Не видит комбинации условий</td>
+</tr>
+<tr>
+<td>Function</td>
+<td>Вызванные функции</td>
+<td>Очень грубая</td>
+</tr>
+</tbody>
+</table></div>
+<p>Покрытие собирают инструментированием кода (Istanbul/nyc) или средствами движка V8 (c8; <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> умеет собирать JS-покрытие в Chromium через <code>page.coverage</code>). Для AQA важно понимать, что Code Coverage обычно считают по unit- и интеграционным тестам; для E2E-набора через браузер её собирают редко и интерпретируют осторожно.</p>
+<h3 id="/test-quality/coverage-illusion" data-anchor="coverage-illusion">Почему 100% не значит «без ошибок»<a class="h-anchor" href="#/test-quality/coverage-illusion" aria-label="Ссылка на раздел">#</a></h3>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">shipping.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">shippingCost</span><span class="p">(</span><span class="nx">total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">,</span><span class="w"> </span><span class="nx">isMember</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isMember</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">total</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">3000</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mf">300</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">shipping.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">shippingCost</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./shipping'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'участник — бесплатно'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">shippingCost</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// нет проверки!</span>
+<span class="p">});</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'обычный клиент — 300'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">shippingCost</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">300</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Оба теста вместе выполняют <strong>каждую строку</strong> и <strong>обе ветви</strong> <code>if</code> — line и Branch Coverage 100%. Но:</p>
+<ul>
+<li>первый тест ничего не проверяет: если функция вернёт 500, он пройдёт;</li>
+<li>граница <code>total &gt;= 3000</code> не проверена: замена на <code>&gt;</code> не будет замечена.</li>
+</ul>
+<p>Покрытие говорит, какой код <strong>не</strong> проверен (это полезно!), но не говорит, что проверенный код проверен хорошо.</p>
+<h3 id="/test-quality/mutation" data-anchor="mutation">Mutation Testing<a class="h-anchor" href="#/test-quality/mutation" aria-label="Ссылка на раздел">#</a></h3>
+<p><button type="button" class="term" data-term="mutation-testing" aria-expanded="false">Mutation Testing</button> отвечает на вопрос «поймают ли мои тесты ошибку?». Инструмент (для <button type="button" class="term" data-term="typescript" aria-expanded="false">TypeScript</button> — Stryker) вносит в код небольшие изменения — мутанты: <code>&gt;=</code> → <code>&gt;</code>, <code>||</code> → <code>&amp;&amp;</code>, <code>return 0</code> → <code>return 1</code> — и запускает тесты. Если тесты упали, мутант «убит»; если прошли — тесты слабые. Доля убитых мутантов (mutation score) — гораздо более честная метрика, чем coverage, но дорогая в вычислении, поэтому её применяют к критичным модулям.</p>
+<h2 id="/test-quality/reliability" data-anchor="reliability">Надёжность и нестабильность<a class="h-anchor" href="#/test-quality/reliability" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="flaky-test" aria-expanded="false">Flaky Test</button> — тест, который при одинаковом коде и окружении то проходит, то падает. Причины разобраны в главе <a href="#/flaky">«Flaky Tests и диагностика»</a>; здесь важна арифметика.</p>
+<p>Если каждый из <code>N</code> тестов независимо даёт ложное падение с вероятностью <code>p</code>, то вероятность полностью зелёного прогона при отсутствии дефектов:</p>
+<p><code>P(зелёный) = (1 − p)^N</code></p>
+<p>При <code>p = 0,5%</code> и <code>N = 300</code> получается <code>0,995^300 ≈ 0,22</code>: почти 4 из 5 прогонов красные без причины. Набор, где отдельные тесты «почти стабильны», в целом нестабилен.</p>
+<p>Ретраи (<code>retries</code> в <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button>) повторяют упавший тест. С <code>r</code> ретраями тест ложно падает, только если упали все <code>r + 1</code> попыток: <code>p^(r+1)</code>. Это резко повышает долю зелёных прогонов, но:</p>
+<ul>
+<li>нестабильность никуда не делась — просто стала невидимой (Playwright помечает такие тесты как <code>flaky</code>, и это нужно отслеживать);</li>
+<li>реальный периодический дефект (гонка в коде продукта) тоже будет скрыт;</li>
+<li>время прогона растёт.</li>
+</ul>
+<div class="sim-mount" data-sim="suite-reliability"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Калькулятор надёжности набора: число тестов, доля ложных падений одного теста и число ретраев → вероятность зелёного прогона, ожидаемое число повторов и время.</div></div>
+<h2 id="/test-quality/execution-time" data-anchor="execution-time">Время выполнения<a class="h-anchor" href="#/test-quality/execution-time" aria-label="Ссылка на раздел">#</a></h2>
+<p>Время прогона определяет, как используется набор. Ориентиры для большинства команд:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Набор</th>
+<th>Где запускается</th>
+<th>Желаемое время</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit</td>
+<td>Локально и на каждый коммит</td>
+<td>Секунды – пара минут</td>
+</tr>
+<tr>
+<td>Smoke</td>
+<td>После деплоя</td>
+<td>До 5 минут</td>
+</tr>
+<tr>
+<td>Регрессия API + ключевой UI</td>
+<td>На каждый <button type="button" class="term" data-term="merge-request" aria-expanded="false">Merge Request</button></td>
+<td>10–20 минут</td>
+</tr>
+<tr>
+<td>Полная регрессия</td>
+<td>Ночью / перед релизом</td>
+<td>Часы допустимы</td>
+</tr>
+</tbody>
+</table></div>
+<p>Если тесты на Merge Request идут час, разработчики начинают сливать изменения без них. Способы ускорения — параллелизм, шардирование, перенос проверок на нижние уровни — разобраны в главах <a href="#/parallel">«Параллельное выполнение»</a> и <a href="#/optimization">«Оптимизация»</a>.</p>
+<h2 id="/test-quality/maintainability" data-anchor="maintainability">Поддерживаемость<a class="h-anchor" href="#/test-quality/maintainability" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-maintainability" aria-expanded="false">Test Maintainability</button> — сколько усилий нужно, чтобы понять, изменить и починить тест. Признаки хорошей поддерживаемости:</p>
+<ul>
+<li><strong>Имя теста описывает поведение</strong>: <code>«просроченный промокод не применяется»</code>, а не <code>test_47</code>.</li>
+<li><strong>Тест читается как сценарий</strong>: подготовка → действие → проверка (Arrange–Act–Assert).</li>
+<li><strong>Нет дублирования</strong>: шаги входа или создания заказа вынесены в <a href="#/fixtures">fixtures</a> и <a href="#/pom">page objects</a>.</li>
+<li><strong>Устойчивые локаторы</strong>: по роли и тексту, а не по случайным CSS-классам (<a href="#/locators">глава 14</a>).</li>
+<li><strong>Независимость</strong>: тест не зависит от порядка запуска и данных других тестов.</li>
+<li><strong>Понятное падение</strong>: сообщение говорит, что ожидалось и что получено.</li>
+</ul>
+<h2 id="/test-quality/metrics" data-anchor="metrics">Метрики набора и ROI<a class="h-anchor" href="#/test-quality/metrics" aria-label="Ссылка на раздел">#</a></h2>
+<p>Полезно смотреть на несколько метрик вместе:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Метрика</th>
+<th>Что показывает</th>
+<th>Хороший тренд</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Доля нестабильных тестов</td>
+<td>Доверие к сигналу</td>
+<td>Падает</td>
+</tr>
+<tr>
+<td>Время до обратной связи на MR</td>
+<td>Удобство для разработчиков</td>
+<td>Падает</td>
+</tr>
+<tr>
+<td>Регрессии, пойманные автотестами</td>
+<td>Реальная польза</td>
+<td>Растёт</td>
+</tr>
+<tr>
+<td>Дефекты, ушедшие в прод (defect escape)</td>
+<td>Пробелы в покрытии рисков</td>
+<td>Падает</td>
+</tr>
+<tr>
+<td>Время на поддержку тестов в спринте</td>
+<td>Стоимость</td>
+<td>Стабильно или падает</td>
+</tr>
+<tr>
+<td>Покрытие требований и рисков</td>
+<td>Широта</td>
+<td>Растёт по критичным областям</td>
+</tr>
+</tbody>
+</table></div>
+<p><button type="button" class="term" data-term="test-automation-roi" aria-expanded="false">Test Automation ROI</button> из <a href="#/aqa-intro/economics">первой главы</a> складывается из этих же величин: поддержка и разбор ложных падений — это затраты, пойманные регрессии и ускорение релизов — выгода.</p>
+<h2 id="/test-quality/example" data-anchor="example">Пример: две команды<a class="h-anchor" href="#/test-quality/example" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Команда А</th>
+<th>Команда Б</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Тестов</td>
+<td>1200, в основном UI</td>
+<td>450: 300 API, 120 компонентных, 30 UI</td>
+</tr>
+<tr>
+<td><button type="button" class="term" data-term="code-coverage" aria-expanded="false">Code Coverage</button> (unit)</td>
+<td>85%</td>
+<td>70%</td>
+</tr>
+<tr>
+<td>Время на MR</td>
+<td>75 минут</td>
+<td>12 минут</td>
+</tr>
+<tr>
+<td>Нестабильных</td>
+<td>6%</td>
+<td>0,5%</td>
+</tr>
+<tr>
+<td>Перезапусков «на всякий случай»</td>
+<td>Почти каждый MR</td>
+<td>Редко</td>
+</tr>
+</tbody>
+</table></div>
+<p>Команда А выглядит сильнее по количеству и покрытию, но её набор почти бесполезен как ворота: он долгий и шумный, поэтому разработчики его обходят. Команда Б получает быстрый и надёжный сигнал. Задача AQA в команде А — не дописывать тесты, а переносить проверки на API, удалять дубли и чинить нестабильные тесты.</p>
+<h2 id="/test-quality/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/test-quality/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Ставить coverage целью</span></div><div class="callout-body"><p>Требование «не ниже 90%» приводит к тестам, которые вызывают код без проверок. Используйте coverage для поиска непроверенного кода, а не как KPI.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Скрывать нестабильность ретраями</span></div><div class="callout-body"><p>Ретраи — временная мера с обязательным мониторингом тестов со статусом flaky. Без мониторинга они маскируют и нестабильные тесты, и периодические дефекты продукта.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Считать тест полезным, потому что он ни разу не падал</span></div><div class="callout-body"><p>Тест, который никогда не падает, может проверять несущественное или ничего (как первый тест в примере с coverage). Периодически проверяйте тесты мутациями: сломайте условие вручную и убедитесь, что тест покраснел.</p></div></div>
+<h2 id="/test-quality/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/test-quality/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="q-coverage-100" data-level="J" data-topic="Качество автотестов"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">У проекта 100% code coverage. Значит ли это, что дефектов нет?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Нет. Coverage показывает, что код выполнялся во время тестов, а не что результат проверялся. Тест без assertions даёт покрытие без защиты; проверки могут не затрагивать границы условий; покрытие не учитывает комбинации ветвей, требования, которые вообще не реализованы, и интеграцию с другими системами. Coverage полезен, чтобы найти непроверенный код; силу тестов лучше оценивать <button type="button" class="term" data-term="mutation-testing" aria-expanded="false">Mutation Testing</button>.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="q-test-vs-code-coverage" data-level="J" data-topic="Качество автотестов"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Чем Test Coverage отличается от Code Coverage?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p><button type="button" class="term" data-term="test-coverage" aria-expanded="false">Test Coverage</button> — доля требований, сценариев или рисков, для которых есть тесты; считается по трассировке требований. <button type="button" class="term" data-term="code-coverage" aria-expanded="false">Code Coverage</button> — доля кода, выполненного тестами; считается инструментами (Istanbul, c8). Первая отвечает на вопрос «что из нужного проверено», вторая — «какой код вообще не исполнялся».</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="q-flaky-math" data-level="M" data-topic="Качество автотестов"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Почему набор из 300 «почти стабильных» тестов постоянно красный?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Ложные падения складываются. Если у каждого теста вероятность ложного падения <code>p</code>, вероятность зелёного прогона <code>(1 − p)^N</code>. При <code>p = 0,5%</code> и <code>N = 300</code> это около 22%. Поэтому важна стабильность каждого теста, измерение доли flaky и ограничение числа медленных верхнеуровневых тестов.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="q-metrics" data-level="M" data-topic="Качество автотестов"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Какими метриками вы оцениваете эффективность автоматизации?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Набор метрик, а не одна: доля нестабильных тестов и ложных падений, время обратной связи на <button type="button" class="term" data-term="merge-request" aria-expanded="false">Merge Request</button>, число регрессий, пойманных автотестами, дефекты, ушедшие в прод (defect escape rate), покрытие критичных требований и рисков, время на поддержку тестов. Количество тестов и Code Coverage — вспомогательные показатели.</p><h4>Частая ошибка</h4><div class="iq-mistake">Назвать только «количество тестов» и «процент покрытия».</div><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="q-retries-policy" data-level="M+" data-topic="Качество автотестов"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Какую политику ретраев вы бы предложили для CI?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Локально — 0 ретраев, чтобы видеть нестабильность сразу. В CI — 1–2 ретрая как страховка от инфраструктурных сбоев, но с обязательной обработкой статуса flaky: отчёт о тестах, прошедших со второй попытки, задачи на их починку, порог, при превышении которого тест уходит в карантин. Для тестов, падающих детерминированно, ретраи только удлиняют прогон. Можно включить <code>failOnFlakyTests</code>, чтобы сделать нестабильность видимой как ошибку.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="mp-coverage-goal" data-level="M+" data-topic="Качество автотестов"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Руководитель просит «довести покрытие автотестами до 90% к концу квартала». Как ответите?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Уточню цель: скорее всего, нужно меньше дефектов в продакшене и быстрее релизы. Процент покрытия легко нарастить бесполезными тестами без проверок, и он не говорит о рисках. Предложу метрики, связанные с целью: покрытие критичных бизнес-потоков и требований, defect escape rate по областям, время обратной связи на MR, доля flaky. Покрытие кода оставить как индикатор непроверенных мест (особенно для изменённого кода), а не как цель. Покажу план: какие риски закрываем и на каких уровнях.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/test-quality/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/test-quality/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="test-quality:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Тест вызывает функцию со всеми ветвями, но не содержит ни одного <code>expect</code>. Что верно?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Coverage будет 0%</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Такой тест упадёт с ошибкой «no assertions»</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Coverage может быть 100%, но тест не обнаружит неверный результат</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Mutation score будет 100%</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Coverage учитывает выполнение кода, а не проверки. Playwright Test по умолчанию не требует наличия assertions. Mutation Testing покажет, что мутанты выживают.</p></div></div><div class="quiz" data-qid="test-quality:2"><div class="quiz-q"><span class="quiz-n">2</span><div>В наборе 100 тестов, у каждого 1% ложных падений. Какая вероятность зелёного прогона без дефектов?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>99%</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="1"><span class="quiz-mark"></span><span>≈ 37%</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>90%</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>1%</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p><code>0,99^100 ≈ 0,366</code>. Нестабильность складывается: «почти стабильные» тесты дают нестабильный набор.</p></div></div><div class="quiz" data-qid="test-quality:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Чем branch coverage строже line coverage?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Учитывает только функции</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Учитывает проверки внутри тестов</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Требует пройти каждую ветвь условия, даже если обе в одной строке</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Ничем, это синонимы</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>В строке <code>return a &gt; 0 ? x : y</code> line coverage засчитает строку после одного вызова, а Branch Coverage потребует пройти обе ветви тернарного оператора.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Как убедиться, что новый тест действительно может упасть?</span></summary><div class="check-body"><p>Временно сломать проверяемое поведение (изменить ожидаемое значение, условие в коде или ответ мока) и убедиться, что тест покраснел с понятным сообщением. Это ручная версия <button type="button" class="term" data-term="mutation-testing" aria-expanded="false">Mutation Testing</button>. Тест, который нельзя заставить упасть, ничего не проверяет.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему ретраи увеличивают время прогона даже при стабильных тестах в целом?</span></summary><div class="check-body"><p>Повтор выполняется для каждого упавшего теста. Если в прогоне есть реальный дефект, все задетые им тесты будут прогнаны <code>r + 1</code> раз, и прогон станет заметно дольше именно тогда, когда нужен быстрый сигнал. Поэтому в CI обычно ставят 1–2 ретрая, а локально — 0.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/test-design"><small>← Назад</small><span>Test Design</span></a><a class="foot-link next" href="#/ts-basics"><small>Дальше →</small><span>Основы TypeScript</span></a></div></footer></article><hr class="nojs-sep">

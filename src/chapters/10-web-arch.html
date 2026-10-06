@@ -1,0 +1,222 @@
+<article class="chapter" id="/web-arch" data-chapter="web-arch" data-section="tech" aria-labelledby="h1-web-arch"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 9 · Раздел III · Технические основы</div><h1 class="ch-title" id="h1-web-arch" tabindex="-1">Архитектура веб-приложений</h1><p class="ch-lead">Client-server, frontend, backend и база данных; DNS, TCP/IP, HTTP и HTTPS; cookies, сессии, аутентификация и авторизация. Что происходит между вводом адреса и появлением страницы — и где на этом пути ломаются тесты.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 9 мин чтения</span><span class="lvl" title="Уровень">J</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Веб-приложение — цепочка компонентов: браузер, DNS, сеть, балансировщик, фронтенд, бэкенд, база данных. Автотест взаимодействует с её началом, а падать может из-за любого звена. Понимание цепочки превращает «тест упал» в «запрос не прошёл авторизацию на бэкенде».</p><p class="idea-goal"><strong>Цель главы:</strong> представлять путь запроса через систему и по симптому определять, какое звено вероятнее всего сломалось.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Запрос проходит <button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button> → TCP → TLS → <button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button> → балансировщик → бэкенд → база данных и обратно; на каждом звене возможна своя ошибка.</p><h3>Главное</h3><ul class="recall-points"><li><button type="button" class="term" data-term="frontend" aria-expanded="false">Frontend</button> выполняется в браузере и вызывает backend по HTTP; бизнес-правила и права доступа должны проверяться на backend.</li><li>DNS превращает имя в IP-адрес; TCP устанавливает соединение; TLS шифрует его и проверяет сертификат (HTTPS).</li><li>HTTP не хранит состояние; состояние пользователя переносят cookies или токены в заголовке <code>Authorization</code>.</li><li>Cookie-атрибуты: <code>HttpOnly</code> (недоступна JS), <code>Secure</code> (только HTTPS), <code>SameSite</code> (защита от CSRF), <code>Domain</code>/<code>Path</code>/<code>Expires</code>.</li><li><button type="button" class="term" data-term="authentication" aria-expanded="false">Authentication</button> — кто вы (401 при неудаче), <button type="button" class="term" data-term="authorization" aria-expanded="false">Authorization</button> — что вам можно (403).</li><li>Сессия на сервере хранит состояние по id из cookie; <button type="button" class="term" data-term="jwt" aria-expanded="false">JWT</button> содержит данные пользователя в подписанном токене.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Frontend</dt><dd>Часть приложения, выполняемая в браузере: HTML, CSS, JavaScript. Показывает интерфейс и вызывает backend по HTTP.</dd></div><div><dt>Backend</dt><dd>Серверное приложение: принимает запросы, проверяет права, выполняет бизнес-логику и работает с базой данных.</dd></div><div><dt>DNS</dt><dd>Domain Name System: переводит доменное имя (shop.example.com) в IP-адрес. Ответы кэшируются на время TTL.</dd></div><div><dt>HTTP</dt><dd>Протокол «запрос–ответ» без хранения состояния: метод, URL, заголовки и тело запроса; код статуса, заголовки и тело ответа.</dd></div><div><dt>HTTPS / TLS</dt><dd>HTTP поверх TLS: шифрование трафика, проверка подлинности сервера по сертификату и защита целостности данных.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Кнопка, скрытая в интерфейсе для обычного пользователя, не означает запрет: права проверяются на сервере, и это нужно тестировать через API.</p><div class="recall-links"><a href="#/web-arch/client-server">Client-server архитектура →</a><a href="#/web-arch/request-path">Путь запроса →</a><a href="#/web-arch/dns">DNS →</a><a href="#/web-arch/tcp-ip">TCP/IP →</a><a href="#/web-arch/http-https">HTTP и HTTPS →</a><a href="#/web-arch/cookies-sessions">Cookies и сессии →</a><a href="#/web-arch/auth">Authentication и Authorization →</a><a href="#/web-arch/example">Пример: диагностика по симптому →</a><a href="#/web-arch/mistakes">Типичные ошибки →</a><a href="#/web-arch/interview">Что важно для собеседования →</a><a href="#/web-arch/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/web-arch/client-server">Client-server архитектура</a><a href="#/web-arch/request-path">Путь запроса</a><a href="#/web-arch/dns">DNS</a><a href="#/web-arch/tcp-ip">TCP/IP</a><a href="#/web-arch/http-https">HTTP и HTTPS</a><a href="#/web-arch/cookies-sessions">Cookies и сессии</a><a href="#/web-arch/auth">Authentication и Authorization</a><a href="#/web-arch/example">Пример: диагностика по симптому</a><a href="#/web-arch/mistakes">Типичные ошибки</a><a href="#/web-arch/interview">Что важно для собеседования</a><a href="#/web-arch/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/web-arch/client-server" data-anchor="client-server">Client-server архитектура<a class="h-anchor" href="#/web-arch/client-server" aria-label="Ссылка на раздел">#</a></h2>
+<p>В <button type="button" class="term" data-term="client-server" aria-expanded="false">Client-server Architecture</button> модели клиент (браузер, мобильное приложение, автотест) отправляет запросы, а сервер их обрабатывает и отвечает. Типичное веб-приложение состоит из трёх слоёв:</p>
+<ul>
+<li><strong><button type="button" class="term" data-term="frontend" aria-expanded="false">Frontend</button></strong> — код, выполняемый в браузере: HTML, CSS, JavaScript. Современные приложения часто SPA (Single <button type="button" class="term" data-term="page-object-pw" aria-expanded="false">Page</button> Application): страница загружается один раз, а данные подгружаются запросами к API.</li>
+<li><strong><button type="button" class="term" data-term="backend" aria-expanded="false">Backend</button></strong> — серверное приложение: принимает HTTP-запросы, проверяет права, выполняет бизнес-логику, читает и записывает данные.</li>
+<li><strong>Database</strong> — хранилище данных (PostgreSQL, MySQL, MongoDB). Напрямую с браузером не общается.</li>
+</ul>
+<p>Между ними часто стоят: <strong>CDN</strong> (раздаёт статику ближе к пользователю), <strong>балансировщик нагрузки</strong> (распределяет запросы между экземплярами бэкенда), <strong>кэш</strong> (Redis), <strong>очереди сообщений</strong> и <strong>внешние сервисы</strong> (платежи, почта, SMS).</p>
+<div class="callout c-key"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r=".8"></circle></svg><span>Что это значит для тестировщика</span></div><div class="callout-body"><p>Одно и то же поведение можно проверить на разных слоях. Сообщение «недостаточно средств» показывает фронтенд, но решение принимает бэкенд. Если проверить правило только через UI, вы проверите и фронтенд, и бэкенд вместе — и при падении не будете знать, кто виноват. Если проверить только через API, не узнаете, правильно ли сообщение показано пользователю.</p></div></div>
+<h2 id="/web-arch/request-path" data-anchor="request-path">Путь запроса<a class="h-anchor" href="#/web-arch/request-path" aria-label="Ссылка на раздел">#</a></h2>
+<p>Что происходит, когда тест выполняет <code>page.goto('https://shop.example.com/catalog')</code>:</p>
+<ol>
+<li><strong><button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button>.</strong> Браузер узнаёт IP-адрес домена <code>shop.example.com</code>.</li>
+<li><strong>TCP.</strong> Устанавливается соединение с сервером на порту 443.</li>
+<li><strong>TLS.</strong> Стороны договариваются о шифровании; браузер проверяет сертификат сервера.</li>
+<li><strong>HTTP-запрос.</strong> <code>GET /catalog</code> с заголовками и cookies.</li>
+<li><strong>Балансировщик / прокси</strong> передаёт запрос одному из экземпляров приложения.</li>
+<li><strong><button type="button" class="term" data-term="backend" aria-expanded="false">Backend</button></strong> проверяет сессию, выполняет логику, обращается к <strong>базе данных</strong>.</li>
+<li><strong>Ответ.</strong> HTML-страница, затем браузер загружает CSS, JS и выполняет запросы к API за данными.</li>
+<li><strong>Рендеринг.</strong> Браузер строит DOM и показывает страницу; JS навешивает обработчики событий.</li>
+</ol>
+<div class="sim-mount" data-sim="request-journey"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Путь запроса: включайте и выключайте условия (кэш DNS, HTTPS, наличие сессии, права пользователя, состояние базы) и смотрите, на каком звене запрос проходит или ломается и с каким кодом.</div></div>
+<h2 id="/web-arch/dns" data-anchor="dns">DNS<a class="h-anchor" href="#/web-arch/dns" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button> (Domain Name System) переводит доменное имя в IP-адрес. Результат кэшируется в браузере, операционной системе и у провайдера на время TTL.</p>
+<p>Почему это важно в автоматизации:</p>
+<ul>
+<li>тестовые стенды часто доступны по внутренним доменам — без VPN или правильного DNS тест упадёт с <code>net::ERR_NAME_NOT_RESOLVED</code>;</li>
+<li>после переключения стенда на новый IP старые записи в кэше какое-то время ведут на старый сервер;</li>
+<li>в Docker-сетях имя сервиса (<code>app</code>, <code>db</code>) — тоже DNS-имя внутри сети (<a href="#/docker">глава 27</a>).</li>
+</ul>
+<h2 id="/web-arch/tcp-ip" data-anchor="tcp-ip">TCP/IP<a class="h-anchor" href="#/web-arch/tcp-ip" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="tcp-ip" aria-expanded="false">TCP/IP</button> — стек протоколов передачи данных. Упрощённо:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Уровень</th>
+<th>Протоколы</th>
+<th>Что делает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Прикладной</td>
+<td><button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button>, <button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button>, WebSocket</td>
+<td>Смысл сообщений</td>
+</tr>
+<tr>
+<td>Транспортный</td>
+<td>TCP, UDP</td>
+<td>Доставка между процессами (порты); TCP гарантирует порядок и доставку</td>
+</tr>
+<tr>
+<td>Сетевой</td>
+<td>IP</td>
+<td>Маршрутизация между компьютерами по IP-адресам</td>
+</tr>
+<tr>
+<td>Канальный</td>
+<td>Ethernet, Wi-Fi</td>
+<td>Передача в локальной сети</td>
+</tr>
+</tbody>
+</table></div>
+<p>TCP устанавливает соединение «тройным рукопожатием» (SYN → SYN-ACK → ACK). Порт определяет процесс на сервере: 80 — HTTP, 443 — HTTPS, 5432 — PostgreSQL, 3000 — частый порт локального dev-сервера.</p>
+<p>Типичные сетевые ошибки в тестах: <code>ECONNREFUSED</code> / <code>ERR_CONNECTION_REFUSED</code> — на порту никто не слушает (приложение не запущено, неверный порт); <code>ETIMEDOUT</code> — пакеты не доходят (firewall, недоступная сеть); <code>ECONNRESET</code> — соединение оборвано (перезапуск сервера, прокси).</p>
+<h2 id="/web-arch/http-https" data-anchor="http-https">HTTP и HTTPS<a class="h-anchor" href="#/web-arch/http-https" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button> — протокол «запрос–ответ» поверх TCP. Подробно он разобран в следующей главе <a href="#/http-rest">«HTTP и REST API»</a>. Ключевое свойство: HTTP <strong>не хранит состояния</strong> — каждый запрос независим, сервер «не помнит» предыдущие.</p>
+<p><button type="button" class="term" data-term="https-tls" aria-expanded="false">HTTPS / TLS</button> — HTTP поверх TLS. TLS:</p>
+<ul>
+<li><strong>шифрует</strong> трафик — посторонние не прочитают пароль и cookies;</li>
+<li><strong>проверяет подлинность</strong> сервера по сертификату, выданному доверенным центром сертификации;</li>
+<li><strong>защищает целостность</strong> — данные нельзя незаметно изменить.</li>
+</ul>
+<p>На тестовых стендах часто используют самоподписанные сертификаты; браузер их отвергнет (<code>ERR_CERT_AUTHORITY_INVALID</code>). В <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> для таких стендов есть опция <code>ignoreHTTPSErrors: true</code> — её включают только для тестовых окружений, где это осознанное решение.</p>
+<h2 id="/web-arch/cookies-sessions" data-anchor="cookies-sessions">Cookies и сессии<a class="h-anchor" href="#/web-arch/cookies-sessions" aria-label="Ссылка на раздел">#</a></h2>
+<p>Раз <button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button> не хранит состояние, как сайт «помнит», что вы вошли? Сервер выдаёт браузеру <button type="button" class="term" data-term="cookie" aria-expanded="false">Cookie</button> заголовком <code>Set-Cookie</code>, а браузер автоматически отправляет её в каждом следующем запросе к этому домену.</p>
+<div class="code"><div class="code-head"><span class="code-lang">HTTP</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Set-Cookie</span><span class="o">:</span> <span class="l">sid=8f3a9c…; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400</span>
+</code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Атрибут</th>
+<th>Значение</th>
+<th>Почему важно</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HttpOnly</code></td>
+<td>JavaScript на странице не может прочитать Cookie</td>
+<td>Защита от кражи сессии при XSS</td>
+</tr>
+<tr>
+<td><code>Secure</code></td>
+<td>Отправляется только по HTTPS</td>
+<td>Не утечёт в открытом HTTP</td>
+</tr>
+<tr>
+<td><code>SameSite</code></td>
+<td><code>Strict</code> / <code>Lax</code> / <code>None</code> — отправлять ли при запросах с других сайтов</td>
+<td>Защита от CSRF</td>
+</tr>
+<tr>
+<td><code>Domain</code>, <code>Path</code></td>
+<td>Для каких адресов отправлять</td>
+<td>Cookie стенда A не попадёт на стенд B</td>
+</tr>
+<tr>
+<td><code>Expires</code> / <code>Max-Age</code></td>
+<td>Срок жизни</td>
+<td>Без них — до закрытия браузера</td>
+</tr>
+</tbody>
+</table></div>
+<p>Два основных подхода к хранению состояния входа:</p>
+<ul>
+<li><strong>Серверная <button type="button" class="term" data-term="session" aria-expanded="false">Session</button></strong>: Cookie содержит только случайный идентификатор, а данные сессии лежат на сервере (в памяти, Redis, БД). Выход — удаление сессии на сервере.</li>
+<li><strong>Токен (<button type="button" class="term" data-term="jwt" aria-expanded="false">JWT</button>)</strong>: сервер выдаёт подписанный токен с данными пользователя и сроком действия; клиент отправляет его в заголовке <code>Authorization: Bearer …</code> или в Cookie. Сервер проверяет подпись, не обращаясь к хранилищу. Отозвать JWT до истечения срока сложнее.</li>
+</ul>
+<div class="callout c-tip"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg><span>Как это использовать в тестах</span></div><div class="callout-body"><p>Раз состояние входа — это cookies или токен, вход через форму в каждом тесте не нужен: можно один раз войти, сохранить состояние (cookies и localStorage) и подставлять его в новые контексты браузера. В <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> это <code>storageState</code> — разбор в главе <a href="#/pw-advanced/auth">«Продвинутый Playwright»</a>.</p></div></div>
+<h2 id="/web-arch/auth" data-anchor="auth">Authentication и Authorization<a class="h-anchor" href="#/web-arch/auth" aria-label="Ссылка на раздел">#</a></h2>
+<p>Два разных вопроса:</p>
+<ul>
+<li><strong><button type="button" class="term" data-term="authentication" aria-expanded="false">Authentication</button></strong> — «кто вы?» Проверка учётных данных: пароль, токен, сертификат, второй фактор. Неудача — <code>401 Unauthorized</code> (название исторически неточное: речь именно об аутентификации).</li>
+<li><strong><button type="button" class="term" data-term="authorization" aria-expanded="false">Authorization</button></strong> — «что вам можно?» Проверка прав аутентифицированного пользователя на действие или ресурс. Неудача — <code>403 Forbidden</code>; иногда сервер намеренно отвечает <code>404</code>, чтобы не раскрывать существование чужого ресурса.</li>
+</ul>
+<p>Матрица проверок доступа, которую стоит автоматизировать через API для каждого важного ресурса:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Кто</th>
+<th>Свой ресурс</th>
+<th>Чужой ресурс</th>
+<th>Админ-операция</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Без токена</td>
+<td>401</td>
+<td>401</td>
+<td>401</td>
+</tr>
+<tr>
+<td>Истёкший токен</td>
+<td>401</td>
+<td>401</td>
+<td>401</td>
+</tr>
+<tr>
+<td>Обычный пользователь</td>
+<td>200</td>
+<td>403 / 404</td>
+<td>403</td>
+</tr>
+<tr>
+<td>Администратор</td>
+<td>200</td>
+<td>200</td>
+<td>200</td>
+</tr>
+</tbody>
+</table></div>
+<p>Отдельная частая уязвимость — IDOR (Insecure Direct Object Reference): пользователь меняет <code>id</code> в URL (<code>/api/orders/1042</code> → <code>/api/orders/1043</code>) и получает чужой заказ. Тест на неё прост и очень ценен.</p>
+<h2 id="/web-arch/example" data-anchor="example">Пример: диагностика по симптому<a class="h-anchor" href="#/web-arch/example" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Симптом в тесте</th>
+<th>Звено</th>
+<th>Что проверить</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ERR_NAME_NOT_RESOLVED</code></td>
+<td><button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button></td>
+<td>Домен стенда, VPN, <code>/etc/hosts</code>, имя сервиса в Docker</td>
+</tr>
+<tr>
+<td><code>ERR_CONNECTION_REFUSED</code></td>
+<td>TCP</td>
+<td>Запущено ли приложение, порт, <code>baseURL</code></td>
+</tr>
+<tr>
+<td><code>ERR_CERT_AUTHORITY_INVALID</code></td>
+<td>TLS</td>
+<td>Сертификат стенда, <code>ignoreHTTPSErrors</code> для теста</td>
+</tr>
+<tr>
+<td>Редирект на <code>/login</code> посреди теста</td>
+<td>Сессия</td>
+<td>Истёк срок Cookie/токена, тесты делят одну сессию, выход в другом тесте</td>
+</tr>
+<tr>
+<td><code>403</code> при действии, которое раньше работало</td>
+<td>Авторизация</td>
+<td>Роль тестового пользователя, изменение прав</td>
+</tr>
+<tr>
+<td><code>502 Bad Gateway</code> / <code>504 Gateway Timeout</code></td>
+<td>Балансировщик / бэкенд</td>
+<td>Бэкенд упал или не успевает ответить</td>
+</tr>
+<tr>
+<td>Данные на странице не обновились</td>
+<td>Кэш / <button type="button" class="term" data-term="frontend" aria-expanded="false">Frontend</button></td>
+<td>Кэширование ответов, повторный запрос, ожидание в тесте</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/web-arch/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/web-arch/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Проверять права только через UI</span></div><div class="callout-body"><p>Скрытая кнопка «Удалить» не мешает отправить <code>DELETE /api/users/5</code> напрямую. Проверки доступа автоматизируют на уровне API.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Путать 401 и 403</span></div><div class="callout-body"><p>401 — не удалось установить, кто вы; 403 — вы известны, но действие запрещено. Тест, ожидающий 403 без токена, проверяет неправильное поведение.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Включить <code>ignoreHTTPSErrors</code> везде</span></div><div class="callout-body"><p>Опция маскирует реальную проблему с сертификатом на стенде, где он должен быть корректным, — например, перед релизом.</p></div></div>
+<h2 id="/web-arch/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/web-arch/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="web-url-enter" data-level="J" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Что происходит, когда вы вводите адрес сайта в браузере?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Браузер получает IP через <button type="button" class="term" data-term="dns" aria-expanded="false">DNS</button> (с учётом кэша), устанавливает TCP-соединение, для HTTPS выполняет TLS-рукопожатие с проверкой сертификата, отправляет HTTP-запрос с заголовками и cookies. Запрос проходит через балансировщик к бэкенду, тот проверяет сессию, выполняет логику и обращается к базе. Ответ — HTML; затем браузер загружает CSS и JS, выполняет запросы к API и отрисовывает страницу.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="web-401-403" data-level="J" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Чем аутентификация отличается от авторизации? Какие коды ответа им соответствуют?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Аутентификация — установить, кто пользователь (пароль, токен); при неудаче — 401. Авторизация — проверить, что можно этому пользователю; при отказе — 403 (иногда 404, чтобы не раскрывать существование ресурса). Проверки доступа тестирую через API матрицей: без токена, с истёкшим, с чужим ресурсом, с недостаточной ролью.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="web-cookies" data-level="J" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Что такое cookies и какие у них важные атрибуты?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Данные, которые сервер сохраняет в браузере заголовком <code>Set-Cookie</code>, а браузер отправляет обратно с запросами к домену. Важные атрибуты: <code>HttpOnly</code> (недоступна JS — защита от XSS), <code>Secure</code> (только HTTPS), <code>SameSite</code> (не отправлять с чужих сайтов — защита от CSRF), <code>Domain</code>/<code>Path</code> (область), <code>Expires</code>/<code>Max-Age</code> (срок).</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="web-session-jwt" data-level="M" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Чем серверная сессия отличается от JWT и что это меняет для тестов?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Серверная сессия: в <button type="button" class="term" data-term="cookie" aria-expanded="false">Cookie</button> только идентификатор, состояние на сервере, выход — удаление сессии. <button type="button" class="term" data-term="jwt" aria-expanded="false">JWT</button>: подписанный токен содержит данные и срок, сервер проверяет подпись без хранилища, отзыв до истечения требует отдельного механизма. Для тестов: проверяю выход (старый токен/сессия не работает), истечение срока, подмену данных в токене (подпись должна не сойтись) и могу готовить авторизацию через API или сохранённый storageState.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="web-idor" data-level="M+" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Как автоматизировать проверку, что пользователь не видит чужие данные?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Через API: создаю два пользователя и ресурс у первого, затем запрашиваю, изменяю и удаляю этот ресурс токеном второго — ожидаю 403 или 404 и неизменность данных. Повторяю для всех чувствительных эндпоинтов (лучше параметризованным тестом по списку маршрутов). Это ловит IDOR — частую уязвимость, которую UI-тесты не находят, потому что интерфейс просто не показывает чужие id.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/web-arch/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/web-arch/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="web-arch:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Тест получает <code>ERR_CONNECTION_REFUSED</code>. Что вероятнее всего?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Неверный пароль тестового пользователя</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Истёк сертификат</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>У пользователя нет прав</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Приложение не запущено или указан неверный порт</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Отказ в соединении означает, что на указанном адресе и порту никто не принимает TCP-соединения.</p></div></div><div class="quiz" data-qid="web-arch:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Какой атрибут cookie не даёт JavaScript на странице прочитать значение сессии?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>SameSite</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Secure</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="1"><span class="quiz-mark"></span><span>HttpOnly</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Path</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p><code>HttpOnly</code> запрещает доступ к Cookie из <code>document.cookie</code>, что защищает сессию при XSS.</p></div></div><div class="quiz" data-qid="web-arch:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Пользователь с ролью «покупатель» запрашивает <code>GET /api/admin/reports</code> с валидным токеном. Какой ответ корректен?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>200</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>403</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>500</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>401</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Аутентификация прошла (токен валиден), но прав нет — это 403.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему после входа через UI тест можно не логинить заново в каждом следующем тесте?</span></summary><div class="check-body"><p>Состояние входа хранится в cookies или localStorage (токен). Его можно сохранить после одного входа и подставлять в новые контексты браузера — так тесты становятся быстрее и не зависят от формы входа. Саму форму входа проверяют отдельными тестами.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Чем серверная сессия отличается от JWT с точки зрения тестирования выхода из системы?</span></summary><div class="check-body"><p>При серверной сессии выход удаляет сессию на сервере, и старая <button type="button" class="term" data-term="cookie" aria-expanded="false">Cookie</button> сразу перестаёт работать — это легко проверить. <button type="button" class="term" data-term="jwt" aria-expanded="false">JWT</button> действителен до истечения срока, если сервер не ведёт список отозванных токенов. Тест «после выхода старый токен не даёт доступа» для JWT особенно важен: он часто находит проблему.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/debugging"><small>← Назад</small><span>Debugging</span></a><a class="foot-link next" href="#/http-rest"><small>Дальше →</small><span>HTTP и REST</span></a></div></footer></article><hr class="nojs-sep">

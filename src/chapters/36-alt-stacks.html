@@ -1,0 +1,192 @@
+<article class="chapter" id="/alt-stacks" data-chapter="alt-stacks" data-section="practice" aria-labelledby="h1-alt-stacks"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Раздел VIII · Практика и проектирование</div><h1 class="ch-title" id="h1-alt-stacks" tabindex="-1">Альтернативные стеки</h1><p class="ch-lead">Справочная глава: как принципы учебника выглядят в Python + pytest + Playwright, Java + Selenium + JUnit 5 + REST Assured и Cypress. Не самостоятельный курс, а карта соответствий для тех, кто встретит другой стек на проекте или собеседовании.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 6 мин чтения</span><span class="lvl" title="Уровень">M</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/pw-arch">Архитектура Playwright</a><a href="#/api-auto">Автоматизация API</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Инструменты меняются, принципы остаются: устойчивые локаторы, ожидание состояния, изоляция через фикстуры, слой страниц и клиентов, данные под контролем, тесты в CI. Зная их на одном стеке, на другом нужно выучить синтаксис и особенности, а не автоматизацию заново.</p><p class="idea-goal"><strong>Цель главы:</strong> сопоставлять понятия основного стека с альтернативными и понимать ключевые отличия при выборе инструмента.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Принципы автоматизации переносимы между стеками; различаются способ управления браузером, модель ожиданий, система фикстур и экосистема.</p><h3>Главное</h3><ul class="recall-points"><li>Python + pytest + <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button>: тот же движок Playwright, фикстуры pytest (<code>page</code>, свои с <code>yield</code>), синхронный API по умолчанию.</li><li>Java + Selenium WebDriver: явные ожидания <code>WebDriverWait</code>, фабрика драйверов, JUnit 5/TestNG, <button type="button" class="term" data-term="rest" aria-expanded="false">REST</button> Assured для API.</li><li>Cypress: тесты выполняются в браузере, цепочки команд с повторами, сильный DX для фронтенда, ограничения по вкладкам и доменам.</li><li>Сравнение по критериям: языки команды, браузеры, параллелизм, сеть, отчёты, порог входа, экосистема.</li><li>Python — отдельный backend-маршрут: pytest, Requests, Pydantic, Ruff; typing не заменяет runtime validation.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Playwright</dt><dd>Инструмент автоматизации браузеров Chromium, Firefox и WebKit с API для JS/TS, Python, Java и .NET.</dd></div><div><dt>Page Object Model</dt><dd>Паттерн: каждая страница описывается классом с локаторами и действиями пользователя; тесты используют эти методы и не знают о вёрстке.</dd></div><div><dt>Fixture</dt><dd>Именованный ресурс, который тест запрашивает в параметрах: фикстура готовит значение, передаёт его через use() и убирает за собой после теста.</dd></div><div><dt>Explicit Wait</dt><dd>Ожидание конкретного события или условия, заданного тестом: ответа сервера, URL, скачивания, значения через expect.poll.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Не переносите привычки механически: в Selenium нет автоожидания web-first проверок Playwright, а в Cypress команды — не <button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button>, и <code>async/await</code> с ними не работает.</p><div class="recall-links"><a href="#/alt-stacks/compare">Сравнение →</a><a href="#/alt-stacks/python">Python + pytest + Playwright →</a><a href="#/alt-stacks/java">Java + Selenium + JUnit 5 + REST Assured →</a><a href="#/alt-stacks/cypress">Cypress →</a><a href="#/alt-stacks/python-backend">Python backend: те же идеи, другие инструменты →</a><a href="#/alt-stacks/choose">Как выбирать →</a><a href="#/alt-stacks/mistakes">Типичные ошибки →</a><a href="#/alt-stacks/interview">Что важно для собеседования →</a><a href="#/alt-stacks/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/alt-stacks/compare">Сравнение</a><a href="#/alt-stacks/python">Python + pytest + Playwright</a><a href="#/alt-stacks/java">Java + Selenium + JUnit 5 + REST Assured</a><a href="#/alt-stacks/cypress">Cypress</a><a href="#/alt-stacks/python-backend">Python backend: те же идеи, другие инструменты</a><a href="#/alt-stacks/choose">Как выбирать</a><a href="#/alt-stacks/mistakes">Типичные ошибки</a><a href="#/alt-stacks/interview">Что важно для собеседования</a><a href="#/alt-stacks/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/alt-stacks/compare" data-anchor="compare">Сравнение<a class="h-anchor" href="#/alt-stacks/compare" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Критерий</th>
+<th>Playwright (TS)</th>
+<th>Playwright (Python)</th>
+<th>Selenium (Java)</th>
+<th>Cypress</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Языки</td>
+<td>JS/TS</td>
+<td>Python</td>
+<td>Java, C#, Python, JS, Ruby</td>
+<td>JS/TS</td>
+</tr>
+<tr>
+<td>Браузеры</td>
+<td>Chromium, Firefox, WebKit</td>
+<td>Те же</td>
+<td>Все с WebDriver, включая Safari</td>
+<td>Chromium-семейство, Firefox, WebKit (экспериментально)</td>
+</tr>
+<tr>
+<td>Ожидания</td>
+<td>Встроены в действия и <code>expect</code></td>
+<td>Встроены</td>
+<td>Явные <code>WebDriverWait</code></td>
+<td>Встроенные повторы команд</td>
+</tr>
+<tr>
+<td>Раннер и фикстуры</td>
+<td><button type="button" class="term" data-term="playwright-test" aria-expanded="false">Playwright Test</button></td>
+<td>pytest + pytest-playwright</td>
+<td>JUnit 5 / TestNG</td>
+<td>Встроенный</td>
+</tr>
+<tr>
+<td>Параллелизм</td>
+<td>Воркеры и шарды из коробки</td>
+<td><code>pytest-xdist</code></td>
+<td>Selenium Grid, параллелизм JUnit</td>
+<td>Платные сервисы или самостоятельная настройка</td>
+</tr>
+<tr>
+<td>Перехват сети</td>
+<td><code>page.route</code></td>
+<td><code>page.route</code></td>
+<td>Ограничен (BiDi, прокси)</td>
+<td><code>cy.intercept</code></td>
+</tr>
+<tr>
+<td>API-тесты</td>
+<td><code>request</code></td>
+<td><code>request</code> / requests</td>
+<td><button type="button" class="term" data-term="rest" aria-expanded="false">REST</button> Assured</td>
+<td><code>cy.request</code></td>
+</tr>
+<tr>
+<td>Трассировка</td>
+<td><button type="button" class="term" data-term="trace-viewer" aria-expanded="false">Trace Viewer</button></td>
+<td>Trace Viewer</td>
+<td>Скриншоты, логи</td>
+<td>Time travel в раннере, видео</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/alt-stacks/python" data-anchor="python">Python + pytest + Playwright<a class="h-anchor" href="#/alt-stacks/python" aria-label="Ссылка на раздел">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">Python</span><span class="code-title">tests/test_cart.py</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.sync_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span><span class="p">,</span> <span class="n">expect</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_promo_reduces_total</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">cart_with_product</span><span class="p">):</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="s2">"/cart"</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">get_by_label</span><span class="p">(</span><span class="s2">"Промокод"</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="s2">"SALE10"</span><span class="p">)</span>
+    <span class="n">page</span><span class="o">.</span><span class="n">get_by_role</span><span class="p">(</span><span class="s2">"button"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Применить"</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+    <span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">get_by_test_id</span><span class="p">(</span><span class="s2">"cart-total"</span><span class="p">))</span><span class="o">.</span><span class="n">to_have_text</span><span class="p">(</span><span class="s2">"8 982 ₽"</span><span class="p">)</span>
+    <span class="n">expect</span><span class="p">(</span><span class="n">page</span><span class="p">)</span><span class="o">.</span><span class="n">to_have_url</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"/cart"</span><span class="p">))</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Python</span><span class="code-title">tests/conftest.py</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">playwright.sync_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRequestContext</span><span class="p">,</span> <span class="n">Playwright</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">"session"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">api</span><span class="p">(</span><span class="n">playwright</span><span class="p">:</span> <span class="n">Playwright</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIRequestContext</span><span class="p">:</span>
+    <span class="n">ctx</span> <span class="o">=</span> <span class="n">playwright</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">new_context</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="s2">"http://localhost:8080"</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">ctx</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">dispose</span><span class="p">()</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cart_with_product</span><span class="p">(</span><span class="n">api</span><span class="p">:</span> <span class="n">APIRequestContext</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/api/users"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"email"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"qa+</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">@example.com"</span><span class="p">})</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">yield</span> <span class="n">user</span>                       <span class="c1"># код после yield — teardown</span>
+    <span class="n">api</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="sa">f</span><span class="s2">"/api/users/</span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+<p>Соответствия: фикстуры pytest с <code>yield</code> ≈ фикстуры <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> с <code>use</code>; <code>scope="session"</code> ≈ Worker-фикстура (при <code>pytest-xdist</code> <button type="button" class="term" data-term="session" aria-expanded="false">Session</button> — на процесс); параметризация — <code>@pytest.mark.parametrize</code>; запуск — <code>pytest --browser chromium -n 4</code>.</p>
+<h2 id="/alt-stacks/java" data-anchor="java">Java + Selenium + JUnit 5 + REST Assured<a class="h-anchor" href="#/alt-stacks/java" aria-label="Ссылка на раздел">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">Java</span><span class="code-title">CheckoutTest.java</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">org.junit.jupiter.api.*</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.openqa.selenium.*</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.openqa.selenium.chrome.ChromeDriver</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.openqa.selenium.support.ui.*</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.time.Duration</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nc">CheckoutTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">WebDriver</span><span class="w"> </span><span class="n">driver</span><span class="p">;</span>
+<span class="w">    </span><span class="n">WebDriverWait</span><span class="w"> </span><span class="n">wait</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nd">@BeforeEach</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">setUp</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ChromeDriver</span><span class="p">();</span><span class="w">                      </span><span class="c1">// Selenium Manager подберёт драйвер</span>
+<span class="w">        </span><span class="n">wait</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">WebDriverWait</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@AfterEach</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="na">quit</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nd">@Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">promoReducesTotal</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">driver</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">"https://staging.shop.example.com/cart"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">driver</span><span class="p">.</span><span class="na">findElement</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="na">cssSelector</span><span class="p">(</span><span class="s">"[data-testid='promo-input']"</span><span class="p">)).</span><span class="na">sendKeys</span><span class="p">(</span><span class="s">"SALE10"</span><span class="p">);</span>
+<span class="w">        </span><span class="n">driver</span><span class="p">.</span><span class="na">findElement</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="na">xpath</span><span class="p">(</span><span class="s">"//button[normalize-space()='Применить']"</span><span class="p">)).</span><span class="na">click</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// явное ожидание состояния — аналог web-first assertion</span>
+<span class="w">        </span><span class="n">wait</span><span class="p">.</span><span class="na">until</span><span class="p">(</span><span class="n">ExpectedConditions</span><span class="p">.</span><span class="na">textToBe</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="na">cssSelector</span><span class="p">(</span><span class="s">"[data-testid='cart-total']"</span><span class="p">),</span><span class="w"> </span><span class="s">"8 982 ₽"</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Java</span><span class="code-title">OrdersApiTest.java</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kn">import static</span><span class="w"> </span><span class="nn">io.restassured.RestAssured.given</span><span class="p">;</span>
+<span class="kn">import static</span><span class="w"> </span><span class="nn">org.hamcrest.Matchers.*</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nc">OrdersApiTest</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nd">@org.junit.jupiter.api.Test</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">createOrder</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">given</span><span class="p">().</span><span class="na">baseUri</span><span class="p">(</span><span class="s">"https://staging.shop.example.com"</span><span class="p">)</span>
+<span class="w">               </span><span class="p">.</span><span class="na">contentType</span><span class="p">(</span><span class="s">"application/json"</span><span class="p">)</span>
+<span class="w">               </span><span class="p">.</span><span class="na">body</span><span class="p">(</span><span class="s">"{\"productId\": 1, \"qty\": 2}"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">when</span><span class="p">().</span><span class="na">post</span><span class="p">(</span><span class="s">"/api/orders"</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="na">then</span><span class="p">().</span><span class="na">statusCode</span><span class="p">(</span><span class="mi">201</span><span class="p">)</span>
+<span class="w">               </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">"Location"</span><span class="p">,</span><span class="w"> </span><span class="n">matchesPattern</span><span class="p">(</span><span class="s">"/api/orders/\\d+"</span><span class="p">))</span>
+<span class="w">               </span><span class="p">.</span><span class="na">body</span><span class="p">(</span><span class="s">"status"</span><span class="p">,</span><span class="w"> </span><span class="n">equalTo</span><span class="p">(</span><span class="s">"created"</span><span class="p">));</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Отличия, о которых важно помнить: <button type="button" class="term" data-term="explicit-wait" aria-expanded="false">Explicit Wait</button> пишется явно (<code>WebDriverWait</code>, <code>ExpectedConditions</code>), <code>findElement</code> ищет сразу и бросает <code>NoSuchElementException</code>, найденный <code>WebElement</code> может устареть (<code>StaleElementReferenceException</code>). <button type="button" class="term" data-term="page-object-model" aria-expanded="false">Page Object Model</button> распространён (часто с <code>PageFactory</code>), параллелизм и разные браузеры — через Selenium Grid или облачные фермы.</p>
+<h2 id="/alt-stacks/cypress" data-anchor="cypress">Cypress<a class="h-anchor" href="#/alt-stacks/cypress" aria-label="Ссылка на раздел">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">cypress/e2e/cart.cy.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="nx">describe</span><span class="p">(</span><span class="s1">'корзина'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">it</span><span class="p">(</span><span class="s1">'промокод уменьшает сумму'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">cy</span><span class="p">.</span><span class="nx">intercept</span><span class="p">(</span><span class="s1">'POST'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/api/cart/promo'</span><span class="p">).</span><span class="kr">as</span><span class="p">(</span><span class="s1">'promo'</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">cy</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="s1">'/cart'</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">cy</span><span class="p">.</span><span class="nx">findByLabelText</span><span class="p">(</span><span class="s1">'Промокод'</span><span class="p">).</span><span class="kr">type</span><span class="p">(</span><span class="s1">'SALE10'</span><span class="p">);</span><span class="w">   </span><span class="c1">// Testing Library для Cypress</span>
+<span class="w">    </span><span class="nx">cy</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Применить'</span><span class="p">).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">    </span><span class="nx">cy</span><span class="p">.</span><span class="nx">wait</span><span class="p">(</span><span class="s1">'@promo'</span><span class="p">).</span><span class="nx">its</span><span class="p">(</span><span class="s1">'response.statusCode'</span><span class="p">).</span><span class="nx">should</span><span class="p">(</span><span class="s1">'eq'</span><span class="p">,</span><span class="w"> </span><span class="mf">200</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'[data-testid="cart-total"]'</span><span class="p">).</span><span class="nx">should</span><span class="p">(</span><span class="s1">'have.text'</span><span class="p">,</span><span class="w"> </span><span class="s1">'8 982 ₽'</span><span class="p">);</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Особенности: команды Cypress ставятся в очередь и выполняются позже — это не <button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button>, поэтому <code>async/await</code> и обычные переменные для результатов команд не работают (используются <code>.then</code> и алиасы); <code>should</code> повторяет проверку до таймаута; тест работает внутри браузера, что упрощает доступ к приложению, но ограничивает работу с несколькими вкладками и доменами.</p>
+<h2 id="/alt-stacks/python-backend" data-anchor="python-backend">Python backend: те же идеи, другие инструменты<a class="h-anchor" href="#/alt-stacks/python-backend" aria-label="Ссылка на раздел">#</a></h2><p>Этот маршрут показывает, как те же идеи — клиент API, типы, runtime validation, линтер и отчёт — выглядят в Python (Requests, Pydantic, Ruff, Allure). Основной TypeScript-маршрут от него не зависит.</p><div class="table-wrap"><table><thead><tr><th>Задача</th><th>TypeScript-маршрут</th><th>Python-маршрут</th></tr></thead><tbody><tr><td>Раннер</td><td><button type="button" class="term" data-term="playwright-test" aria-expanded="false">Playwright Test</button></td><td>pytest</td></tr><tr><td><button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button></td><td><button type="button" class="term" data-term="api-request-context" aria-expanded="false">APIRequestContext</button></td><td>requests.Session</td></tr><tr><td>Fixtures</td><td>test.extend</td><td><code>@pytest.fixture</code> и yield</td></tr><tr><td>Структура ответа</td><td><button type="button" class="term" data-term="json-schema" aria-expanded="false">JSON Schema</button> / runtime validator</td><td>Pydantic</td></tr><tr><td>Lint</td><td>ESLint</td><td>Ruff</td></tr><tr><td>Report</td><td>HTML / Allure <button type="button" class="term" data-term="reporter" aria-expanded="false">Reporter</button></td><td>allure-pytest</td></tr><tr><td>Типы</td><td><button type="button" class="term" data-term="typescript" aria-expanded="false">TypeScript</button> compiler</td><td>typing + выбранный type checker</td></tr></tbody></table></div><div class="code"><div class="code-head"><span class="code-lang">Python · фрагмент, не полный тест</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>from pydantic import BaseModel, ConfigDict, Field
+
+class Order(BaseModel):
+    model_config = ConfigDict(strict=True)
+    id: str
+    quantity: int = Field(ge=1, le=10)
+    total: int
+    status: str
+
+# response — requests.Response; проект должен передать session и base_url.
+response = session.post(f'{base_url}/api/orders', json={'quantity': 2}, timeout=5)
+assert response.status_code == 201
+order = Order.model_validate(response.json())
+assert order.total == 2000
+assert order.status == 'created'</code></pre></div><p>Pydantic проверяет данные во время выполнения. strict=True ограничивает неявное приведение, но каждое ограничение схемы задаётся явно. Requests синхронный: <button type="button" class="term" data-term="async-await" aria-expanded="false">async/await</button> из TypeScript сюда не переносится. Декоратор оборачивает поведение функции; сохраняйте её метаданные через functools.wraps и не прячьте retries записи без анализа идемпотентности.</p><p>Для самостоятельного проекта добавьте fixture pytest с requests.Session, yield и cleanup, тесты негативных данных, Ruff, фиксированные зависимости и Allure. Пример выше не подтверждает выполнение Python-набора.</p><h2 id="/alt-stacks/choose" data-anchor="choose">Как выбирать<a class="h-anchor" href="#/alt-stacks/choose" aria-label="Ссылка на раздел">#</a></h2>
+<ol>
+<li><strong>Язык команды и продукта.</strong> Тесты, которые разработчики могут читать и править, живут дольше.</li>
+<li><strong>Браузеры и платформы.</strong> Нужен ли реальный Safari, мобильные устройства, старые браузеры.</li>
+<li><strong>Требования к сети и изоляции</strong>: перехват запросов, несколько пользователей, вкладки, домены.</li>
+<li><strong>Инфраструктура</strong>: существующий CI, Grid, облачные фермы, отчётность (Allure есть для всех стеков).</li>
+<li><strong>Прототип</strong>: несколько реальных сценариев на кандидатах — лучше любой сравнительной таблицы (<a href="#/aqa-design/timeline">AQA System Design</a>).</li>
+</ol>
+<h2 id="/alt-stacks/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/alt-stacks/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>Thread.sleep</code> в Selenium вместо явных ожиданий</span></div><div class="callout-body"><p>Тот же антипаттерн, что <code>waitForTimeout</code>: медленно и нестабильно.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>async/await</code> в Cypress</span></div><div class="callout-body"><p>Команды Cypress не возвращают <button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button> со значением; такой код ведёт себя непредсказуемо.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Смешивать несколько UI-фреймворков в одном проекте без причины</span></div><div class="callout-body"><p>Два набора правил, два способа ожиданий, две инфраструктуры — двойная стоимость поддержки.</p></div></div>
+<h2 id="/alt-stacks/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/alt-stacks/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="alt-selenium-vs-pw" data-level="M" data-topic="Playwright"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Вы переходите с Selenium + Java на Playwright + TypeScript. Что изменится в подходе к ожиданиям и изоляции?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Явные <code>WebDriverWait</code> заменяются автоожиданием действий и web-first assertions; локаторы становятся ленивыми, нет <code>StaleElementReferenceException</code>. Изоляция — через <button type="button" class="term" data-term="browser-context" aria-expanded="false">BrowserContext</button> на тест вместо нового драйвера; параллелизм и шардирование встроены вместо Grid. Появляются перехват сети, storageState и trace. Принципы POM, данных и CI остаются.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="alt-cypress" data-level="M" data-topic="Playwright"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Чем модель выполнения Cypress отличается от Playwright?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Cypress выполняет тесты внутри браузера, а команды ставит в очередь — это не <button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button>, поэтому <code>async/await</code> к ним не применяется, результаты получают через <code>.then</code> и алиасы. <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> управляет браузером из отдельного процесса по протоколу, команды — обычные Promise. Отсюда различия: несколько вкладок и доменов, контексты пользователей, языки, параллелизм.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/alt-stacks/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/alt-stacks/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="alt-stacks:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Что в Selenium выполняет роль web-first assertion Playwright?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span><code>Thread.sleep(5000)</code></span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span><code>driver.quit()</code></span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span><code>WebDriverWait</code> с <code>ExpectedConditions</code></span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span><code>findElement</code></span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Явное ожидание повторяет проверку условия до таймаута, как web-first assertions.</p></div></div><div class="quiz" data-qid="alt-stacks:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Чем фикстура pytest с <code>yield</code> похожа на фикстуру Playwright Test?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Она не поддерживает очистку</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Она выполняется только для всех тестов сразу</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>Ничем</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="1"><span class="quiz-mark"></span><span>Код до <code>yield</code> — подготовка, после — очистка, и тест получает значение</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Обе модели дают значение тесту и гарантированную очистку после него.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему знания Playwright на TypeScript помогают при переходе на Selenium + Java?</span></summary><div class="check-body"><p>Принципы те же: устойчивые локаторы, ожидание состояния, изоляция данных и сессий, слой страниц и клиентов, отчётность, CI. Нужно освоить язык, явные ожидания, управление драйверами и Grid, а также экосистему (JUnit, <button type="button" class="term" data-term="rest" aria-expanded="false">REST</button> Assured, Allure), но не сам подход к автоматизации.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/competence"><small>← Назад</small><span>Практика Junior → Middle+</span></a><a class="foot-link next" href="#/glossary"><small>Дальше →</small><span>Глоссарий</span></a></div></footer></article><hr class="nojs-sep">

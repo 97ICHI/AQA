@@ -1,0 +1,191 @@
+<article class="chapter" id="/isolation" data-chapter="isolation" data-section="arch" aria-labelledby="h1-isolation"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 24 · Раздел VI · Архитектура автоматизации</div><h1 class="ch-title" id="h1-isolation" tabindex="-1">Test Isolation и управление данными</h1><p class="ch-lead">Изоляция и независимость тестов, подготовка и очистка данных, тестовые окружения, конфигурация, управление секретами и детерминированность проверок. Всё, что позволяет запускать любой тест в любой момент и получать одинаковый результат.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 9 мин чтения</span><span class="lvl" title="Уровень">M</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/project-arch">Архитектура проекта</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Изолированный тест не знает о существовании других тестов: он сам создаёт нужное ему состояние, не зависит от порядка и параллельного запуска и не оставляет следов. Только такой набор можно безопасно распараллелить, повторять и запускать по частям.</p><p class="idea-goal"><strong>Цель главы:</strong> проектировать тесты и окружения так, чтобы результат зависел только от проверяемого кода, а конфигурация и секреты были управляемыми и безопасными.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Изоляция = своё состояние + независимость от порядка + безопасность параллельного запуска + очистка. Конфигурация приходит из окружения, секреты — из защищённого хранилища.</p><h3>Главное</h3><ul class="recall-points"><li>Проверка изоляции: тест проходит отдельно, в обратном порядке, с <code>--repeat-each</code>, при нескольких воркерах.</li><li>Состояние браузера изолирует <button type="button" class="term" data-term="browser-context" aria-expanded="false">BrowserContext</button>; состояние сервера (данные) изолируют только ваши решения: уникальные данные, аккаунты на воркер, очистка.</li><li>Очистка: teardown фикстур; метка прогона и уборка по ней; эфемерные окружения, которые удаляются целиком.</li><li>Окружения: локальное, эфемерное в CI (<button type="button" class="term" data-term="docker-compose" aria-expanded="false">Docker Compose</button>), общий staging, preview-окружение на MR.</li><li><button type="button" class="term" data-term="dotenv" aria-expanded="false">dotenv</button> не перезаписывает уже заданные переменные окружения: значения из CI имеют приоритет над <code>.env</code>.</li><li>Секреты: переменные CI с маскированием или хранилище (Vault), никогда в репозитории и логах; <code>.env.example</code> без значений.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Test Isolation</dt><dd>Независимость тестов: каждый можно запустить отдельно, в любом порядке, параллельно и повторно с тем же результатом.</dd></div><div><dt>Test Environment</dt><dd>Развёрнутая система для выполнения тестов: локальная, эфемерная в CI, preview на MR, общий staging.</dd></div><div><dt>Ephemeral Environment</dt><dd>Окружение, которое создаётся под конкретный прогон или Merge Request и удаляется после: чистые данные и полная изоляция между прогонами.</dd></div><div><dt>Secrets Management</dt><dd>Хранение и передача паролей, токенов и ключей вне репозитория: защищённые переменные CI, Vault; маскирование в логах и регулярная ротация.</dd></div><div><dt>dotenv</dt><dd>Пакет, загружающий переменные из файла .env в process.env. По умолчанию не перезаписывает уже заданные переменные окружения.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Изоляция браузера не означает изоляцию данных: новый BrowserContext у каждого теста не помешает двум тестам одновременно изменить одного и того же пользователя на сервере.</p><div class="recall-links"><a href="#/isolation/principles">Принципы изоляции →</a><a href="#/isolation/data-setup">Подготовка данных →</a><a href="#/isolation/cleanup">Очистка данных →</a><a href="#/isolation/environments">Тестовые окружения →</a><a href="#/isolation/config-secrets">Конфигурация и секреты →</a><a href="#/isolation/determinism">Детерминированность →</a><a href="#/isolation/example">Пример: изоляция набора корзины →</a><a href="#/isolation/mistakes">Типичные ошибки →</a><a href="#/isolation/interview">Что важно для собеседования →</a><a href="#/isolation/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/isolation/principles">Принципы изоляции</a><a href="#/isolation/data-setup">Подготовка данных</a><a href="#/isolation/cleanup">Очистка данных</a><a href="#/isolation/environments">Тестовые окружения</a><a href="#/isolation/config-secrets">Конфигурация и секреты</a><a href="#/isolation/determinism">Детерминированность</a><a href="#/isolation/example">Пример: изоляция набора корзины</a><a href="#/isolation/mistakes">Типичные ошибки</a><a href="#/isolation/interview">Что важно для собеседования</a><a href="#/isolation/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/isolation/principles" data-anchor="principles">Принципы изоляции<a class="h-anchor" href="#/isolation/principles" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-isolation" aria-expanded="false">Test Isolation</button> — набор свойств, при которых результат теста определяется только его кодом и проверяемой системой:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Свойство</th>
+<th>Что значит</th>
+<th>Как проверить</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Независимость</strong></td>
+<td>Тест не использует результат другого теста</td>
+<td>Запуск одного теста: <code>npx playwright test file.spec.ts:42</code></td>
+</tr>
+<tr>
+<td><strong>Независимость от порядка</strong></td>
+<td>Любой порядок даёт тот же результат</td>
+<td>Обратный порядок, случайное перемешивание файлов</td>
+</tr>
+<tr>
+<td><strong>Повторяемость</strong></td>
+<td>Повторный запуск даёт тот же результат</td>
+<td><code>--repeat-each=10</code></td>
+</tr>
+<tr>
+<td><strong>Параллельная безопасность</strong></td>
+<td>Одновременные тесты не мешают друг другу</td>
+<td>Несколько воркеров, <code>fullyParallel</code></td>
+</tr>
+<tr>
+<td><strong>Чистота</strong></td>
+<td>Тест не оставляет следов, влияющих на других</td>
+<td>Прогон дважды подряд на одном стенде</td>
+</tr>
+</tbody>
+</table></div>
+<p><button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> обеспечивает изоляцию <strong>браузерного</strong> состояния: каждый тест получает новый контекст. Изоляция <strong>серверного</strong> состояния — задача тестировщика: данные на бэкенде общие для всех контекстов.</p>
+<h2 id="/isolation/data-setup" data-anchor="data-setup">Подготовка данных<a class="h-anchor" href="#/isolation/data-setup" aria-label="Ссылка на раздел">#</a></h2>
+<p>Варианты из главы <a href="#/mocking/tdm">«Mocking и Test Data»</a> в терминах изоляции:</p>
+<ul>
+<li><strong>Своё для каждого теста</strong> — максимальная изоляция. Пользователь, заказ, корзина создаются фикстурой и принадлежат только этому тесту.</li>
+<li><strong>Своё для каждого воркера</strong> — компромисс, когда создание дорого (аккаунт с подтверждённой почтой, настроенным профилем). Тесты одного воркера выполняются последовательно и не конфликтуют.</li>
+<li><strong>Общее неизменяемое</strong> — справочники, каталог товаров, тарифы. Безопасно, пока никто их не меняет.</li>
+<li><strong>Общее изменяемое</strong> — источник гонок. Если без него нельзя (единственный тестовый мерчант у провайдера), тесты, которые его меняют, выполняют последовательно (<code>test.describe.configure({ mode: 'serial' })</code> в отдельном проекте с <code>workers: 1</code>) и документируют причину.</li>
+</ul>
+<p>Правило уникальности: всё, что может конфликтовать (email, логин, номер телефона, название товара, промокод), содержит уникальную часть — метку прогона и случайный суффикс.</p>
+<h2 id="/isolation/cleanup" data-anchor="cleanup">Очистка данных<a class="h-anchor" href="#/isolation/cleanup" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Стратегия</th>
+<th>Как</th>
+<th>Когда</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Teardown фикстуры</td>
+<td>Удаление после <code>use()</code></td>
+<td>Основной способ для данных теста</td>
+</tr>
+<tr>
+<td>Метка прогона + уборка</td>
+<td>Все данные с <code>RUN_ID</code>; после прогона или по расписанию удаляются по метке</td>
+<td>Страховка от прерванных прогонов (отмена <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button>, падение агента)</td>
+</tr>
+<tr>
+<td>Эфемерное окружение</td>
+<td>Окружение создаётся на прогон и удаляется целиком</td>
+<td>CI с <button type="button" class="term" data-term="docker-compose" aria-expanded="false">Docker Compose</button> или Kubernetes namespace</td>
+</tr>
+<tr>
+<td>Сброс базы</td>
+<td>Восстановление снимка или пересоздание схемы перед прогоном</td>
+<td>Локальные и эфемерные окружения, не общий staging</td>
+</tr>
+<tr>
+<td>Без очистки, но с изоляцией</td>
+<td>Данные уникальны и никому не мешают</td>
+<td>Допустимо на эфемерных окружениях; на общих стендах приводит к росту мусора</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout c-tip"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg><span>Почему teardown недостаточно</span></div><div class="callout-body"><p>Если CI-задачу отменили или агент упал, teardown не выполнится. Метка прогона в данных (<code>qa+run42-…@example.com</code>, поле <code>comment: "autotest run42"</code>) позволяет найти и удалить всё созданное прогоном отдельным скриптом.</p></div></div>
+<h2 id="/isolation/environments" data-anchor="environments">Тестовые окружения<a class="h-anchor" href="#/isolation/environments" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-environment" aria-expanded="false">Test Environment</button> — развёрнутая система, на которой выполняются тесты:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Окружение</th>
+<th>Плюсы</th>
+<th>Минусы</th>
+<th>Для чего</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Локальное (<button type="button" class="term" data-term="docker-compose" aria-expanded="false">Docker Compose</button> на машине)</td>
+<td>Полный контроль, быстро</td>
+<td>Не все интеграции</td>
+<td>Разработка тестов, отладка</td>
+</tr>
+<tr>
+<td><button type="button" class="term" data-term="ephemeral-environment" aria-expanded="false">Ephemeral Environment</button> в CI</td>
+<td>Чистое на каждый прогон, полная изоляция между прогонами</td>
+<td>Время на подъём, ресурсы</td>
+<td>Тесты на MR</td>
+</tr>
+<tr>
+<td>Preview на MR (Kubernetes namespace)</td>
+<td>Реалистично, можно показать продукту</td>
+<td>Инфраструктура</td>
+<td>E2E по изменению до слияния</td>
+</tr>
+<tr>
+<td>Общий staging</td>
+<td>Похож на прод, реальные интеграции</td>
+<td>Чужие данные и деплои, конфликты</td>
+<td>Регрессия перед релизом, smoke</td>
+</tr>
+<tr>
+<td>Production</td>
+<td>Реальность</td>
+<td>Нельзя ломать данные</td>
+<td>Только безопасный smoke и синтетический мониторинг</td>
+</tr>
+</tbody>
+</table></div>
+<p>Тесты, которые идут на общем staging, должны быть особенно аккуратны: свои данные, уникальные метки, очистка, никаких действий с «чужими» сущностями.</p>
+<h2 id="/isolation/config-secrets" data-anchor="config-secrets">Конфигурация и секреты<a class="h-anchor" href="#/isolation/config-secrets" aria-label="Ссылка на раздел">#</a></h2>
+<p>Конфигурация — всё, что отличается между окружениями: адреса, учётные данные, флаги, таймауты. Её передают переменными окружения и читают в одном модуле (см. <a href="#/project-arch/config">главу 23</a>).</p>
+<p>Для локального запуска удобен файл <code>.env</code> и пакет <button type="button" class="term" data-term="dotenv" aria-expanded="false">dotenv</button>:</p>
+<div class="code"><div class="code-head"><span class="code-lang">Текст</span><span class="code-title">.env.example</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code># Скопируйте в .env и заполните. Файл .env в git не попадает.
+TEST_ENV=local
+BASE_URL=http://localhost:3000
+API_URL=http://localhost:8080
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">playwright.config.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defineConfig</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="s1">'dotenv/config'</span><span class="p">;</span><span class="w">   </span><span class="c1">// загрузить .env; уже заданные переменные НЕ перезаписываются</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">defineConfig</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.BASE_URL</span><span class="w"> </span><span class="p">},</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Важная деталь dotenv: <strong>переменная, уже существующая в окружении процесса, имеет приоритет</strong> над значением из <code>.env</code>. Поэтому в CI значения из настроек <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> побеждают локальный файл, если он случайно оказался на агенте.</p>
+<div class="sim-mount" data-sim="config-resolver"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Откуда берётся значение конфигурации: включайте источники (значение по умолчанию в коде, файл .env, переменная CI, флаг командной строки) и смотрите итоговую конфигурацию, приоритеты и маскирование секретов.</div></div>
+<p><button type="button" class="term" data-term="secrets-management" aria-expanded="false">Secrets Management</button> — правила обращения с паролями, токенами, ключами:</p>
+<ol>
+<li><strong>Не в репозитории.</strong> <code>.env</code>, <code>playwright/.auth/</code>, файлы с ключами — в <code>.gitignore</code>. Утёкший в историю секрет считается скомпрометированным.</li>
+<li><strong>Хранилище.</strong> Защищённые и маскируемые переменные <button type="button" class="term" data-term="gitlab-ci" aria-expanded="false">GitLab CI</button> / <button type="button" class="term" data-term="github-actions" aria-expanded="false">GitHub Actions</button> secrets, HashiCorp Vault, облачные хранилища секретов.</li>
+<li><strong>Минимальные права.</strong> Тестовые учётные записи — только в тестовых окружениях и с нужными ролями; отдельный пользователь БД только для чтения, где возможно.</li>
+<li><strong>Не в логах и отчётах.</strong> Маскирование в CI, <code>***</code> в логах тестов, не прикладывать к отчётам <code>storageState</code> и заголовки <code>Authorization</code>.</li>
+<li><strong>Ротация.</strong> Регулярная смена и немедленная — при утечке.</li>
+</ol>
+<h2 id="/isolation/determinism" data-anchor="determinism">Детерминированность<a class="h-anchor" href="#/isolation/determinism" aria-label="Ссылка на раздел">#</a></h2><p>Источники недетерминированности и способы их контроля разобраны в главе <a href="#/mocking/determinism">«Mocking и Test Data»</a>. Для набора в целом полезен чек-лист:</p>
+<p>Чек-лист <button type="button" class="term" data-term="determinism" aria-expanded="false">Determinism</button> для набора:</p>
+<ul>
+<li>[ ] Время: <code>page.clock</code> в UI, данные относительно «сейчас», фиксированный <code>timezoneId</code> и <code>TZ</code>.</li>
+<li>[ ] Локаль: фиксированные <code>locale</code> браузера и формат чисел и дат в проверках.</li>
+<li>[ ] Случайность: seed генераторов в отчёте.</li>
+<li>[ ] Данные: свои, уникальные, не зависящие от состояния стенда.</li>
+<li>[ ] Внешние сервисы: подменены или вынесены в отдельный набор интеграционных тестов.</li>
+<li>[ ] Порядок: проверки списков с явной сортировкой или как множеств.</li>
+<li>[ ] Ожидания: только состояния и события, без пауз (<a href="#/assertions">глава 15</a>).</li>
+<li>[ ] Окружение: версия браузера и приложения записана в отчёт.</li>
+</ul>
+<h2 id="/isolation/example" data-anchor="example">Пример: изоляция набора корзины<a class="h-anchor" href="#/isolation/example" aria-label="Ссылка на раздел">#</a></h2>
+<p>Исходно: 30 тестов корзины используют одного пользователя <code>cart-tester@example.com</code>. При 4 воркерах — 3–5 случайных падений за прогон: «в корзине неожиданный товар», «сумма не совпадает».</p>
+<p>Изменения:</p>
+<ol>
+<li>Фикстура <code>cartUser</code> области <button type="button" class="term" data-term="worker" aria-expanded="false">Worker</button> создаёт пользователя на воркер — тесты разных воркеров больше не делят корзину.</li>
+<li>Фикстура <code>emptyCart</code> области test очищает корзину перед тестом — тесты одного воркера не зависят от порядка.</li>
+<li>Товары берутся из неизменяемого сида каталога; остатки не проверяются там, где они не важны.</li>
+<li>Метка прогона в email; ночная задача удаляет пользователей с метками старше суток.</li>
+</ol>
+<p>Результат: 0 конфликтов за 200 прогонов; время не изменилось.</p>
+<h2 id="/isolation/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/isolation/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>«У каждого теста свой контекст, значит, тесты изолированы»</span></div><div class="callout-body"><p>Контекст изолирует cookies и хранилище браузера. Данные на сервере — общие. Тесты под одним аккаунтом конфликтуют несмотря на разные контексты.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Секреты в <code>playwright.config.ts</code></span></div><div class="callout-body"><p>Пароль «тестового» администратора в коде доступен всем, у кого есть доступ к репозиторию, и остаётся в истории навсегда.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Тесты полагаются на «чистый» staging</span></div><div class="callout-body"><p>Общий стенд никогда не бывает чистым: деплои, ручное тестирование, другие команды. Тест должен работать среди чужих данных.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Сброс общей базы перед прогоном</span></div><div class="callout-body"><p>Удаление всех данных на общем стенде ломает работу других людей и параллельные прогоны. Сброс уместен только на собственном эфемерном окружении.</p></div></div>
+<h2 id="/isolation/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/isolation/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="iso-what" data-level="J" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Что такое изоляция тестов и как её добиться?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Каждый тест можно запустить отдельно, в любом порядке, повторно и параллельно — с тем же результатом. Для этого: тест создаёт свои данные (фикстуры с уникальными значениями), не использует результаты других тестов, не изменяет общие данные, убирает за собой в teardown. Браузерное состояние изолирует <button type="button" class="term" data-term="browser-context" aria-expanded="false">BrowserContext</button>, серверное — только такие решения.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="iso-secrets" data-level="M" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как вы храните и передаёте секреты в тестовом проекте?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Не в репозитории: <code>.env</code> и файлы авторизации в <code>.gitignore</code>, в репозитории только <code>.env.example</code> без значений. В CI — защищённые маскируемые переменные или хранилище (Vault). Тесты читают их через модуль конфигурации; отсутствие секрета даёт понятную ошибку. Маскирую в логах и не прикладываю к отчётам; тестовые учётки с минимальными правами и ротацией.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="iso-cleanup" data-level="M" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Какие стратегии очистки данных вы знаете?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Teardown фикстур (основная), метка прогона в данных и уборка по ней (страховка от прерванных прогонов), эфемерные окружения, которые удаляются целиком, сброс базы до снимка на собственном окружении. На общем staging — только свои данные и аккуратное удаление; сброс общей базы недопустим.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="iso-shared-account" data-level="M+" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">В интеграции с внешним провайдером есть только один тестовый мерчант. Как тестировать параллельно?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Выделить тесты, меняющие состояние мерчанта, в отдельный проект с <code>workers: 1</code> и последовательным режимом, документировать причину; остальные тесты — с мок-сервером провайдера, параллельно. Параллельно добиваться у провайдера дополнительных тестовых аккаунтов. Проверять, что тесты не зависят от остатка состояния: перед каждым тестом приводить мерчанта в известное состояние.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="mp-shared-staging" data-level="M+" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Тесты нескольких команд гоняются на одном staging и мешают друг другу. Что предложите?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Краткосрочно: свои данные у каждого теста с уникальной меткой (команда, прогон), никаких действий с «чужими» сущностями, уборка по метке, глобальные настройки (фича-флаги) — только на уровне пользователя или в отдельном последовательном проекте. Среднесрочно: эфемерные окружения на MR (Compose или namespace в Kubernetes) для API- и UI-тестов, моки внешних систем; staging оставить для smoke после деплоя и регрессии перед релизом. Договориться о расписании деплоев на staging или проверять готовность стенда перед прогоном.</p><h4>Частая ошибка</h4><div class="iq-mistake">Запретить другим командам запускать тесты в «наше» время.</div><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/isolation/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/isolation/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="isolation:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Тесты используют разные BrowserContext, но иногда видят «чужие» товары в корзине. Почему?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Включён trace</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Корзина хранится на сервере, а тесты работают под одним пользователем</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Нужно очищать localStorage</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Playwright не изолирует контексты</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Контекст изолирует состояние браузера, а не данные бэкенда. Нужен пользователь на тест или на воркер.</p></div></div><div class="quiz" data-qid="isolation:2"><div class="quiz-q"><span class="quiz-n">2</span><div>В <code>.env</code> задано <code>BASE_URL=http://localhost:3000</code>, в CI переменная <code>BASE_URL=https://staging.example.com</code>. Что получит тест при <code>import 'dotenv/config'</code>?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>staging — уже заданная переменная окружения не перезаписывается</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>localhost — <code>.env</code> важнее</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Ошибку конфликта</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Пустое значение</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>dotenv по умолчанию не перезаписывает существующие переменные процесса.</p></div></div><div class="quiz" data-qid="isolation:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Как убрать данные прогона, который был отменён посреди выполнения?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Никак</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Пометить данные меткой прогона и удалить их отдельной задачей по метке</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Сбросить общую базу staging</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Перезапустить прогон</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Teardown не выполнился, но метка позволяет найти всё созданное этим прогоном.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Как убедиться, что набор действительно изолирован?</span></summary><div class="check-body"><p>Прогнать его в разных режимах: по одному тесту, в обратном порядке, с <code>--repeat-each</code>, с несколькими воркерами и <code>fullyParallel</code>, дважды подряд на одном стенде. Если результат меняется — есть зависимость. Дополнительно — анализ кода: общие переменные модулей, фиксированные данные, <code>beforeAll</code> с изменяемым состоянием, общие аккаунты.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Чем эфемерное окружение лучше общего staging для тестов на Merge Request?</span></summary><div class="check-body"><p>Оно поднимается из конкретной версии кода MR, содержит только известные данные и уничтожается после прогона: нет чужих деплоев и данных, нет конфликтов с другими прогонами, нет необходимости в аккуратной очистке. Цена — время и ресурсы на подъём окружения.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/project-arch"><small>← Назад</small><span>Архитектура проекта</span></a><a class="foot-link next" href="#/parallel"><small>Дальше →</small><span>Параллельность</span></a></div></footer></article><hr class="nojs-sep">

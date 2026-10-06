@@ -1,0 +1,373 @@
+<article class="chapter" id="/api-basics" data-chapter="api-basics" data-section="api" aria-labelledby="h1-api-basics"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 19 · Раздел V · API Automation</div><h1 class="ch-title" id="h1-api-basics" tabindex="-1">Основы API Testing</h1><p class="ch-lead">Архитектура API-тестов, категории проверок, тестовые данные, способы авторизации, валидация ответов и обработка ошибок. Как превратить описание эндпоинта в полноценный набор проверок.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 10 мин чтения</span><span class="lvl" title="Уровень">J</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/http-rest">HTTP и REST</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>API-тест проверяет поведение системы на уровне, где живут бизнес-правила: быстро, стабильно и без браузера. Хороший API-набор проверяет не только «200 и что-то вернулось», но и валидацию, права доступа, побочные эффекты и формат ошибок.</p><p class="idea-goal"><strong>Цель главы:</strong> составлять для эндпоинта полный чек-лист проверок и понимать, из каких частей состоит API-тест.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">API-тест = подготовка данных и авторизации → запрос → проверка статуса, заголовков, тела, схемы и побочных эффектов → очистка.</p><h3>Главное</h3><ul class="recall-points"><li>Категории проверок: позитивные сценарии, валидация входа, авторизация и права, бизнес-правила, побочные эффекты, идемпотентность, формат ошибок, контракт (схема).</li><li>Ответ проверяют по слоям: статус → заголовки → структура (схема) → значения → состояние системы после запроса.</li><li>Авторизация: API key, Basic, Bearer-токен (<button type="button" class="term" data-term="jwt" aria-expanded="false">JWT</button>), <button type="button" class="term" data-term="oauth2" aria-expanded="false">OAuth 2.0</button> client credentials, cookies сессии.</li><li>Ошибки должны иметь единый формат, правильный код 4xx и не раскрывать внутренности (стек, <button type="button" class="term" data-term="sql" aria-expanded="false">SQL</button>).</li><li>Данные для теста создаются самим тестом (через API), уникальны и удаляются после.</li><li>Для eventual consistency ждите состояние по operation ID с ограниченным polling; не повторяйте создание ресурса.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>API Testing</dt><dd>Проверка системы через программный интерфейс: отправка запросов и проверка статуса, заголовков, тела ответа и побочных эффектов.</dd></div><div><dt>Endpoint</dt><dd>Комбинация метода и пути, по которой API выполняет операцию: <code>POST /api/orders</code>, <code>GET /api/orders/{id}</code>.</dd></div><div><dt>API Authentication</dt><dd>Способ подтвердить, кто обращается к API: API key, Basic, Bearer-токен, OAuth 2.0, cookie сессии.</dd></div><div><dt>API Key</dt><dd>Секретная строка, идентифицирующая клиента API; передаётся в заголовке (например, X-API-Key).</dd></div><div><dt>OAuth 2.0</dt><dd>Стандарт выдачи токенов доступа. В межсервисном взаимодействии — client credentials: клиент обменивает свой id и секрет на access token.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Не проверяйте эндпоинт только «по документации»: документация может отставать от реализации. Найденное расхождение — уже результат тестирования.</p><div class="recall-links"><a href="#/api-basics/why">Почему API-тесты — основа автоматизации →</a><a href="#/api-basics/architecture">Архитектура API-теста →</a><a href="#/api-basics/categories">Категории проверок →</a><a href="#/api-basics/data">Тестовые данные →</a><a href="#/api-basics/auth">Авторизация в API →</a><a href="#/api-basics/validation">Валидация ответов →</a><a href="#/api-basics/eventual">Асинхронные операции и повторные запросы →</a><a href="#/api-basics/errors">Обработка ошибок →</a><a href="#/api-basics/postman">Postman и тесты в коде →</a><a href="#/api-basics/example">Пример: чек-лист для эндпоинта →</a><a href="#/api-basics/mistakes">Типичные ошибки →</a><a href="#/api-basics/interview">Что важно для собеседования →</a><a href="#/api-basics/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/api-basics/why">Почему API-тесты — основа автоматизации</a><a href="#/api-basics/architecture">Архитектура API-теста</a><a href="#/api-basics/categories">Категории проверок</a><a href="#/api-basics/data">Тестовые данные</a><a href="#/api-basics/auth">Авторизация в API</a><a href="#/api-basics/validation">Валидация ответов</a><a href="#/api-basics/eventual">Асинхронные операции и повторные запросы</a><a href="#/api-basics/errors">Обработка ошибок</a><a href="#/api-basics/postman">Postman и тесты в коде</a><a href="#/api-basics/example">Пример: чек-лист для эндпоинта</a><a href="#/api-basics/mistakes">Типичные ошибки</a><a href="#/api-basics/interview">Что важно для собеседования</a><a href="#/api-basics/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/api-basics/why" data-anchor="why">Почему API-тесты — основа автоматизации<a class="h-anchor" href="#/api-basics/why" aria-label="Ссылка на раздел">#</a></h2>
+<p>Вспомним пирамиду из главы <a href="#/test-types/pyramid">«Виды тестирования»</a>: <button type="button" class="term" data-term="api-testing" aria-expanded="false">API Testing</button> стоит посередине и обычно составляет основную часть регрессионного набора AQA. Причины:</p>
+<ul>
+<li><strong>Скорость.</strong> Запрос и ответ — десятки миллисекунд. Тысяча проверок проходит за минуты.</li>
+<li><strong>Стабильность.</strong> Нет рендеринга, анимаций, оверлеев; контракт API меняется реже вёрстки.</li>
+<li><strong>Близость к логике.</strong> Скидки, права, статусы, расчёты — на сервере.</li>
+<li><strong>Точная диагностика.</strong> Падение указывает на конкретный <button type="button" class="term" data-term="endpoint" aria-expanded="false">Endpoint</button> и запрос.</li>
+<li><strong>Подготовка данных.</strong> Те же клиенты API используются UI-тестами для быстрой подготовки состояния.</li>
+</ul>
+<h2 id="/api-basics/architecture" data-anchor="architecture">Архитектура API-теста<a class="h-anchor" href="#/api-basics/architecture" aria-label="Ссылка на раздел">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">Текст</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>Тест
+ ├─ Подготовка: авторизация, данные (фабрики, фикстуры)
+ ├─ Действие: запрос через клиент API
+ ├─ Проверки: статус → заголовки → схема → значения → побочные эффекты
+ └─ Очистка: удаление созданных сущностей (teardown фикстуры)
+</code></pre></div>
+<p>В проекте это раскладывается на слои:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Слой</th>
+<th>Ответственность</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP-клиент</td>
+<td>Базовый URL, заголовки, авторизация, логирование</td>
+<td><code>APIRequestContext</code> <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button></td>
+</tr>
+<tr>
+<td>Клиенты ресурсов</td>
+<td>Методы по эндпоинтам с типами</td>
+<td><code>OrdersApi.create(order)</code></td>
+</tr>
+<tr>
+<td>Модели и схемы</td>
+<td>Типы запросов/ответов и <button type="button" class="term" data-term="json-schema" aria-expanded="false">JSON Schema</button></td>
+<td><code>Order</code>, <code>orderSchema</code></td>
+</tr>
+<tr>
+<td>Фабрики данных</td>
+<td>Валидные данные с уникальными полями</td>
+<td><code>makeOrder({ qty: 2 })</code></td>
+</tr>
+<tr>
+<td>Фикстуры</td>
+<td>Авторизованный клиент, созданные сущности с очисткой</td>
+<td><code>adminApi</code>, <code>paidOrder</code></td>
+</tr>
+<tr>
+<td>Тесты</td>
+<td>Сценарии и ожидания</td>
+<td><code>test('нельзя отменить отправленный заказ')</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Как это реализовать на Playwright — в следующей главе <a href="#/api-auto">«Автоматизация API»</a>.</p>
+<h2 id="/api-basics/categories" data-anchor="categories">Категории проверок<a class="h-anchor" href="#/api-basics/categories" aria-label="Ссылка на раздел">#</a></h2>
+<p>Для каждого эндпоинта полезно пройти по категориям:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Категория</th>
+<th>Что проверяем</th>
+<th>Пример для <code>POST /api/orders</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Позитивные сценарии</td>
+<td>Основное поведение</td>
+<td>Заказ создан: 201, <code>Location</code>, тело с id и статусом <code>created</code></td>
+</tr>
+<tr>
+<td>Валидация входа</td>
+<td>Обязательные поля, типы, границы, форматы</td>
+<td>Нет <code>productId</code> → 400/422; <code>qty: 0</code> → 422; <code>qty: "два"</code> → 400</td>
+</tr>
+<tr>
+<td>Аутентификация</td>
+<td>Без токена, с неверным и истёкшим</td>
+<td>401 во всех случаях</td>
+</tr>
+<tr>
+<td>Авторизация</td>
+<td>Права и чужие ресурсы</td>
+<td>Заказ от имени другого покупателя → 403</td>
+</tr>
+<tr>
+<td>Бизнес-правила</td>
+<td>Правила предметной области</td>
+<td>Товара нет в наличии → 409 <code>OUT_OF_STOCK</code></td>
+</tr>
+<tr>
+<td>Побочные эффекты</td>
+<td>Изменение состояния системы</td>
+<td>Остаток уменьшился; заказ виден в <code>GET /orders</code></td>
+</tr>
+<tr>
+<td>Идемпотентность</td>
+<td>Повтор запроса</td>
+<td>Тот же <code>Idempotency-Key</code> → тот же заказ, не дубликат</td>
+</tr>
+<tr>
+<td>Формат ошибок</td>
+<td>Единая структура, отсутствие утечек</td>
+<td><code>{ code, message, details[] }</code>, без стек-трейса</td>
+</tr>
+<tr>
+<td>Контракт и схема</td>
+<td>Структура ответа</td>
+<td>Все поля и типы по <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> (<a href="#/contracts">глава 21</a>)</td>
+</tr>
+<tr>
+<td>Нефункциональные (базово)</td>
+<td>Время ответа, размер, заголовки безопасности</td>
+<td>Ответ за разумное время, нет <code>Server: …</code> с версией</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout c-tip"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg><span>Источник ожиданий</span></div><div class="callout-body"><p>Ожидаемое поведение берут из спецификации (OpenAPI/Swagger), требований и договорённостей команды. Если поведение не описано — это вопрос аналитику, а не повод придумать ожидание в тесте.</p></div></div>
+<h2 id="/api-basics/data" data-anchor="data">Тестовые данные<a class="h-anchor" href="#/api-basics/data" aria-label="Ссылка на раздел">#</a></h2>
+<p>Главные правила для API-тестов:</p>
+<ol>
+<li><strong>Тест создаёт свои данные.</strong> Не «первый заказ в базе», а заказ, созданный в начале теста.</li>
+<li><strong>Данные уникальны.</strong> Email с меткой времени или UUID — тесты не конфликтуют при параллельном и повторном запуске.</li>
+<li><strong>Данные валидны по умолчанию.</strong> Фабрика возвращает корректный объект; негативный случай меняет одно поле.</li>
+<li><strong>Данные удаляются.</strong> Очистка — в teardown фикстуры, чтобы выполнилась при падении.</li>
+<li><strong>Нет зависимости между тестами.</strong> Тест не использует то, что создал другой тест.</li>
+</ol>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/data/orders.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">randomUUID</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'node:crypto'</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">NewOrder</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span><span class="w"> </span><span class="nx">comment?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">idempotencyKey</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">makeOrder</span><span class="p">(</span><span class="nx">overrides</span><span class="o">:</span><span class="w"> </span><span class="kt">Partial</span><span class="o">&lt;</span><span class="nx">NewOrder</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="o">:</span><span class="w"> </span><span class="nx">NewOrder</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">idempotencyKey</span><span class="o">:</span><span class="w"> </span><span class="kt">randomUUID</span><span class="p">(),</span><span class="w"> </span><span class="p">...</span><span class="nx">overrides</span><span class="w"> </span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1">// Негативные случаи — одно изменение относительно валидного заказа</span>
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">invalidOrders</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="kt">Record</span><span class="o">&lt;</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">;</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">}[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'нет productId'</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">422</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'qty = 0'</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">0</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">422</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'qty строкой'</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="s1">'два'</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">400</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'несуществующий товар'</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">999999</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">404</span><span class="w"> </span><span class="p">},</span>
+<span class="p">];</span>
+</code></pre></div>
+<p>Подробнее о стратегиях данных — в главах <a href="#/mocking">«Mocking и Test Data»</a> и <a href="#/isolation">«Test Isolation»</a>.</p>
+<h2 id="/api-basics/auth" data-anchor="auth">Авторизация в API<a class="h-anchor" href="#/api-basics/auth" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="api-authentication" aria-expanded="false">API Authentication</button> бывает нескольких видов:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Способ</th>
+<th>Как передаётся</th>
+<th>Где встречается</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><button type="button" class="term" data-term="api-key" aria-expanded="false">API Key</button></td>
+<td>Заголовок <code>X-API-Key: …</code> или query-параметр</td>
+<td>Сервисные интеграции</td>
+</tr>
+<tr>
+<td>Basic</td>
+<td><code>Authorization: Basic base64(login:password)</code></td>
+<td>Внутренние сервисы, старые API</td>
+</tr>
+<tr>
+<td>Bearer-токен (<button type="button" class="term" data-term="jwt" aria-expanded="false">JWT</button>)</td>
+<td><code>Authorization: Bearer eyJ…</code></td>
+<td>Большинство современных API</td>
+</tr>
+<tr>
+<td><button type="button" class="term" data-term="oauth2" aria-expanded="false">OAuth 2.0</button> (client credentials)</td>
+<td>Сначала <code>POST /oauth/token</code>, затем Bearer</td>
+<td>Межсервисное взаимодействие</td>
+</tr>
+<tr>
+<td><button type="button" class="term" data-term="cookie" aria-expanded="false">Cookie</button> сессии</td>
+<td><code>Cookie: sid=…</code></td>
+<td>API, которым пользуется веб-интерфейс</td>
+</tr>
+</tbody>
+</table></div>
+<p>Для тестов важно:</p>
+<ul>
+<li><strong>получать токен программно</strong> в фикстуре (логин через API), а не копировать вручную;</li>
+<li><strong>учитывать срок жизни</strong> токена: для долгих прогонов — обновление или новый токен на воркер;</li>
+<li><strong>проверять матрицу доступа</strong>: нет токена, неверный, истёкший, другая роль, чужой ресурс (см. <a href="#/web-arch/auth">главу 9</a>);</li>
+<li><strong>не выводить токены в логи и отчёты</strong>.</li>
+</ul>
+<p>JWT не обязательно зашифрован: payload обычно читается. Сервер должен проверять подпись, срок и необходимые claims. 401 означает проблему аутентификации; 403 — отказ в доступе согласно контракту. Проверяйте доступ к чужим ресурсам, истёкший токен и недостаточную роль, а не только happy path.</p><h2 id="/api-basics/validation" data-anchor="validation">Валидация ответов<a class="h-anchor" href="#/api-basics/validation" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="response-validation" aria-expanded="false">Response Validation</button> идёт по слоям — от быстрых и общих к точным:</p>
+<ol>
+<li><strong>Статус</strong> — <code>201</code>, а не просто «успешный».</li>
+<li><strong>Заголовки</strong> — <code>Content-Type</code>, <code>Location</code>, кэширование, CORS, если важно.</li>
+<li><strong>Структура</strong> — по схеме: все обязательные поля, типы, отсутствие лишних чувствительных полей.</li>
+<li><strong>Значения</strong> — бизнес-результат: статус заказа, сумма, связи.</li>
+<li><strong>Побочные эффекты</strong> — повторный <code>GET</code>, связанный ресурс, запись в базе, событие в очереди.</li>
+</ol>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/order-create.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">makeOrder</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./data/orders'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'создание заказа: статус, заголовки, тело, побочный эффект'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">request</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">makeOrder</span><span class="p">({</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/api/orders'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">order</span><span class="p">,</span><span class="w"> </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">'Idempotency-Key'</span><span class="o">:</span><span class="w"> </span><span class="nx">order</span><span class="p">.</span><span class="nx">idempotencyKey</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">201</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">()[</span><span class="s1">'content-type'</span><span class="p">]).</span><span class="nx">toMatch</span><span class="p">(</span><span class="sr">/^application\/json/</span><span class="p">);</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">Record</span><span class="o">&lt;</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">unknown</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">body</span><span class="p">).</span><span class="nx">toMatchObject</span><span class="p">({</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s1">'created'</span><span class="p">,</span><span class="w"> </span><span class="nx">items</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="w"> </span><span class="p">}]</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">body</span><span class="p">).</span><span class="nx">not</span><span class="p">.</span><span class="nx">toHaveProperty</span><span class="p">(</span><span class="s1">'internalCost'</span><span class="p">);</span><span class="w">            </span><span class="c1">// не утекают внутренние поля</span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/api/orders'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">params</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s1">'created'</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">ids</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="k">await</span><span class="w"> </span><span class="nx">list</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">items</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">}[]</span><span class="w"> </span><span class="p">}).</span><span class="nx">items</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">o</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">o</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">ids</span><span class="p">).</span><span class="nx">toContain</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">id</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="kt">number</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="/api-basics/eventual" data-anchor="eventual">Асинхронные операции и повторные запросы<a class="h-anchor" href="#/api-basics/eventual" aria-label="Ссылка на раздел">#</a></h2><p>Если POST принят с 202, бизнес-операция может ещё выполняться. Получите operation ID, проверяйте связанный status <button type="button" class="term" data-term="endpoint" aria-expanded="false">Endpoint</button> до конечного состояния с ограниченным общим <button type="button" class="term" data-term="timeout" aria-expanded="false">Timeout</button>. Не создавайте новый заказ на каждой итерации ожидания.</p><div class="code"><div class="code-head"><span class="code-lang">TypeScript · фрагмент</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>const operationId = 'id-from-create-response';
+await expect.poll(async () =&gt; {
+  const response = await request.get(`/operations/${operationId}`);
+  expect(response.status()).toBe(200);
+  return (await response.json()).status;
+}, { timeout: 15_000, intervals: [100, 250, 500, 1000] }).toBe('completed');</code></pre></div><p>Это фрагмент для приложения с таким контрактом, не Endpoint учебного магазина. Обработайте failed-состояние отдельно, чтобы не ждать бессмысленно до таймаута. Повтор чтения допустим; повтор записи требует проверки идемпотентности.</p><h2 id="/api-basics/errors" data-anchor="errors">Обработка ошибок<a class="h-anchor" href="#/api-basics/errors" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="error-handling-api" aria-expanded="false">Error Handling</button> — отдельная область проверок. Хороший API:</p>
+<ul>
+<li>возвращает <strong>правильный класс кода</strong>: ошибки клиента — 4xx, ошибки сервера — 5xx;</li>
+<li>использует <strong>единый формат ошибки</strong> во всех эндпоинтах, например:</li>
+</ul>
+<div class="code"><div class="code-head"><span class="code-lang">JSON</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VALIDATION_ERROR"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Некорректные данные заказа"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"qty"</span><span class="p">,</span><span class="w"> </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"must be greater than 0"</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">  </span><span class="nt">"traceId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5b2c9e1a7f"</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>указывает <strong>поле и причину</strong>, чтобы клиент мог показать ошибку пользователю;</li>
+<li><strong>не раскрывает внутренности</strong>: стек-трейсы, <button type="button" class="term" data-term="sql" aria-expanded="false">SQL</button>, пути файлов, версии библиотек;</li>
+<li>содержит <strong>идентификатор запроса</strong> для поиска в логах.</li>
+</ul>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/order-errors.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">invalidOrders</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./data/orders'</span><span class="p">;</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">c</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">invalidOrders</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">test</span><span class="p">(</span><span class="sb">`ошибка валидации: </span><span class="si">${</span><span class="nx">c</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">request</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/api/orders'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">c.body</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">code</span><span class="p">).</span><span class="nx">toMatch</span><span class="p">(</span><span class="sr">/^[A-Z_]+$/</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">length</span><span class="p">).</span><span class="nx">toBeGreaterThan</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">err</span><span class="p">)).</span><span class="nx">not</span><span class="p">.</span><span class="nx">toMatch</span><span class="p">(</span><span class="sr">/at \w+ \(|SELECT |Exception/</span><span class="p">);</span><span class="w"> </span><span class="c1">// нет утечек</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="/api-basics/postman" data-anchor="postman">Postman и тесты в коде<a class="h-anchor" href="#/api-basics/postman" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="postman" aria-expanded="false">Postman</button> — популярный инструмент для работы с API: коллекции запросов, окружения с переменными, pre-request скрипты, проверки во вкладке Tests, запуск коллекций из CLI через Newman.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Postman</th>
+<th>Тесты в коде (Playwright)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Исследование API, ручные проверки</td>
+<td>Отлично</td>
+<td>Неудобно</td>
+</tr>
+<tr>
+<td>Ревью изменений, история в <button type="button" class="term" data-term="git" aria-expanded="false">Git</button></td>
+<td>Экспорт <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>, сложно читать диффы</td>
+<td>Обычный код и <button type="button" class="term" data-term="merge-request" aria-expanded="false">Merge Request</button></td>
+</tr>
+<tr>
+<td>Переиспользование (фабрики, фикстуры, типы)</td>
+<td>Ограниченно</td>
+<td>Полностью</td>
+</tr>
+<tr>
+<td>Общий фреймворк с UI-тестами</td>
+<td>Нет</td>
+<td>Да: одни клиенты, данные, отчёты</td>
+</tr>
+<tr>
+<td>Порог входа</td>
+<td>Низкий</td>
+<td>Нужен <button type="button" class="term" data-term="typescript" aria-expanded="false">TypeScript</button></td>
+</tr>
+</tbody>
+</table></div>
+<p>Практичный подход: Postman — для исследования и быстрых проверок, коллекция как живая документация; регрессионный набор — в коде.</p>
+<h2 id="/api-basics/example" data-anchor="example">Пример: чек-лист для эндпоинта<a class="h-anchor" href="#/api-basics/example" aria-label="Ссылка на раздел">#</a></h2>
+<p><code>PATCH /api/orders/{id}</code> — изменить статус заказа. Тело: <code>{ "status": "cancelled" }</code>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>№</th>
+<th>Проверка</th>
+<th>Ожидание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Отмена своего заказа в статусе <code>created</code></td>
+<td>200, статус <code>cancelled</code>, остаток товара вернулся</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Отмена заказа в <code>paid</code></td>
+<td>200, статус <code>cancelled</code>, создан возврат</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Отмена заказа в <code>shipped</code></td>
+<td>409, код <code>INVALID_TRANSITION</code>, статус не изменился</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Неизвестный статус <code>"lost"</code></td>
+<td>422, поле <code>status</code> в <code>details</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Пустое тело / нет поля <code>status</code></td>
+<td>400 или 422 по спецификации</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Несуществующий id</td>
+<td>404</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Чужой заказ</td>
+<td>403 или 404, заказ не изменился</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Без токена / истёкший токен</td>
+<td>401</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Повторная отмена</td>
+<td>409 или 200 без изменений — как описано в спецификации</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Схема ответа</td>
+<td>Соответствует <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button></td>
+</tr>
+</tbody>
+</table></div>
+<p>Десять пунктов, каждый — отдельный короткий тест. Пункты 3, 7 и 9 часто находят дефекты, которые UI-тесты никогда не увидят: интерфейс просто не показывает кнопку отмены для отправленного заказа.</p>
+<h2 id="/api-basics/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/api-basics/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Только позитивные тесты</span></div><div class="callout-body"><p>API, которое правильно отвечает на правильные запросы, — половина работы. Валидация, права и ошибки — то, что защищает систему и данные.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Проверять всё тело через <code>toEqual</code> целиком</span></div><div class="callout-body"><p>Поля <code>createdAt</code>, <code>id</code>, <code>updatedAt</code> меняются каждый раз — тест станет хрупким. Проверяйте значимые поля (<code>toMatchObject</code>), структуру — схемой.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Зависеть от данных стенда</span></div><div class="callout-body"><p>«Заказ 1042 должен быть в статусе paid» — ровно до того дня, когда его кто-то изменит. Создавайте свои данные.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Логировать токены и пароли</span></div><div class="callout-body"><p>Логи и отчёты CI видят многие. Маскируйте заголовок <code>Authorization</code> и чувствительные поля.</p></div></div>
+<h2 id="/api-basics/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/api-basics/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="api-checklist" data-level="J" data-topic="API Testing"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Как вы тестируете новый эндпоинт создания сущности?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>По категориям: позитивный сценарий (201, Location, тело), валидация (обязательные поля, типы, границы, форматы — по одному изменению), аутентификация (нет токена, неверный, истёкший → 401), авторизация (чужие ресурсы, роли → 403/404), бизнес-правила (409/422 с кодом), побочные эффекты (сущность доступна через GET, связанные данные изменились), идемпотентность, формат ошибок без утечек, соответствие схеме.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="api-layers" data-level="J" data-topic="API Testing"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Что вы проверяете в ответе API?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>По слоям: статус (точный код), заголовки (Content-Type, Location и др.), структуру по схеме (обязательные поля, типы, нет лишних чувствительных полей), значения (бизнес-результат), побочные эффекты (повторный GET, связанные ресурсы, база). Изменчивые поля (id, даты) проверяю по формату, а не по значению.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="api-postman-vs-code" data-level="J" data-topic="API Testing"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Postman или тесты в коде — что выбрать для API-регрессии?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p><button type="button" class="term" data-term="postman" aria-expanded="false">Postman</button> — для исследования API, ручных проверок и быстрых прототипов; коллекции можно запускать через Newman в CI. Для поддерживаемого регрессионного набора предпочитаю код: ревью в <button type="button" class="term" data-term="git" aria-expanded="false">Git</button>, типы, фабрики данных, фикстуры с очисткой, общие клиенты с UI-тестами и единые отчёты.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="api-errors" data-level="M" data-topic="API Testing"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как проверить обработку ошибок в API?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Для каждого класса ошибок (валидация, не найдено, конфликт, нет прав, нет аутентификации) — правильный код и единый формат тела: машинный код ошибки, сообщение, поле и причина для валидации, traceId. Проверяю отсутствие утечек: стек-трейса, <button type="button" class="term" data-term="sql" aria-expanded="false">SQL</button>, путей, версий. Отдельно: на некорректные данные никогда не должно быть 500.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/api-basics/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/api-basics/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="api-basics:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Что проверить в первую очередь, если <code>POST /api/orders</code> вернул 201?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Что ответ не пустой</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Тело и заголовок Location, затем что заказ действительно доступен через GET</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Только время ответа</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Ничего, 201 достаточно</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Успешный код — только первый слой. Нужно проверить результат и побочный эффект.</p></div></div><div class="quiz" data-qid="api-basics:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Пользователь А запрашивает заказ пользователя Б по id. Какой ответ ожидаем?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>401</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>200 с данными заказа</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="1"><span class="quiz-mark"></span><span>403 или 404 — по спецификации; данные не возвращаются</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>500</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Пользователь аутентифицирован, но прав на ресурс нет. 404 иногда используют, чтобы не раскрывать существование ресурса.</p></div></div><div class="quiz" data-qid="api-basics:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Как правильно сформировать негативные данные для проверки валидации?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Взять валидный объект и изменить одно поле</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Использовать случайные строки</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Отправить пустой запрос во всех тестах</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Сделать всё тело некорректным сразу</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Изменение одного фактора показывает, что работает конкретное правило валидации.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему важно проверять формат ошибок, а не только код?</span></summary><div class="check-body"><p>Клиенты (фронтенд, мобильное приложение, интеграции) разбирают тело ошибки, чтобы показать сообщение и подсветить поле. Неединый формат ломает клиентов, а утечка стек-трейса или <button type="button" class="term" data-term="sql" aria-expanded="false">SQL</button> — уязвимость. Код 400 с неправильным телом — тоже дефект.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Чем проверка побочных эффектов отличается от проверки ответа?</span></summary><div class="check-body"><p>Ответ сообщает, что сервер «считает» результатом. Побочный эффект показывает реальное изменение системы: заказ доступен через GET, остаток уменьшился, событие отправлено. Сервер может ответить 201 и не сохранить данные — это обнаружит только проверка побочного эффекта.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/pw-advanced"><small>← Назад</small><span>Продвинутый Playwright</span></a><a class="foot-link next" href="#/api-auto"><small>Дальше →</small><span>Автоматизация API</span></a></div></footer></article><hr class="nojs-sep">

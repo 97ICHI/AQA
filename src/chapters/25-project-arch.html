@@ -1,0 +1,223 @@
+<article class="chapter" id="/project-arch" data-chapter="project-arch" data-section="arch" aria-labelledby="h1-project-arch"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 23 · Раздел VI · Архитектура автоматизации</div><h1 class="ch-title" id="h1-project-arch" tabindex="-1">Архитектура тестового проекта</h1><p class="ch-lead">Структура репозитория автотестов, конфигурация, фикстуры, клиенты API, страницы, данные, хелперы и утилиты, правила зависимостей между слоями и инструменты качества кода. Как набор тестов превращается в поддерживаемую систему.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 9 мин чтения</span><span class="lvl" title="Уровень">M</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/fixtures">Fixtures и Hooks</a><a href="#/pom">Page Object Model</a><a href="#/api-auto">Автоматизация API</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Архитектура тестового проекта — это ответ на вопрос «куда положить новый код и где искать существующий». Хорошая структура делает очевидным, какой слой меняется при редизайне, изменении API или новом бизнес-правиле.</p><p class="idea-goal"><strong>Цель главы:</strong> организовать репозиторий автотестов по слоям с однонаправленными зависимостями и единой точкой конфигурации.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Тесты зависят от фикстур, фикстуры — от клиентов, страниц и данных, те — от конфигурации и утилит. Обратных зависимостей нет.</p><h3>Главное</h3><ul class="recall-points"><li><code>tests/</code> — только сценарии и ожидания, сгруппированные по видам (api, ui, e2e) и областям продукта.</li><li><code>src/</code> — переиспользуемый код: config, fixtures, api (клиенты), pages и components, data (фабрики), schemas, utils.</li><li>Конфигурация окружений читается в одном модуле с валидацией и значениями по умолчанию; тесты не обращаются к <code>process.env</code> напрямую.</li><li>Фикстуры собираются из модулей через <code>mergeTests</code>, тесты импортируют <code>test</code> из одного места.</li><li>Helpers знают о предметной области (создать оплаченный заказ); utilities — нет (форматирование денег, ожидание, генерация строк).</li><li>Качество кода тестов: <button type="button" class="term" data-term="typescript" aria-expanded="false">TypeScript</button> strict, ESLint с <code>eslint-plugin-playwright</code>, Prettier, проверки в CI и ревью.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Test Framework</dt><dd>Код проекта вокруг инструмента: конфигурация, фикстуры, клиенты API, page objects, фабрики данных, отчётность — общий язык предметной области для тестов.</dd></div><div><dt>Project Structure</dt><dd>Раскладка репозитория автотестов по слоям: tests, fixtures, api, pages, components, data, schemas, config, utils.</dd></div><div><dt>Configuration Management</dt><dd>Получение настроек окружения (адреса, учётные данные, флаги) из одного модуля с проверкой обязательных значений и типами.</dd></div><div><dt>Helper / Utility</dt><dd>Helper — вспомогательная функция, знающая предметную область (создать оплаченный заказ); utility — общая функция без знания продукта (форматирование, генерация строк).</dd></div><div><dt>Linter</dt><dd>Инструмент (ESLint), находящий ошибки и нарушения правил без запуска: забытые await, test.only, waitForTimeout, неиспользуемый код.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Не начинайте с «фреймворка на вырост» с десятью слоями абстракций. Структура должна расти вместе с набором тестов: сначала тесты и фикстуры, затем клиенты и страницы, когда появляется дублирование.</p><div class="recall-links"><a href="#/project-arch/what">Что такое тестовый фреймворк →</a><a href="#/project-arch/structure">Структура репозитория →</a><a href="#/project-arch/dependencies">Правило зависимостей →</a><a href="#/project-arch/config">Конфигурация окружений →</a><a href="#/project-arch/fixtures">Фикстуры как точка сборки →</a><a href="#/project-arch/helpers">Helpers и Utilities →</a><a href="#/project-arch/quality">Качество кода тестов →</a><a href="#/project-arch/repo">Где живут тесты: рядом с кодом или отдельно →</a><a href="#/project-arch/example">Пример: как растёт архитектура →</a><a href="#/project-arch/mistakes">Типичные ошибки →</a><a href="#/project-arch/interview">Что важно для собеседования →</a><a href="#/project-arch/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/project-arch/what">Что такое тестовый фреймворк</a><a href="#/project-arch/structure">Структура репозитория</a><a href="#/project-arch/dependencies">Правило зависимостей</a><a href="#/project-arch/config">Конфигурация окружений</a><a href="#/project-arch/fixtures">Фикстуры как точка сборки</a><a href="#/project-arch/helpers">Helpers и Utilities</a><a href="#/project-arch/quality">Качество кода тестов</a><a href="#/project-arch/repo">Где живут тесты: рядом с кодом или отдельно</a><a href="#/project-arch/example">Пример: как растёт архитектура</a><a href="#/project-arch/mistakes">Типичные ошибки</a><a href="#/project-arch/interview">Что важно для собеседования</a><a href="#/project-arch/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/project-arch/what" data-anchor="what">Что такое тестовый фреймворк<a class="h-anchor" href="#/project-arch/what" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-framework" aria-expanded="false">Test Framework</button> в разговоре AQA — не <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button>, а <strong>ваш код вокруг него</strong>: конфигурация окружений, фикстуры, клиенты API, <button type="button" class="term" data-term="page-object-pw" aria-expanded="false">Page</button> objects, фабрики данных, отчётность. Playwright даёт раннер и API браузера; фреймворк проекта даёт тестам язык предметной области: <code>paidOrder</code>, <code>adminApi</code>, <code>catalogPage</code>.</p>
+<p>Цели архитектуры:</p>
+<ul>
+<li><strong>Найти место для кода</strong> без обсуждений: новая страница → <code>src/pages</code>, новый эндпоинт → <code>src/api</code>.</li>
+<li><strong>Локализовать изменения</strong>: редизайн — <code>pages/components</code>, изменение API — <code>api/schemas</code>, бизнес-правило — <code>tests</code>.</li>
+<li><strong>Сделать тесты короткими</strong>: подготовка и механика вынесены, в тесте — сценарий.</li>
+<li><strong>Запускать подмножества</strong>: по виду теста, области, тегу, окружению.</li>
+</ul>
+<h2 id="/project-arch/structure" data-anchor="structure">Структура репозитория<a class="h-anchor" href="#/project-arch/structure" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="project-structure" aria-expanded="false">Project Structure</button>, к которой приходят многие проекты на <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button>:</p>
+<div class="code"><div class="code-head"><span class="code-lang">Текст</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>shop-autotests/
+├── playwright.config.ts          # проекты, репортеры, use, webServer
+├── package.json                  # скрипты: test, test:api, test:ui, lint, typecheck
+├── tsconfig.json                 # strict, пути-алиасы @src/*
+├── eslint.config.mjs             # правила, включая eslint-plugin-playwright
+├── .env.example                  # список переменных без значений
+├── README.md                     # как запускать, как устроено, как добавить тест
+├── src/
+│   ├── config/
+│   │   └── env.ts                # чтение и валидация переменных окружения
+│   ├── api/
+│   │   ├── ApiClient.ts          # базовая обёртка: авторизация, логирование
+│   │   ├── OrdersApi.ts          # клиент ресурса
+│   │   └── UsersApi.ts
+│   ├── pages/
+│   │   ├── CatalogPage.ts
+│   │   └── CartPage.ts
+│   ├── components/
+│   │   ├── Header.ts
+│   │   └── ProductCard.ts
+│   ├── data/
+│   │   ├── factories.ts          # makeUser, makeOrder
+│   │   └── shipping-cases.json   # данные data-driven тестов
+│   ├── schemas/
+│   │   └── order.schema.json     # из OpenAPI
+│   ├── fixtures/
+│   │   ├── api.fixtures.ts       # клиенты и сущности с очисткой
+│   │   ├── pages.fixtures.ts     # page objects
+│   │   └── index.ts              # mergeTests → единый test
+│   └── utils/
+│       ├── money.ts              # форматирование, парсинг
+│       └── random.ts             # генераторы с seed
+├── tests/
+│   ├── api/orders/…              # API-тесты по ресурсам
+│   ├── ui/cart/…                 # UI-тесты по областям
+│   ├── e2e/checkout.spec.ts      # немногочисленные сквозные сценарии
+│   └── setup/auth.setup.ts       # setup-проекты
+└── .gitlab-ci.yml                # pipeline (глава 28)
+</code></pre></div>
+<div class="sim-mount" data-sim="architecture-explorer"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Test Architecture Explorer: интерактивное дерево учебного проекта. Выберите файл — увидите его назначение, пример содержимого, от чего он зависит и кто зависит от него.</div></div>
+<h2 id="/project-arch/dependencies" data-anchor="dependencies">Правило зависимостей<a class="h-anchor" href="#/project-arch/dependencies" aria-label="Ссылка на раздел">#</a></h2>
+<p>Слои зависят только «вниз»:</p>
+<div class="code"><div class="code-head"><span class="code-lang">Текст</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>tests  →  fixtures  →  api / pages / components / data / schemas  →  config / utils
+</code></pre></div>
+<ul>
+<li><code>utils</code> ничего не знает о продукте и не импортирует остальное.</li>
+<li><code>pages</code> не импортируют <code>api</code>, а <code>api</code> — <code>pages</code>: это параллельные способы взаимодействия.</li>
+<li><code>fixtures</code> собирают всё вместе для тестов.</li>
+<li><code>tests</code> не импортируют друг друга и не содержат переиспользуемого кода.</li>
+</ul>
+<p>Нарушение правила — признак проблемы: <button type="button" class="term" data-term="page-object-pw" aria-expanded="false">Page</button> object, который создаёт пользователя через API, или утилита, импортирующая фикстуру.</p>
+<h2 id="/project-arch/config" data-anchor="config">Конфигурация окружений<a class="h-anchor" href="#/project-arch/config" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="config-management" aria-expanded="false">Configuration Management</button>: тесты запускаются на локальном стенде, в CI, на staging. Значения приходят из переменных окружения; читать их нужно <strong>в одном месте</strong> с проверкой:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">src/config/env.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kr">type</span><span class="w"> </span><span class="nx">Env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'local'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">'staging'</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s1">'ci'</span><span class="p">;</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">required</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">v</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`Не задана переменная окружения </span><span class="si">${</span><span class="nx">name</span><span class="si">}</span><span class="sb"> (см. .env.example)`</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">v</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TEST_ENV</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'local'</span><span class="p">)</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">Env</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'staging'</span><span class="p">,</span><span class="w"> </span><span class="s1">'ci'</span><span class="p">].</span><span class="nx">includes</span><span class="p">(</span><span class="nx">env</span><span class="p">))</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`Неизвестное TEST_ENV: </span><span class="si">${</span><span class="nx">env</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">env</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.BASE_URL</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'http://localhost:3000'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">apiURL</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.API_URL</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'http://localhost:8080'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">admin</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="kt">process.env.ADMIN_EMAIL</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'admin@example.com'</span><span class="p">,</span>
+<span class="w">    </span><span class="c1">// секреты без значения по умолчанию: падение сразу с понятной ошибкой</span>
+<span class="w">    </span><span class="nx">get</span><span class="w"> </span><span class="nx">password</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">required</span><span class="p">(</span><span class="s1">'ADMIN_PASSWORD'</span><span class="p">);</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">slowMoMs</span><span class="o">:</span><span class="w"> </span><span class="kt">Number</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLOW_MO</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="mf">0</span><span class="p">),</span>
+<span class="p">}</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="kd">const</span><span class="p">;</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">playwright.config.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">defineConfig</span><span class="p">,</span><span class="w"> </span><span class="nx">devices</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./src/config/env'</span><span class="p">;</span>
+
+<span class="k">export</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nx">defineConfig</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">testDir</span><span class="o">:</span><span class="w"> </span><span class="s1">'./tests'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="kt">config.baseURL</span><span class="p">,</span><span class="w"> </span><span class="nx">trace</span><span class="o">:</span><span class="w"> </span><span class="s1">'on-first-retry'</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nx">projects</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'setup'</span><span class="p">,</span><span class="w"> </span><span class="nx">testMatch</span><span class="o">:</span><span class="w"> </span><span class="sr">/setup\/.*\.setup\.ts/</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'api'</span><span class="p">,</span><span class="w"> </span><span class="nx">testDir</span><span class="o">:</span><span class="w"> </span><span class="s1">'./tests/api'</span><span class="p">,</span><span class="w"> </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="kt">config.apiURL</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'ui'</span><span class="p">,</span><span class="w"> </span><span class="nx">testDir</span><span class="o">:</span><span class="w"> </span><span class="s1">'./tests/ui'</span><span class="p">,</span><span class="w"> </span><span class="nx">dependencies</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'setup'</span><span class="p">],</span><span class="w"> </span><span class="nx">use</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="nx">devices</span><span class="p">[</span><span class="s1">'Desktop Chrome'</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Плюсы: опечатка в имени переменной не превращается в «тест пошёл на прод»; при отсутствии секрета ошибка понятна; значения типизированы. Как работать с секретами и окружениями — в <a href="#/isolation/config-secrets">следующей главе</a>.</p>
+<h2 id="/project-arch/fixtures" data-anchor="fixtures">Фикстуры как точка сборки<a class="h-anchor" href="#/project-arch/fixtures" aria-label="Ссылка на раздел">#</a></h2>
+<p>Фикстуры удобно делить по модулям и объединять:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">src/fixtures/index.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">mergeTests</span><span class="p">,</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="nx">base</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">apiFixtures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">base</span><span class="p">.</span><span class="nx">extend</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">apiReady</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">apiReady</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">({},</span><span class="w"> </span><span class="nx">use</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">use</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="p">},</span>
+<span class="p">});</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">pageFixtures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">base</span><span class="p">.</span><span class="nx">extend</span><span class="o">&lt;</span><span class="p">{</span><span class="w"> </span><span class="nx">pagesReady</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="p">}</span><span class="o">&gt;</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">pagesReady</span><span class="o">:</span><span class="w"> </span><span class="kt">async</span><span class="w"> </span><span class="p">({},</span><span class="w"> </span><span class="nx">use</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">use</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="p">},</span>
+<span class="p">});</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">mergeTests</span><span class="p">(</span><span class="nx">apiFixtures</span><span class="p">,</span><span class="w"> </span><span class="nx">pageFixtures</span><span class="p">);</span>
+<span class="k">export</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+</code></pre></div>
+<p>Тесты импортируют только <code>test</code> и <code>expect</code> из <code>src/fixtures</code> — одна строка импорта, все фикстуры проекта доступны. (Здесь фикстуры упрощены до заглушек, чтобы показать сборку; содержательные фикстуры — в главах <a href="#/fixtures">16</a> и <a href="#/api-auto/fixtures">20</a>.)</p>
+<h2 id="/project-arch/helpers" data-anchor="helpers">Helpers и Utilities<a class="h-anchor" href="#/project-arch/helpers" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="helper-utility" aria-expanded="false">Helper / Utility</button> — частая путаница:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Helper (предметный)</th>
+<th>Utility (общая)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Знает о продукте</td>
+<td>Да</td>
+<td>Нет</td>
+</tr>
+<tr>
+<td>Примеры</td>
+<td><code>createPaidOrder(api)</code>, <code>loginViaApi(request, user)</code></td>
+<td><code>formatRub(9980)</code>, <code>retry(fn, n)</code>, <code>uniqueSuffix()</code></td>
+</tr>
+<tr>
+<td>Где</td>
+<td><code>src/fixtures</code>, <code>src/data</code>, рядом с клиентами</td>
+<td><code>src/utils</code></td>
+</tr>
+<tr>
+<td>Тестируется</td>
+<td>Через тесты, которые его используют</td>
+<td>Может иметь свои unit-тесты</td>
+</tr>
+</tbody>
+</table></div>
+<p>Свалка <code>helpers.ts</code> на тысячу строк — признак отсутствия архитектуры. Хелпер должен жить рядом со своей предметной областью.</p>
+<h2 id="/project-arch/quality" data-anchor="quality">Качество кода тестов<a class="h-anchor" href="#/project-arch/quality" aria-label="Ссылка на раздел">#</a></h2>
+<p>Тестовый код проходит те же проверки, что и продуктовый:</p>
+<div class="code"><div class="code-head"><span class="code-lang">JSON</span><span class="code-title">package.json (фрагмент)</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"test"</span><span class="p">:</span><span class="w"> </span><span class="s2">"playwright test"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"test:api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"playwright test --project=api"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"test:ui"</span><span class="p">:</span><span class="w"> </span><span class="s2">"playwright test --project=ui"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"test:smoke"</span><span class="p">:</span><span class="w"> </span><span class="s2">"playwright test --grep @smoke"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"typecheck"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tsc --noEmit"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"lint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eslint ."</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"format"</span><span class="p">:</span><span class="w"> </span><span class="s2">"prettier --write ."</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><strong><button type="button" class="term" data-term="typescript" aria-expanded="false">TypeScript</button> <code>strict</code></strong> — ловит <code>undefined</code> и опечатки.</li>
+<li><strong><button type="button" class="term" data-term="lint" aria-expanded="false">Linter</button></strong>: ESLint с <code>@typescript-eslint</code> (<code>no-floating-promises</code>) и <code>eslint-plugin-playwright</code> (<code>missing-playwright-await</code>, <code>no-wait-for-timeout</code>, <code>no-focused-test</code>, <code>no-skipped-test</code>, <code>prefer-web-first-assertions</code>).</li>
+<li><strong>Prettier</strong> — единое форматирование, без споров на ревью.</li>
+<li><strong>CI</strong> — <code>typecheck</code> и <code>lint</code> выполняются до тестов.</li>
+<li><strong>Ревью</strong> — чек-лист: локаторы, независимость, очистка данных, понятные имена, отсутствие секретов.</li>
+</ul>
+<h2 id="/project-arch/repo" data-anchor="repo">Где живут тесты: рядом с кодом или отдельно<a class="h-anchor" href="#/project-arch/repo" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>В репозитории продукта</th>
+<th>Отдельный репозиторий</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Синхронизация с изменениями</td>
+<td>Тесты меняются в том же MR, что и код</td>
+<td>Нужна синхронизация версий</td>
+</tr>
+<tr>
+<td>Владение</td>
+<td>Разработчики и QA вместе</td>
+<td>Чаще команда QA</td>
+</tr>
+<tr>
+<td>Тесты нескольких сервисов</td>
+<td>Неудобно</td>
+<td>Удобно</td>
+</tr>
+<tr>
+<td>Запуск на каждый MR продукта</td>
+<td>Естественно</td>
+<td>Требует триггеров между пайплайнами</td>
+</tr>
+</tbody>
+</table></div>
+<p>Частый компромисс: unit, интеграционные и API-тесты сервиса — рядом с кодом; сквозные E2E по нескольким сервисам — в отдельном репозитории.</p>
+<h2 id="/project-arch/example" data-anchor="example">Пример: как растёт архитектура<a class="h-anchor" href="#/project-arch/example" aria-label="Ссылка на раздел">#</a></h2>
+<ol>
+<li><strong>10 тестов.</strong> <code>tests/*.spec.ts</code>, конфиг, пара фикстур. <button type="button" class="term" data-term="page-object-pw" aria-expanded="false">Page</button> objects не нужны.</li>
+<li><strong>50 тестов.</strong> Дублируются локаторы корзины и вход — появляются <code>pages/CartPage.ts</code>, <code>setup/auth.setup.ts</code>, <code>config/env.ts</code>.</li>
+<li><strong>200 тестов.</strong> Отдельные проекты <code>api</code>/<code>ui</code>, клиенты API, фабрики данных, фикстуры по модулям, ESLint-правила, теги <code>@smoke</code>.</li>
+<li><strong>1000 тестов.</strong> Шардирование в CI, карантин нестабильных, отчёты Allure, CODEOWNERS для областей, документация в README.</li>
+</ol>
+<p>На каждом шаге структура решает реальную проблему, а не воображаемую.</p>
+<h2 id="/project-arch/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/project-arch/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>process.env</code> во всех тестах</span></div><div class="callout-body"><p>Сто мест, где читается <code>process.env.BASE_URL</code>, и в пяти из них опечатка. Один модуль конфигурации с проверкой.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Тест импортирует другой тест</span></div><div class="callout-body"><p>Переиспользуемый код живёт в <code>src</code>. Импорт из <code>*.spec.ts</code> регистрирует тесты чужого файла повторно и связывает файлы.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Универсальный BaseTest/BaseHelper</span></div><div class="callout-body"><p>Класс со всем подряд, от которого наследуются тесты. В <button type="button" class="term" data-term="playwright-test" aria-expanded="false">Playwright Test</button> эту роль выполняют фикстуры — модульно и лениво.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Нет README</span></div><div class="callout-body"><p>Новый участник тратит день, чтобы запустить тесты. Опишите: установка, переменные окружения, запуск подмножеств, структура, правила.</p></div></div>
+<h2 id="/project-arch/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/project-arch/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="arch-structure" data-level="M" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как вы структурируете проект автотестов на Playwright?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p><code>tests/</code> с разделением по видам (api, ui, e2e) и областям продукта — только сценарии; <code>src/</code> со слоями: config (переменные окружения с валидацией), api (клиенты ресурсов), pages и components, data (фабрики), schemas, fixtures (сборка через mergeTests), utils. Зависимости только вниз. Плюс проекты в конфиге под виды тестов, скрипты npm, ESLint с плагином <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button>, проверка типов и README.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="arch-config" data-level="M" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как организовать запуск одних и тех же тестов на разных стендах?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Все адреса и учётные данные — из переменных окружения, которые читаются в одном модуле конфигурации с проверкой обязательных значений и значениями по умолчанию для локального запуска. В <code>playwright.config.ts</code> используется <code>baseURL</code> из конфигурации, тесты пишут относительные пути. Стенд выбирается <code>TEST_ENV</code>/<code>BASE_URL</code> в CI; секреты приходят из хранилища CI.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="arch-growth" data-level="M+" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Вы пришли в проект, где 800 тестов в одной папке без структуры. С чего начнёте?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Не с переписывания всего. Сначала измерю: время, нестабильность, дублирование, самые часто ломающиеся места. Введу базу: модуль конфигурации, линтер, проверку типов в CI. Затем по частям: вынесу дублирующиеся подготовки в фикстуры, локаторы часто меняющихся страниц — в <button type="button" class="term" data-term="page-object-pw" aria-expanded="false">Page</button> objects, разделю тесты на проекты по видам. Каждый шаг — небольшой MR с зелёным прогоном. Параллельно правила для нового кода, чтобы долг не рос.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/project-arch/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/project-arch/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="project-arch:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Где разместить функцию <code>createPaidOrder(api)</code>?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>В тестовом файле, который её использует первым</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>В <code>playwright.config.ts</code></span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Рядом с предметной областью: фикстуры или фабрики данных</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>В <code>src/utils</code> — это вспомогательная функция</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Функция знает о заказах и оплате — это предметный helper, а не общая утилита.</p></div></div><div class="quiz" data-qid="project-arch:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Какая зависимость нарушает правило слоёв?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="1"><span class="quiz-mark"></span><span>Утилита форматирования импортирует page object</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Тест импортирует фикстуру</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Page object использует компонент</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>Фикстура использует клиент API</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Утилиты — самый нижний слой и ничего не знают о продукте.</p></div></div><div class="quiz" data-qid="project-arch:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Зачем читать переменные окружения в одном модуле <code>config/env.ts</code>?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Чтобы хранить секреты в репозитории</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Так быстрее</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Иначе Playwright не увидит переменные</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Проверка обязательных значений, типы, значения по умолчанию и одна точка изменения</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Ошибка конфигурации обнаруживается сразу с понятным сообщением, а не случайным падением в середине прогона.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему структура «по видам тестов» (api/ui/e2e) удобна для CI?</span></summary><div class="check-body"><p>Разные виды запускаются в разное время и с разными настройками: API — на каждый коммит с большим числом воркеров, UI — на MR, E2E — после деплоя на стенд. Каталог превращается в отдельный проект <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button>, и <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> запускает нужный набор одной командой.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Что должно быть в README тестового проекта?</span></summary><div class="check-body"><p>Требования и установка, переменные окружения (со ссылкой на <code>.env.example</code>), команды запуска наборов и одного теста, как открыть отчёт и trace, структура каталогов и правила (куда класть код, локаторы, теги), как добавить новый тест, к кому обращаться.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/mocking"><small>← Назад</small><span>Mocking и Test Data</span></a><a class="foot-link next" href="#/isolation"><small>Дальше →</small><span>Изоляция и данные</span></a></div></footer></article><hr class="nojs-sep">

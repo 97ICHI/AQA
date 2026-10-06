@@ -1,0 +1,370 @@
+<article class="chapter" id="/assertions" data-chapter="assertions" data-section="ui" aria-labelledby="h1-assertions"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 15 · Раздел IV · UI Automation</div><h1 class="ch-title" id="h1-assertions" tabindex="-1">Assertions и Synchronization</h1><p class="ch-lead">Web-first assertions, автоожидание действий, явные ожидания событий, таймауты и механизмы повторов. Главная тема для стабильности UI-тестов: как дождаться нужного состояния приложения, а не «подождать на всякий случай».</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 12 мин чтения</span><span class="lvl" title="Уровень">J–M</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/locators">Locators</a><a href="#/async">Асинхронность</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Веб-приложение асинхронно: после клика данные приходят через десятки или тысячи миллисекунд. Стабильный тест не угадывает время, а ждёт конкретного состояния — видимости, текста, URL, ответа сервера — с разумным таймаутом.</p><p class="idea-goal"><strong>Цель главы:</strong> писать проверки, которые сами дожидаются нужного состояния, выбирать правильный вид ожидания и понимать, как таймауты и повторы влияют на стабильность.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Web-first assertions (<code>await expect(locator).toHaveText(...)</code>) повторяют проверку до таймаута; действия ждут готовности элемента. Фиксированные паузы делают тесты одновременно медленными и нестабильными.</p><h3>Главное</h3><ul class="recall-points"><li>Асинхронные проверки локаторов и страницы (<code>toBeVisible</code>, <code>toHaveText</code>, <code>toHaveURL</code>, <code>toHaveCount</code>…) ждут до <code>expect.timeout</code> (5 с по умолчанию).</li><li>Обычные проверки значений (<code>toBe</code>, <code>toEqual</code>, <code>toContain</code>) срабатывают один раз; <code>expect(await locator.textContent())</code> — однократное чтение и гонка.</li><li>Перед действием <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> проверяет actionability, набор проверок зависит от действия: для клика — виден, стабилен, принимает события, доступен; для <code>fill</code> — виден, доступен, редактируем.</li><li>События, которые не выражаются состоянием элемента, ждут явно (<code>waitForResponse</code>, <code>waitForURL</code>, <code>waitForEvent</code>); для произвольных условий — <code>expect.poll</code> и <code>toPass</code>. <code>waitForTimeout</code> — только для отладки, <code>networkidle</code> не рекомендуется.</li><li>Таймауты: тест — 30 с, <code>expect</code> — 5 с, действия и навигация — без отдельного лимита; ретраи теста — отдельный механизм поверх.</li><li><code>expect.soft</code> продолжает тест после неудачной проверки и собирает все ошибки.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Assertion</dt><dd>Сравнение фактического результата с ожидаемым; при несовпадении тест падает. В Playwright — через <code>expect</code>.</dd></div><div><dt>Web-first Assertion</dt><dd>Проверка локатора или страницы, которая повторяет поиск и сравнение, пока условие не выполнится или не истечёт таймаут: toBeVisible, toHaveText, toHaveURL.</dd></div><div><dt>Actionability Checks</dt><dd>Условия, которые Playwright проверяет перед действием: элемент видим, стабилен, получает события, доступен и (для ввода) редактируем.</dd></div><div><dt>Timeout</dt><dd>Предел времени ожидания. В Playwright: тест — 30 с, expect — 5 с, действие и навигация — без отдельного лимита по умолчанию.</dd></div><div><dt>Soft Assertion</dt><dd>Проверка (<code>expect.soft</code>), которая не прерывает тест при неудаче: ошибки собираются, и тест помечается упавшим в конце.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Увеличение таймаутов и ретраев не делает тест стабильным: оно делает его медленнее и скрывает реальную гонку.</p><div class="recall-links"><a href="#/assertions/assertion">Что такое Assertion →</a><a href="#/assertions/web-first">Web-first assertions →</a><a href="#/assertions/auto-waiting">Auto-waiting и actionability →</a><a href="#/assertions/explicit-wait">Explicit waiting →</a><a href="#/assertions/fixed-vs-state">Фиксированное ожидание против ожидания состояния →</a><a href="#/assertions/timeouts">Таймауты →</a><a href="#/assertions/retries">Retry Mechanisms →</a><a href="#/assertions/soft">Soft assertions →</a><a href="#/assertions/flaky-causes">Почему появляются Flaky Tests →</a><a href="#/assertions/example">Пример: стабилизация теста поиска →</a><a href="#/assertions/mistakes">Типичные ошибки →</a><a href="#/assertions/interview">Что важно для собеседования →</a><a href="#/assertions/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/assertions/assertion">Что такое Assertion</a><a href="#/assertions/web-first">Web-first assertions</a><a href="#/assertions/auto-waiting">Auto-waiting и actionability</a><a href="#/assertions/explicit-wait">Explicit waiting</a><a href="#/assertions/fixed-vs-state">Фиксированное ожидание против ожидания состояния</a><a href="#/assertions/timeouts">Таймауты</a><a href="#/assertions/retries">Retry Mechanisms</a><a href="#/assertions/soft">Soft assertions</a><a href="#/assertions/flaky-causes">Почему появляются Flaky Tests</a><a href="#/assertions/example">Пример: стабилизация теста поиска</a><a href="#/assertions/mistakes">Типичные ошибки</a><a href="#/assertions/interview">Что важно для собеседования</a><a href="#/assertions/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/assertions/assertion" data-anchor="assertion">Что такое Assertion<a class="h-anchor" href="#/assertions/assertion" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="assertion" aria-expanded="false">Assertion</button> — проверка, которая сравнивает фактическое состояние с ожидаемым и при несовпадении выбрасывает ошибку. В <button type="button" class="term" data-term="playwright-test" aria-expanded="false">Playwright Test</button> проверки пишут через <code>expect</code>.</p>
+<p>Важно различать два вида:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Вид</th>
+<th>Пример</th>
+<th>Как работает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Web-first (асинхронные)</strong></td>
+<td><code>await expect(locator).toHaveText('Оплачен')</code></td>
+<td>Повторяет поиск элемента и проверку, пока условие не выполнится или не истечёт таймаут</td>
+</tr>
+<tr>
+<td><strong>Обычные (синхронные)</strong></td>
+<td><code>expect(total).toBe(900)</code></td>
+<td>Проверяет значение один раз, сразу</td>
+</tr>
+</tbody>
+</table></div>
+<p><button type="button" class="term" data-term="web-first-assertion" aria-expanded="false">Web-first Assertion</button> — основа стабильных UI-тестов. Обычные проверки нужны для значений, которые уже получены и не меняются: тело ответа API, результат функции, вычисленное число.</p>
+<h2 id="/assertions/web-first" data-anchor="web-first">Web-first assertions<a class="h-anchor" href="#/assertions/web-first" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Проверка</th>
+<th>Что ждёт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toBeVisible()</code> / <code>toBeHidden()</code></td>
+<td>Элемент видим / скрыт или отсутствует</td>
+</tr>
+<tr>
+<td><code>toHaveText(text \| RegExp \| string[])</code></td>
+<td>Полное совпадение текста (с нормализацией пробелов)</td>
+</tr>
+<tr>
+<td><code>toContainText(text)</code></td>
+<td>Текст содержит подстроку</td>
+</tr>
+<tr>
+<td><code>toHaveValue(value)</code></td>
+<td>Значение поля ввода</td>
+</tr>
+<tr>
+<td><code>toBeChecked()</code>, <code>toBeEnabled()</code>, <code>toBeDisabled()</code>, <code>toBeEditable()</code>, <code>toBeFocused()</code></td>
+<td>Состояние элемента</td>
+</tr>
+<tr>
+<td><code>toHaveCount(n)</code></td>
+<td>Количество элементов, найденных локатором</td>
+</tr>
+<tr>
+<td><code>toHaveAttribute(name, value)</code>, <code>toHaveClass()</code>, <code>toHaveCSS()</code></td>
+<td>Атрибуты и стили</td>
+</tr>
+<tr>
+<td><code>toHaveAccessibleName()</code>, <code>toHaveRole()</code></td>
+<td>Доступность</td>
+</tr>
+<tr>
+<td><code>toHaveURL(url)</code>, <code>toHaveTitle(title)</code></td>
+<td>URL и заголовок страницы</td>
+</tr>
+<tr>
+<td><code>toHaveScreenshot()</code></td>
+<td>Визуальное сравнение со снимком</td>
+</tr>
+<tr>
+<td><code>toBeOK()</code></td>
+<td>Ответ API в диапазоне 2xx (для <code>APIResponse</code>)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/assertions.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'оформление заказа'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/checkout'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Оплатить'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">).</span><span class="nx">toHaveURL</span><span class="p">(</span><span class="sr">/\/orders\/\d+$/</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'heading'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">level</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">})).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="s1">'Заказ оформлен'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'order-status'</span><span class="p">)).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="sr">/Оплачен|Ожидает подтверждения/</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'listitem'</span><span class="p">)).</span><span class="nx">toHaveCount</span><span class="p">(</span><span class="mf">2</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Оплатить'</span><span class="w"> </span><span class="p">})).</span><span class="nx">toBeHidden</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'order-total'</span><span class="p">),</span><span class="w"> </span><span class="s1">'итоговая сумма заказа'</span><span class="p">).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="s1">'9 980 ₽'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Отрицание — через <code>.not</code>: <code>await expect(locator).not.toBeVisible()</code> тоже ждёт, пока элемент станет невидимым. Второй аргумент <code>expect</code> — сообщение, которое появится в отчёте при падении.</p>
+<div class="compare"><div class="code bad"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">Однократное чтение — гонка</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kd">const</span><span class="w"> </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'status'</span><span class="p">).</span><span class="nx">textContent</span><span class="p">();</span>
+<span class="nx">expect</span><span class="p">(</span><span class="nx">text</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="s1">'Оплачен'</span><span class="p">);</span>
+</code></pre></div>
+<div class="code good"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">Проверка ждёт нужного состояния</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'status'</span><span class="p">)).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="s1">'Оплачен'</span><span class="p">);</span>
+</code></pre></div></div>
+<div class="sim-mount" data-sim="assertion-builder"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Assertion Builder: выберите элемент учебной страницы и проверяемое состояние — получите правильную web-first проверку и увидите на шкале времени, как она дожидается изменения состояния, а однократная проверка падает.</div></div>
+<h2 id="/assertions/auto-waiting" data-anchor="auto-waiting">Auto-waiting и actionability<a class="h-anchor" href="#/assertions/auto-waiting" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="auto-waiting" aria-expanded="false">Auto-waiting</button>: перед действием <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> сам ждёт, пока элемент будет готов. Набор проверок готовности — Actionability Checks — зависит от действия:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Действие</th>
+<th>Visible</th>
+<th>Stable</th>
+<th>Receives Events</th>
+<th>Enabled</th>
+<th>Editable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>click</code>, <code>dblclick</code>, <code>check</code>, <code>uncheck</code>, <code>tap</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td><code>hover</code>, <code>dragTo</code></td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>fill</code>, <code>clear</code></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><code>selectOption</code></td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td><code>screenshot</code></td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Visible</strong> — есть размеры, не <code>visibility: hidden</code>.</li>
+<li><strong>Stable</strong> — не анимируется (положение одинаково в двух соседних кадрах).</li>
+<li><strong>Receives Events</strong> — клик в эту точку попадёт в элемент, а не в перекрывающий его оверлей.</li>
+<li><strong>Enabled</strong> — не <code>disabled</code>.</li>
+<li><strong>Editable</strong> — можно вводить (не <code>readonly</code>).</li>
+</ul>
+<p>Если условия не выполнены до таймаута, действие падает с подробным журналом: «element is not visible», «element is outside of the viewport», «&lt;div class="overlay"&gt; intercepts pointer events». Параметр <code>force: true</code> отключает часть проверок — используйте его осознанно: он может кликнуть по элементу, который пользователь кликнуть не может.</p>
+<div class="callout c-key"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r=".8"></circle></svg><span>Что Auto-waiting <strong>не</strong> делает</span></div><div class="callout-body"><p>Действие ждёт готовности <strong>элемента</strong>, но не завершения <strong>последствий</strong>. <code>click()</code> вернёт управление, когда клик выполнен, а не когда сервер ответил и страница обновилась. Последствия проверяют web-first assertions.</p></div></div>
+<h2 id="/assertions/explicit-wait" data-anchor="explicit-wait">Explicit waiting<a class="h-anchor" href="#/assertions/explicit-wait" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="explicit-wait" aria-expanded="false">Explicit Wait</button> нужно, когда ожидаемое состояние — не свойство элемента, а событие:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/explicit-waits.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'явные ожидания событий'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/reports'</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Ответ сервера: ожидание создаётся ДО действия</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">saved</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForResponse</span><span class="p">((</span><span class="nx">r</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">url</span><span class="p">().</span><span class="nx">includes</span><span class="p">(</span><span class="s1">'/api/reports'</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">request</span><span class="p">().</span><span class="nx">method</span><span class="p">()</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'POST'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Сформировать'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">((</span><span class="k">await</span><span class="w"> </span><span class="nx">saved</span><span class="p">).</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">202</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Скачивание файла</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">downloadPromise</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForEvent</span><span class="p">(</span><span class="s1">'download'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'link'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Скачать CSV'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">download</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">downloadPromise</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">download</span><span class="p">.</span><span class="nx">suggestedFilename</span><span class="p">()).</span><span class="nx">toMatch</span><span class="p">(</span><span class="sr">/\.csv$/</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Переход на страницу</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'link'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Все отчёты'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForURL</span><span class="p">(</span><span class="s1">'**/reports/all'</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// Элемент в нужном состоянии без проверки (например, перед замером)</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'chart'</span><span class="p">).</span><span class="nx">waitFor</span><span class="p">({</span><span class="w"> </span><span class="nx">state</span><span class="o">:</span><span class="w"> </span><span class="s1">'visible'</span><span class="w"> </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Для произвольных условий есть два инструмента повторов:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/poll.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'асинхронная обработка заказа'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">request</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/api/orders'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">7</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">};</span>
+
+<span class="w">  </span><span class="c1">// expect.poll: повторять функцию, пока значение не станет ожидаемым</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">poll</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="sb">`/api/orders/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="p">((</span><span class="k">await</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}).</span><span class="nx">status</span><span class="p">;</span>
+<span class="w">    </span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s1">'заказ подтверждён'</span><span class="p">,</span><span class="w"> </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="kt">15_000</span><span class="p">,</span><span class="w"> </span><span class="nx">intervals</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="mf">500</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="nx">_000</span><span class="p">,</span><span class="w"> </span><span class="mf">2</span><span class="nx">_000</span><span class="p">]</span><span class="w"> </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">toBe</span><span class="p">(</span><span class="s1">'confirmed'</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// toPass: повторять блок с несколькими проверками целиком</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="sb">`/api/orders/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">/invoice`</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">200</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">expect</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">headers</span><span class="p">()[</span><span class="s1">'content-type'</span><span class="p">]).</span><span class="nx">toContain</span><span class="p">(</span><span class="s1">'application/pdf'</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}).</span><span class="nx">toPass</span><span class="p">({</span><span class="w"> </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="kt">20_000</span><span class="w"> </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>waitForTimeout</code> и <code>networkidle</code></span></div><div class="callout-body"><p><code>await page.waitForTimeout(3000)</code> — фиксированная пауза: на быстром стенде тратит время, на медленном — не дожидается. Используйте только при отладке. <code>waitForLoadState('networkidle')</code> ждёт отсутствия запросов 500 мс; в приложениях с аналитикой, опросом сервера и WebSocket это ненадёжно или бесконечно. Ждите конкретного состояния.</p></div></div>
+<h2 id="/assertions/fixed-vs-state" data-anchor="fixed-vs-state">Фиксированное ожидание против ожидания состояния<a class="h-anchor" href="#/assertions/fixed-vs-state" aria-label="Ссылка на раздел">#</a></h2>
+<p>Ниже — модель 50 прогонов одного теста. Время ответа сервера в каждом прогоне случайно (как в реальном CI). Сравните <code>waitForTimeout(N)</code> с проверкой, которая ждёт состояния.</p>
+<div class="sim-mount" data-sim="wait-strategies"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Фиксированная пауза против ожидания состояния: задайте среднее и разброс времени ответа и длину паузы — сравните долю ложных падений и суммарное время 50 прогонов.</div></div>
+<h2 id="/assertions/timeouts" data-anchor="timeouts">Таймауты<a class="h-anchor" href="#/assertions/timeouts" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="timeout" aria-expanded="false">Timeout</button> — предел ожидания. В <button type="button" class="term" data-term="playwright-test" aria-expanded="false">Playwright Test</button> несколько уровней:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Таймаут</th>
+<th>По умолчанию</th>
+<th>Где задать</th>
+<th>Что при превышении</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Тест (включая фикстуры с областью test, beforeEach/afterEach)</td>
+<td>30 с</td>
+<td><code>timeout</code> в конфиге, <code>test.setTimeout()</code>, <code>test.slow()</code></td>
+<td>Тест падает: <code>Test timeout of 30000ms exceeded</code></td>
+</tr>
+<tr>
+<td><code>expect</code> (web-first)</td>
+<td>5 с</td>
+<td><code>expect.timeout</code>, <code>{ timeout }</code> в проверке</td>
+<td>Падает проверка</td>
+</tr>
+<tr>
+<td>Действие (<code>click</code>, <code>fill</code>…)</td>
+<td>Нет отдельного</td>
+<td><code>use.actionTimeout</code></td>
+<td>Падает действие</td>
+</tr>
+<tr>
+<td>Навигация (<code>goto</code>, <code>waitForURL</code>)</td>
+<td>Нет отдельного</td>
+<td><code>use.navigationTimeout</code></td>
+<td>Падает навигация</td>
+</tr>
+<tr>
+<td>Весь прогон</td>
+<td>Нет</td>
+<td><code>globalTimeout</code></td>
+<td>Прогон прерывается</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/timeouts.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'экспорт большого отчёта'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">test</span><span class="p">.</span><span class="nx">slow</span><span class="p">();</span><span class="w"> </span><span class="c1">// утроить таймаут теста — осознанно, с причиной в названии</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/reports/yearly'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Экспорт'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByText</span><span class="p">(</span><span class="s1">'Отчёт готов'</span><span class="p">)).</span><span class="nx">toBeVisible</span><span class="p">({</span><span class="w"> </span><span class="nx">timeout</span><span class="o">:</span><span class="w"> </span><span class="kt">60_000</span><span class="w"> </span><span class="p">});</span><span class="w"> </span><span class="c1">// точечно для долгой операции</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Правило: таймаут увеличивают точечно для операции, которая <strong>заведомо</strong> долгая, а не глобально «чтобы перестало падать».</p>
+<h2 id="/assertions/retries" data-anchor="retries">Retry Mechanisms<a class="h-anchor" href="#/assertions/retries" aria-label="Ссылка на раздел">#</a></h2>
+<p>В <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> три разных механизма повторов — их часто путают:</p>
+<ol>
+<li><strong>Повторы внутри <button type="button" class="term" data-term="web-first-assertion" aria-expanded="false">Web-first Assertion</button></strong> — <code>toHaveText</code> перепроверяет элемент до таймаута <code>expect</code>. Это нормальная синхронизация.</li>
+<li><strong><code>expect.poll</code> / <code>toPass</code></strong> — повтор произвольной функции или блока до успеха. Тоже синхронизация, но для условий вне DOM.</li>
+<li><strong><button type="button" class="term" data-term="test-retry" aria-expanded="false">Test Retry</button></strong> — повтор <strong>всего упавшего теста</strong> (<code>retries</code> в конфиге). Это страховка, а не синхронизация. Прошедший со второй попытки тест помечается как <code>flaky</code> и требует разбора (<a href="#/flaky">глава 30</a>).</li>
+</ol>
+<h2 id="/assertions/soft" data-anchor="soft">Soft assertions<a class="h-anchor" href="#/assertions/soft" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="soft-assertion" aria-expanded="false">Soft Assertion</button> (<code>expect.soft</code>) не прерывает тест при неудаче: ошибка запоминается, тест продолжается, а в конце помечается упавшим со всеми собранными ошибками.</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/soft.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'профиль показывает все поля'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/account/profile'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">.</span><span class="nx">soft</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByLabel</span><span class="p">(</span><span class="s1">'Имя'</span><span class="p">)).</span><span class="nx">toHaveValue</span><span class="p">(</span><span class="s1">'Анна'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">.</span><span class="nx">soft</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByLabel</span><span class="p">(</span><span class="s1">'Email'</span><span class="p">)).</span><span class="nx">toHaveValue</span><span class="p">(</span><span class="s1">'anna@example.com'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">.</span><span class="nx">soft</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByLabel</span><span class="p">(</span><span class="s1">'Город'</span><span class="p">)).</span><span class="nx">toHaveValue</span><span class="p">(</span><span class="s1">'Москва'</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// Одна загрузка страницы — три независимые проверки в одном отчёте</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Используйте soft-проверки для независимых проверок одного экрана. Не используйте, если следующие шаги без предыдущего результата бессмысленны.</p>
+<h2 id="/assertions/flaky-causes" data-anchor="flaky-causes">Почему появляются Flaky Tests<a class="h-anchor" href="#/assertions/flaky-causes" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="flaky-test" aria-expanded="false">Flaky Test</button> из-за синхронизации — самая частая категория:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Причина</th>
+<th>Симптом</th>
+<th>Исправление</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Однократное чтение (<code>textContent()</code>, <code>isVisible()</code>) вместо web-first проверки</td>
+<td>Иногда старое значение</td>
+<td><code>await expect(locator).toHaveText(...)</code></td>
+</tr>
+<tr>
+<td>Фиксированная пауза</td>
+<td>Падает на медленном CI</td>
+<td>Ожидание состояния или события</td>
+</tr>
+<tr>
+<td>Ожидание ответа начато после действия</td>
+<td>Иногда таймаут ожидания</td>
+<td>Создать <button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button> ожидания до действия</td>
+</tr>
+<tr>
+<td>Клик до гидратации SPA (обработчик ещё не навешен)</td>
+<td>Клик «не сработал»</td>
+<td>Ждать признак готовности страницы; исправить приложение (кнопка disabled до готовности)</td>
+</tr>
+<tr>
+<td>Анимация, оверлей, тост поверх кнопки</td>
+<td><code>intercepts pointer events</code></td>
+<td>Ждать исчезновения оверлея; <code>addLocatorHandler</code></td>
+</tr>
+<tr>
+<td>Забытый <code>await</code></td>
+<td>Проверка после конца теста, случайные ошибки</td>
+<td>ESLint <code>no-floating-promises</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/assertions/example" data-anchor="example">Пример: стабилизация теста поиска<a class="h-anchor" href="#/assertions/example" aria-label="Ссылка на раздел">#</a></h2>
+<div class="code bad"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">Нестабильная версия</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="nx">test</span><span class="p">(</span><span class="s1">'поиск'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="s1">'#search'</span><span class="p">,</span><span class="w"> </span><span class="s1">'pulse'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">waitForTimeout</span><span class="p">(</span><span class="mf">2000</span><span class="p">);</span><span class="w">                         </span><span class="c1">// «подождать подсказки»</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">items</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">'.suggest-item'</span><span class="p">).</span><span class="nx">count</span><span class="p">();</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">items</span><span class="p">).</span><span class="nx">toBeGreaterThan</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span><span class="w">                        </span><span class="c1">// однократная проверка</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">locator</span><span class="p">(</span><span class="s1">'.suggest-item'</span><span class="p">).</span><span class="nx">first</span><span class="p">().</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">url</span><span class="p">()).</span><span class="nx">toContain</span><span class="p">(</span><span class="s1">'/product/'</span><span class="p">);</span><span class="w">               </span><span class="c1">// URL мог ещё не смениться</span>
+<span class="p">});</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/search-suggest.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'подсказка поиска ведёт на страницу товара'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'combobox'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Поиск'</span><span class="w"> </span><span class="p">}).</span><span class="nx">fill</span><span class="p">(</span><span class="s1">'pulse'</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">suggestions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'listbox'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Подсказки'</span><span class="w"> </span><span class="p">}).</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'option'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">suggestions</span><span class="p">.</span><span class="nx">first</span><span class="p">()).</span><span class="nx">toBeVisible</span><span class="p">();</span><span class="w">                 </span><span class="c1">// ждём появления подсказок</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">suggestions</span><span class="p">.</span><span class="nx">filter</span><span class="p">({</span><span class="w"> </span><span class="nx">hasText</span><span class="o">:</span><span class="w"> </span><span class="s1">'Наушники Pulse'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span><span class="w"> </span><span class="c1">// однозначный выбор</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">).</span><span class="nx">toHaveURL</span><span class="p">(</span><span class="sr">/\/product\/\d+/</span><span class="p">);</span><span class="w">                  </span><span class="c1">// ждём навигации</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'heading'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">level</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">})).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="s1">'Наушники Pulse'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="/assertions/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/assertions/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>expect(await locator.isVisible()).toBe(true)</code></span></div><div class="callout-body"><p><code>isVisible()</code> проверяет состояние мгновенно, без ожидания. Используйте <code>await expect(locator).toBeVisible()</code>.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Проверка «что-то произошло» вместо конкретного результата</span></div><div class="callout-body"><p><code>toBeVisible()</code> у контейнера результата пройдёт и тогда, когда в нём сообщение об ошибке. Проверяйте конкретный текст, значение, количество.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span><code>force: true</code> для «непослушных» кликов</span></div><div class="callout-body"><p>Клик сквозь оверлей проходит в тесте, хотя пользователь кликнуть не может. Это скрывает реальный дефект интерфейса.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Глобально поднять <code>expect.timeout</code> до 30 секунд</span></div><div class="callout-body"><p>Каждая неудачная проверка будет ждать 30 секунд, прогон с дефектом станет очень долгим, а гонки останутся.</p></div></div>
+<h2 id="/assertions/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/assertions/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="as-web-first" data-level="J" data-topic="Playwright"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Чем <code>await expect(locator).toHaveText()</code> отличается от <code>expect(await locator.textContent()).toBe()</code>?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Первая — web-first: повторяет поиск элемента и сравнение до таймаута <code>expect</code> и дождётся обновления. Вторая читает текст один раз в текущий момент и сравнивает сразу — если страница ещё обновляется, тест получит старое значение. Это классическая причина нестабильности.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="as-autowait" data-level="J" data-topic="Playwright"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Что такое auto-waiting в Playwright?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Перед действием <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> ждёт, пока элемент пройдёт проверки готовности: видим, стабилен (не анимируется), получает события (не перекрыт), доступен, а для ввода — редактируем. Web-first проверки повторяются до таймаута. Важно: действие не ждёт последствий (ответа сервера) — их проверяют assertions.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="as-waitfortimeout" data-level="J" data-topic="Playwright"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Почему <code>waitForTimeout</code> — плохая практика?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Фиксированная пауза не связана с реальным состоянием: на быстром окружении тест тратит лишнее время, на медленном пауза оказывается мала — тест падает. В результате тест и медленный, и нестабильный. Нужно ждать конкретного состояния (<button type="button" class="term" data-term="web-first-assertion" aria-expanded="false">Web-first Assertion</button>) или события (<code>waitForResponse</code>, <code>waitForURL</code>).</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="as-timeouts" data-level="M" data-topic="Playwright"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Какие таймауты есть в Playwright и как их правильно менять?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Таймаут теста (30 с, включает фикстуры и хуки beforeEach/afterEach), таймаут <code>expect</code> (5 с), таймауты действий и навигации (по умолчанию без отдельного лимита), глобальный таймаут прогона. Меняю точечно: <code>{ timeout }</code> у конкретной долгой проверки, <code>test.slow()</code> для заведомо долгого теста. Глобальное увеличение скрывает гонки и делает падения долгими.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="as-retries-kinds" data-level="M" data-topic="Playwright"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Какие механизмы повторов есть в Playwright и чем они отличаются?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Повторы внутри web-first проверок (синхронизация с UI), <code>expect.poll</code> и <code>toPass</code> (синхронизация с произвольными условиями: API, база, файлы) и ретраи всего теста (<code>retries</code>) — страховка от нестабильности, после которой тест помечается flaky. Первые два — нормальная часть теста, третий — сигнал проблемы.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="as-poll" data-level="M+" data-topic="Playwright"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Заказ обрабатывается асинхронно через очередь. Как проверить, что статус стал «confirmed»?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p><code>expect.poll(() =&gt; getOrderStatus(id), { timeout, intervals }).toBe('confirmed')</code> — с таймаутом, соответствующим SLA обработки, и понятным сообщением. Если нужно несколько связанных проверок — <code>expect(async () =&gt; {...}).toPass()</code>. Не <code>waitForTimeout</code> и не цикл с <code>sleep</code>. Если обработка регулярно не укладывается в SLA — это информация о продукте, а не повод поднять таймаут.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/assertions/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/assertions/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="assertions:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Какая проверка дождётся, пока статус заказа сменится на «Оплачен»?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span><code>expect(await status.textContent()).toBe('Оплачен')</code></span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span><code>await page.waitForTimeout(5000)</code></span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span><code>await expect(status).toHaveText('Оплачен')</code></span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span><code>expect(status).toBe('Оплачен')</code></span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Web-first проверка повторяет поиск и сравнение до таймаута <code>expect</code>. Остальные варианты проверяют один раз или не проверяют вовсе.</p></div></div><div class="quiz" data-qid="assertions:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Что Playwright проверяет перед <code>click()</code>?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Что страница полностью загрузилась</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Что все запросы завершены</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Видимость, стабильность, получение событий и доступность (enabled)</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Только что элемент есть в DOM</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Это actionability-проверки. Состояние сети и «загрузка страницы» не проверяются.</p></div></div><div class="quiz" data-qid="assertions:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Тест прошёл со второй попытки благодаря <code>retries: 2</code>. Как его отметит Playwright?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>skipped</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>failed</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>flaky</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>passed</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Тест, который упал, а затем прошёл при повторе, получает статус flaky — сигнал к расследованию.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему <code>waitForResponse</code> после клика может падать, хотя запрос был?</span></summary><div class="check-body"><p>Ожидание ловит только события после своего создания. Если ответ пришёл, пока тест выполнял <code>await click()</code>, ожидание, созданное позже, его не увидит и будет ждать до таймаута. Нужно создать <button type="button" class="term" data-term="promise" aria-expanded="false">Promise</button> ожидания до клика и дождаться его после.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Когда уместен <code>expect.poll</code>, а когда достаточно web-first проверки?</span></summary><div class="check-body"><p>Web-first проверка — для состояния элементов страницы и самой страницы. <code>expect.poll</code> — для значений вне DOM: статус в API, запись в базе, файл, письмо в тестовом почтовом ящике, если они меняются асинхронно.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/locators"><small>← Назад</small><span>Locators</span></a><a class="foot-link next" href="#/fixtures"><small>Дальше →</small><span>Fixtures и Hooks</span></a></div></footer></article><hr class="nojs-sep">

@@ -1,0 +1,279 @@
+<article class="chapter" id="/contracts" data-chapter="contracts" data-section="api" aria-labelledby="h1-contracts"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 21 · Раздел V · API Automation</div><h1 class="ch-title" id="h1-contracts" tabindex="-1">Schema и Contract Testing</h1><p class="ch-lead">JSON Schema и OpenAPI, проверка схемы ответа, контрактное тестирование и consumer-driven contracts. Чем проверка «ответ соответствует схеме» отличается от «изменение провайдера не сломает потребителей».</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 10 мин чтения</span><span class="lvl" title="Уровень">M–M+</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/api-auto">Автоматизация API</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Схема описывает форму данных, контракт — договорённость двух сторон. Проверка схемы ловит, что ответ не похож на описание; контрактное тестирование ловит, что изменение одного сервиса сломает другой, — до того, как они встретятся на стенде.</p><p class="idea-goal"><strong>Цель главы:</strong> валидировать ответы API схемой, читать OpenAPI и понимать, как и зачем внедряют consumer-driven contracts.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Schema validation проверяет структуру отдельного ответа против описания; contract testing проверяет совместимость конкретного потребителя и поставщика по реально используемым взаимодействиям.</p><h3>Главное</h3><ul class="recall-points"><li><button type="button" class="term" data-term="json-schema" aria-expanded="false">JSON Schema</button>: <code>type</code>, <code>properties</code>, <code>required</code>, <code>additionalProperties</code>, <code>enum</code>, <code>format</code>, <code>minimum</code>, <code>items</code>, <code>$ref</code>.</li><li><button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> описывает весь API: пути, методы, параметры, тела запросов и ответов, коды и схемы (<code>components/schemas</code>).</li><li>Валидация схемы в тестах — Ajv: <code>compile(schema)</code> один раз, затем <code>validate(body)</code> и вывод <code>errors</code> в сообщение.</li><li>Consumer-driven contracts (<button type="button" class="term" data-term="pact" aria-expanded="false">Pact</button>): тесты потребителя фиксируют ожидания в pact-файле → брокер → провайдер проверяет их на своей стороне → <code>can-i-deploy</code>.</li><li>Обратно совместимо: добавить необязательное поле в ответ, новый эндпоинт. Ломает: удалить или переименовать поле, сменить тип, сделать поле запроса обязательным.</li><li>Схема в тестах должна быть связана с источником (OpenAPI), иначе она устаревает так же, как моки.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>JSON Schema</dt><dd>Стандарт описания структуры JSON: типы, обязательные поля, допустимые значения, форматы, вложенные объекты и массивы.</dd></div><div><dt>Schema Validation</dt><dd>Проверка, что данные (обычно ответ API) соответствуют JSON Schema; в TypeScript чаще всего выполняется библиотекой Ajv.</dd></div><div><dt>OpenAPI</dt><dd>Машиночитаемое описание HTTP API: пути, методы, параметры, тела запросов, ответы по кодам и схемы данных. Ранее называлась Swagger.</dd></div><div><dt>Contract Testing</dt><dd>Проверка, что поставщик API отвечает так, как ожидает потребитель, без развёртывания всей системы.</dd></div><div><dt>Consumer-driven Contracts</dt><dd>Подход, при котором потребитель фиксирует свои ожидания от API в контракте, а поставщик проверяет, что их выполняет.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Схема с <code>additionalProperties: true</code> и без <code>required</code> пропускает почти любой ответ. Слишком мягкая схема даёт ложное чувство защищённости.</p><div class="recall-links"><a href="#/contracts/why">Зачем проверять структуру ответа →</a><a href="#/contracts/json-schema">JSON Schema →</a><a href="#/contracts/validation">Валидация схемы в тестах →</a><a href="#/contracts/openapi">OpenAPI →</a><a href="#/contracts/cdc">Contract Testing →</a><a href="#/contracts/compatibility">Обратная совместимость →</a><a href="#/contracts/example">Пример: внедрение проверок в команде →</a><a href="#/contracts/mistakes">Типичные ошибки →</a><a href="#/contracts/interview">Что важно для собеседования →</a><a href="#/contracts/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/contracts/why">Зачем проверять структуру ответа</a><a href="#/contracts/json-schema">JSON Schema</a><a href="#/contracts/validation">Валидация схемы в тестах</a><a href="#/contracts/openapi">OpenAPI</a><a href="#/contracts/cdc">Contract Testing</a><a href="#/contracts/compatibility">Обратная совместимость</a><a href="#/contracts/example">Пример: внедрение проверок в команде</a><a href="#/contracts/mistakes">Типичные ошибки</a><a href="#/contracts/interview">Что важно для собеседования</a><a href="#/contracts/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/contracts/why" data-anchor="why">Зачем проверять структуру ответа<a class="h-anchor" href="#/contracts/why" aria-label="Ссылка на раздел">#</a></h2>
+<p>В главе <a href="#/ts-basics/interfaces">«Основы TypeScript»</a> мы видели, что <code>as Order</code> ничего не проверяет во время выполнения. Тест может долго «работать» с ответом, в котором поле <code>total</code> стало строкой <code>"9980.00"</code> или исчезло, а упасть совсем в другом месте — или не упасть. Явная проверка структуры решает это и одновременно ловит регрессии API: случайно удалённое поле, сменившийся тип, утёкшее внутреннее поле.</p>
+<h2 id="/contracts/json-schema" data-anchor="json-schema">JSON Schema<a class="h-anchor" href="#/contracts/json-schema" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="json-schema" aria-expanded="false">JSON Schema</button> — стандарт описания структуры JSON-документа. Схема — тоже <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>:</p>
+<div class="code"><div class="code-head"><span class="code-lang">JSON</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"$schema"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://json-schema.org/draft/2020-12/schema"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"id"</span><span class="p">,</span><span class="w"> </span><span class="s2">"status"</span><span class="p">,</span><span class="w"> </span><span class="s2">"items"</span><span class="p">,</span><span class="w"> </span><span class="s2">"total"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"additionalProperties"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="p">,</span><span class="w"> </span><span class="nt">"minimum"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"enum"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"created"</span><span class="p">,</span><span class="w"> </span><span class="s2">"paid"</span><span class="p">,</span><span class="w"> </span><span class="s2">"shipped"</span><span class="p">,</span><span class="w"> </span><span class="s2">"delivered"</span><span class="p">,</span><span class="w"> </span><span class="s2">"cancelled"</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="p">,</span><span class="w"> </span><span class="nt">"minimum"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"promoCode"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="s2">"null"</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"createdAt"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"format"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date-time"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"minItems"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"productId"</span><span class="p">,</span><span class="w"> </span><span class="s2">"qty"</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">"productId"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">          </span><span class="nt">"qty"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="p">,</span><span class="w"> </span><span class="nt">"minimum"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ключевое слово</th>
+<th>Смысл</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>Тип: <code>object</code>, <code>array</code>, <code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code>, <code>null</code> (или массив типов)</td>
+</tr>
+<tr>
+<td><code>properties</code></td>
+<td>Схемы полей объекта</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td>Обязательные поля (без него все поля необязательны!)</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td>Разрешены ли поля, не описанные в <code>properties</code></td>
+</tr>
+<tr>
+<td><code>enum</code>, <code>const</code></td>
+<td>Допустимые значения</td>
+</tr>
+<tr>
+<td><code>minimum</code>, <code>maximum</code>, <code>minLength</code>, <code>maxLength</code>, <code>pattern</code></td>
+<td>Ограничения чисел и строк</td>
+</tr>
+<tr>
+<td><code>format</code></td>
+<td>Семантика строки: <code>date-time</code>, <code>email</code>, <code>uuid</code>, <code>uri</code> (проверяется валидатором при включении форматов)</td>
+</tr>
+<tr>
+<td><code>items</code>, <code>minItems</code>, <code>uniqueItems</code></td>
+<td>Массивы</td>
+</tr>
+<tr>
+<td><code>$ref</code></td>
+<td>Ссылка на другую схему (переиспользование)</td>
+</tr>
+<tr>
+<td><code>oneOf</code>, <code>anyOf</code>, <code>allOf</code></td>
+<td>Комбинации схем</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/contracts/validation" data-anchor="validation">Валидация схемы в тестах<a class="h-anchor" href="#/contracts/validation" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="schema-validation" aria-expanded="false">Schema Validation</button> в TypeScript-проектах чаще всего делают библиотекой Ajv:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">src/schemas/validate.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="nx">Ajv</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="nx">ValidateFunction</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'ajv'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">ajv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Ajv</span><span class="p">({</span><span class="w"> </span><span class="nx">allErrors</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="w"> </span><span class="p">});</span><span class="w">            </span><span class="c1">// собрать все ошибки, а не только первую</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">compiled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="o">&lt;</span><span class="nx">object</span><span class="p">,</span><span class="w"> </span><span class="nx">ValidateFunction</span><span class="o">&gt;</span><span class="p">();</span><span class="w">  </span><span class="c1">// компиляция дорогая — кэшируем</span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">expectToMatchSchema</span><span class="p">(</span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">unknown</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="o">:</span><span class="w"> </span><span class="kt">object</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">validate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">compiled</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">schema</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">validate</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">validate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ajv</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">schema</span><span class="p">);</span>
+<span class="w">    </span><span class="nx">compiled</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">schema</span><span class="p">,</span><span class="w"> </span><span class="nx">validate</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">valid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">validate</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">details</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">validate</span><span class="p">.</span><span class="nx">errors</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="p">[])</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">instancePath</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">'(корень)'</span><span class="si">}</span><span class="sb"> </span><span class="si">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">keyword</span><span class="si">}</span><span class="sb">`</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'\n'</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">valid</span><span class="p">,</span><span class="w"> </span><span class="sb">`ответ не соответствует схеме </span><span class="si">${</span><span class="nx">name</span><span class="si">}</span><span class="sb">:\n</span><span class="si">${</span><span class="nx">details</span><span class="si">}</span><span class="sb">`</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/order-schema.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">expectToMatchSchema</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'../src/schemas/validate'</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">orderSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'object'</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">required</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'items'</span><span class="p">,</span><span class="w"> </span><span class="s1">'total'</span><span class="p">],</span>
+<span class="w">  </span><span class="nx">additionalProperties</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">properties</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'integer'</span><span class="p">,</span><span class="w"> </span><span class="nx">minimum</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">enum</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'created'</span><span class="p">,</span><span class="w"> </span><span class="s1">'paid'</span><span class="p">,</span><span class="w"> </span><span class="s1">'shipped'</span><span class="p">,</span><span class="w"> </span><span class="s1">'delivered'</span><span class="p">,</span><span class="w"> </span><span class="s1">'cancelled'</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">total</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'integer'</span><span class="p">,</span><span class="w"> </span><span class="nx">minimum</span><span class="o">:</span><span class="w"> </span><span class="kt">0</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">promoCode</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'string'</span><span class="p">,</span><span class="w"> </span><span class="s1">'null'</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">items</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'array'</span><span class="p">,</span><span class="w"> </span><span class="nx">minItems</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">items</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'object'</span><span class="p">,</span><span class="w"> </span><span class="nx">required</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'productId'</span><span class="p">,</span><span class="w"> </span><span class="s1">'qty'</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">};</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'GET /api/orders/:id соответствует схеме'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">request</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/api/orders/101'</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">expectToMatchSchema</span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">(),</span><span class="w"> </span><span class="nx">orderSchema</span><span class="p">,</span><span class="w"> </span><span class="s1">'Order'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Для форматов (<code>email</code>, <code>date-time</code>) в Ajv 8 подключают пакет <code>ajv-formats</code>. Сообщение об ошибке содержит путь к полю (<code>/items/0/qty</code>) и нарушенное правило — по нему сразу видно, что изменилось в API.</p>
+<div class="callout c-tip"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg><span>Схема и типы из одного источника</span></div><div class="callout-body"><p>Чтобы не поддерживать вручную и интерфейс <code>Order</code>, и схему, используют генерацию: типы <button type="button" class="term" data-term="typescript" aria-expanded="false">TypeScript</button> из <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> (<code>openapi-typescript</code>) или схему и тип из одного описания (zod, TypeBox). Тогда тип и проверка не разойдутся.</p></div></div>
+<div class="sim-mount" data-sim="schema-validator"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Валидатор схемы: редактируйте JSON-ответ заказа и посмотрите, какие правила схемы нарушены и почему. Поддерживается учебное подмножество JSON Schema.</div></div>
+<h2 id="/contracts/openapi" data-anchor="openapi">OpenAPI<a class="h-anchor" href="#/contracts/openapi" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> (ранее Swagger) — спецификация всего <button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button> API в YAML или JSON: пути, методы, параметры, тела запросов, ответы по кодам и схемы данных.</p>
+<div class="code"><div class="code-head"><span class="code-lang">YAML</span><span class="code-title">OpenAPI.yaml (фрагмент)</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="nt">openapi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3.1.0</span>
+<span class="nt">info</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> title</span><span class="p">:</span><span class="w"> </span><span class="nv">Shop API</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">2.4.0</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="nt">paths</span><span class="p">:</span>
+<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">/api/orders/{id}</span><span class="p p-Indicator">:</span>
+<span class="w">    </span><span class="nt">get</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="nv">id</span><span class="p p-Indicator">,</span><span class="nt"> in</span><span class="p">:</span><span class="w"> </span><span class="nv">path</span><span class="p p-Indicator">,</span><span class="nt"> required</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">integer</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">responses</span><span class="p">:</span>
+<span class="w">        </span><span class="s">'200'</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Заказ</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> $ref</span><span class="p">:</span><span class="w"> </span><span class="s">'#/components/schemas/Order'</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="s">'404'</span><span class="p p-Indicator">:</span>
+<span class="w">          </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Не найден</span>
+<span class="w">          </span><span class="nt">content</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">application/json</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> $ref</span><span class="p">:</span><span class="w"> </span><span class="s">'#/components/schemas/Error'</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="nt">components</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">schemas</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Order</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">      </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">id</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">status</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">items</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">total</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">properties</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">integer</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">string</span><span class="p p-Indicator">,</span><span class="nt"> enum</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">created</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">paid</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">shipped</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">delivered</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cancelled</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">total</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">integer</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</code></pre></div>
+<p>Что AQA делает с OpenAPI:</p>
+<ul>
+<li>берёт из спецификации ожидаемые коды и форматы для тест-дизайна;</li>
+<li>валидирует ответы по схемам из <code>components/schemas</code> (а не по самописным копиям);</li>
+<li>генерирует типы и клиенты;</li>
+<li>проверяет, что спецификация соответствует реализации (расхождение — дефект документации или кода).</li>
+</ul>
+<h2 id="/contracts/cdc" data-anchor="cdc">Contract Testing<a class="h-anchor" href="#/contracts/cdc" aria-label="Ссылка на раздел">#</a></h2>
+<p>Представьте: сервис «Заказы» (consumer) читает поле <code>price</code> из ответа сервиса «Каталог» (provider). Команда каталога переименовала <code>price</code> в <code>amount</code>. Схема каталога обновлена, все тесты каталога зелёные — с их точки зрения всё корректно. Сломается сервис заказов, причём обнаружится это на общем стенде или в продакшене.</p>
+<p><button type="button" class="term" data-term="contract-testing" aria-expanded="false">Contract Testing</button> ловит такие проблемы до интеграции. Главный подход — <button type="button" class="term" data-term="consumer-driven-contracts" aria-expanded="false">Consumer-driven Contracts</button>:</p>
+<ol>
+<li><strong>Тест потребителя</strong> описывает, какие запросы он делает и какие поля ответа ему нужны. Тест выполняется против мок-сервера, а ожидания записываются в контракт (Pact-файл).</li>
+<li><strong>Контракт публикуется</strong> в брокер (<button type="button" class="term" data-term="pact" aria-expanded="false">Pact</button> Broker / PactFlow) с версией потребителя.</li>
+<li><strong>Поставщик проверяет контракт</strong>: инструмент воспроизводит записанные запросы против настоящего провайдера и сравнивает ответы с ожиданиями потребителя.</li>
+<li><strong><code>can-i-deploy</code></strong> — перед деплоем любой стороны брокер отвечает, совместима ли эта версия с версиями партнёров в целевом окружении.</li>
+</ol>
+<p>Pact — самый распространённый инструмент такого подхода (библиотеки для JS, Java, Go, Python и др.).</p>
+<h3 id="/contracts/schema-vs-contract" data-anchor="schema-vs-contract">Схема или контракт<a class="h-anchor" href="#/contracts/schema-vs-contract" aria-label="Ссылка на раздел">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Schema validation</th>
+<th>Contract testing (CDC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Что проверяет</td>
+<td>Ответ соответствует описанию API</td>
+<td>Провайдер удовлетворяет ожиданиям конкретных потребителей</td>
+</tr>
+<tr>
+<td>Источник ожиданий</td>
+<td>Спецификация провайдера</td>
+<td>Тесты потребителя</td>
+</tr>
+<tr>
+<td>Кто ломается при изменении</td>
+<td>Тест провайдера, если схема не обновлена</td>
+<td>Проверка провайдера, если изменение ломает реального потребителя</td>
+</tr>
+<tr>
+<td>Ловит переименование поля, которое провайдер «законно» внёс в свою схему</td>
+<td>Нет</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Видит, какие поля реально используются</td>
+<td>Нет</td>
+<td>Да — можно безопасно удалять неиспользуемые</td>
+</tr>
+<tr>
+<td>Стоимость внедрения</td>
+<td>Низкая</td>
+<td>Выше: брокер, процесс, участие обеих команд</td>
+</tr>
+</tbody>
+</table></div>
+<p>Проверка схемы — минимум для любого API-набора. Контрактное тестирование окупается в системах из многих сервисов с разными командами и независимыми релизами.</p>
+<div class="sim-mount" data-sim="contract-compat"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Совместимость изменений: выберите изменение API провайдера (добавить поле, переименовать, сменить тип, сделать параметр обязательным) и посмотрите, какие потребители сломаются и поймает ли это проверка схемы или контракт.</div></div>
+<h2 id="/contracts/compatibility" data-anchor="compatibility">Обратная совместимость<a class="h-anchor" href="#/contracts/compatibility" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="backward-compatibility" aria-expanded="false">Backward Compatibility</button> — новая версия API работает со старыми клиентами. Правила для ответов и запросов:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Изменение</th>
+<th>Совместимо?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Добавить необязательное поле в ответ</td>
+<td>Да (если клиенты не валидируют <code>additionalProperties: false</code> у себя)</td>
+</tr>
+<tr>
+<td>Добавить новый эндпоинт</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Добавить необязательный параметр запроса</td>
+<td>Да</td>
+</tr>
+<tr>
+<td>Удалить или переименовать поле ответа</td>
+<td><strong>Нет</strong></td>
+</tr>
+<tr>
+<td>Изменить тип поля (<code>integer</code> → <code>string</code>)</td>
+<td><strong>Нет</strong></td>
+</tr>
+<tr>
+<td>Сделать необязательное поле запроса обязательным</td>
+<td><strong>Нет</strong></td>
+</tr>
+<tr>
+<td>Добавить значение в <code>enum</code> ответа</td>
+<td>Опасно: старые клиенты могут не знать нового статуса</td>
+</tr>
+<tr>
+<td>Изменить смысл поля при том же имени и типе</td>
+<td><strong>Нет</strong>, и схема этого не заметит</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ломающие изменения выпускают через версионирование (<code>/v2/orders</code>) или с периодом поддержки старого поля (deprecated).</p>
+<h2 id="/contracts/example" data-anchor="example">Пример: внедрение проверок в команде<a class="h-anchor" href="#/contracts/example" aria-label="Ссылка на раздел">#</a></h2>
+<ol>
+<li><strong>Неделя 1.</strong> Все API-тесты валидируют ответы схемами из <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button>. Найдено 3 расхождения документации и кода — заведены задачи.</li>
+<li><strong>Неделя 2.</strong> Моки UI-тестов проверяются той же схемой при загрузке: устаревший мок падает сразу, а не через месяц.</li>
+<li><strong>Месяц 2.</strong> Для самой хрупкой пары сервисов (заказы ← каталог) внедрён <button type="button" class="term" data-term="pact" aria-expanded="false">Pact</button>: потребитель публикует контракт, провайдер проверяет его в своём CI, деплой проверяется <code>can-i-deploy</code>.</li>
+</ol>
+<p>Через квартал переименование поля в каталоге было остановлено проверкой контракта в CI провайдера — до появления на стенде.</p>
+<h2 id="/contracts/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/contracts/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Самописная копия схемы</span></div><div class="callout-body"><p>Схема, скопированная вручную в тесты, устаревает и начинает проверять «как было». Берите схемы из <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> или генерируйте их.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Слишком мягкая схема</span></div><div class="callout-body"><p>Без <code>required</code> и с разрешёнными лишними полями схема пропустит пустой объект <code>{}</code>. Обязательные поля и типы — минимум.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Считать проверку схемы контрактным тестом</span></div><div class="callout-body"><p>Схема проверяет, что провайдер соответствует своему описанию. Сломает ли он потребителей — она не знает.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Проверять в контракте значения, а не форму</span></div><div class="callout-body"><p>Контракт потребителя должен описывать, какие поля и типы ему нужны (matchers), а не конкретные данные стенда. Иначе любое изменение данных ломает проверку.</p></div></div>
+<h2 id="/contracts/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/contracts/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="ct-json-schema" data-level="J" data-topic="API Testing"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Как вы проверяете структуру ответа API?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p><button type="button" class="term" data-term="json-schema" aria-expanded="false">JSON Schema</button> (лучше взятой из <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> или сгенерированной), валидатор Ajv с <code>allErrors</code>, компиляция схемы один раз, понятное сообщение с путями полей. В схеме обязательно <code>required</code> и типы; <code>additionalProperties: false</code> — где важно не пропустить лишние (например, чувствительные) поля. Значения бизнес-полей проверяю отдельными assertions.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="ct-schema-vs-contract" data-level="M" data-topic="API Testing"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Чем проверка схемы отличается от контрактного тестирования?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Проверка схемы сравнивает ответ с описанием API провайдера (OpenAPI/JSON Schema): структура, типы, обязательные поля. Контрактное тестирование (CDC) проверяет, что провайдер выполняет ожидания конкретных потребителей, зафиксированные их тестами. Если провайдер «законно» изменил свою схему, переименовав поле, проверка схемы пройдёт, а контракт потребителя упадёт.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="ct-breaking" data-level="M" data-topic="API Testing"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Какие изменения API ломают обратную совместимость?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Удаление или переименование поля ответа, смена типа, изменение смысла поля, превращение необязательного поля запроса в обязательное, удаление эндпоинта или значения enum в запросе. Добавление значения enum в ответ опасно для клиентов со строгой обработкой. Совместимо: новые необязательные поля ответа и параметры, новые эндпоинты.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="ct-pact-flow" data-level="M+" data-topic="API Testing"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Опишите процесс consumer-driven contract testing с Pact.</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Потребитель пишет тесты против мок-сервера <button type="button" class="term" data-term="pact" aria-expanded="false">Pact</button>, описывая запросы и нужные поля ответа (через matchers, не конкретные значения) — получается Pact-файл. Он публикуется в брокер с версией и веткой. CI провайдера скачивает контракты потребителей и воспроизводит запросы против реального провайдера (с подготовкой состояний), результат публикуется в брокер. Перед деплоем любая сторона выполняет <code>can-i-deploy</code> для целевого окружения.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="mp-schema-or-contract" data-level="M+" data-topic="API Testing"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Компания из 12 микросервисов, релизы независимые, интеграционные баги находят на staging. Внедрять Pact или хватит проверки схем?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Проверка схемы ловит расхождение ответа со спецификацией провайдера, но не ловит законное с точки зрения провайдера изменение, которое ломает потребителя (переименование, удаление используемого поля). При независимых релизах и многих командах это как раз основной класс проблем, поэтому CDC окупается: контракты потребителей, брокер, проверка провайдера в его <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button> и can-i-deploy перед деплоем. Начать с одной пары сервисов с самыми частыми инцидентами, показать результат, затем расширять. Схемы при этом остаются базовым уровнем для всех API.</p><h4>Частая ошибка</h4><div class="iq-mistake">Считать, что OpenAPI-спецификация и валидация ответов делают контрактное тестирование ненужным.</div><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/contracts/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/contracts/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="contracts:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Схема содержит <code>properties</code>, но не содержит <code>required</code>. Что пройдёт валидацию?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Только объекты со всеми полями</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>В том числе пустой объект <code>{}</code></span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Ничего</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Только массивы</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Без <code>required</code> все описанные поля необязательны: схема проверит типы присутствующих полей, но не их наличие.</p></div></div><div class="quiz" data-qid="contracts:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Провайдер переименовал поле и обновил свою OpenAPI-схему. Что поймает проблему у потребителя?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Unit-тесты провайдера</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Проверка контракта потребителя на стороне провайдера (CDC)</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Ничего</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Проверка схемы в тестах провайдера</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Тесты провайдера сверяются с обновлённой схемой и проходят. Только контракт потребителя знает, что поле используется.</p></div></div><div class="quiz" data-qid="contracts:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Какое изменение API обратно совместимо?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Сделать поле запроса обязательным</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="1"><span class="quiz-mark"></span><span>Добавить необязательное поле в ответ</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Сменить тип поля с integer на string</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>Удалить поле из ответа</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Старые клиенты просто проигнорируют новое необязательное поле.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему моки UI-тестов полезно валидировать той же схемой, что и ответы API?</span></summary><div class="check-body"><p>Моки отражают ожидания фронтенда о структуре ответа. Если API изменился, а мок нет, UI-тесты проверяют фронтенд против несуществующего API. Валидация мока схемой из <button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button> заставляет обновить мок сразу при изменении спецификации.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Когда внедрение Pact не окупится?</span></summary><div class="check-body"><p>В монолите или в системе из пары сервисов одной команды с общим релизом: интеграционные и API-тесты на общем стенде дешевле. CDC окупается при многих сервисах, разных командах и независимых деплоях, когда «встретиться на стенде» дорого и поздно.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/api-auto"><small>← Назад</small><span>Автоматизация API</span></a><a class="foot-link next" href="#/mocking"><small>Дальше →</small><span>Mocking и Test Data</span></a></div></footer></article><hr class="nojs-sep">

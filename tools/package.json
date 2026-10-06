@@ -1,0 +1,25 @@
+{
+  "name": "aqa-lab-tools",
+  "private": true,
+  "type": "module",
+  "description": "Сборка и проверки учебника AQA Lab",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:check": "node build.mjs --check",
+    "check:static": "node checks/static.mjs",
+    "check:links": "node checks/links.mjs",
+    "check:layout": "node checks/layout.mjs",
+    "check:behaviour": "node checks/behaviour.mjs",
+    "check:interactives": "node checks/interactives.mjs",
+    "check:offline": "node checks/offline.mjs",
+    "check:actionability": "node checks/actionability.mjs",
+    "check:sql": "node checks/sql.mjs",
+    "check": "npm run build:check && npm run check:static && npm run check:links && npm run check:behaviour && npm run check:offline && npm run check:interactives && npm run check:layout && npm run check:actionability && npm run check:sql",
+    "pdf": "node print-pdf.mjs",
+    "mutation": "node mutation-check.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@playwright/test": "1.58.2"
+  }
+}

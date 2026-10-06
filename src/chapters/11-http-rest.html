@@ -1,0 +1,381 @@
+<article class="chapter" id="/http-rest" data-chapter="http-rest" data-section="tech" aria-labelledby="h1-http-rest"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 10 · Раздел III · Технические основы</div><h1 class="ch-title" id="h1-http-rest" tabindex="-1">HTTP и REST API</h1><p class="ch-lead">Методы, коды ответов, заголовки, тело запроса и ответа, query- и path-параметры, идемпотентность, пагинация и ограничение частоты запросов — всё, что нужно, чтобы читать, составлять и проверять HTTP-запросы.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 12 мин чтения</span><span class="lvl" title="Уровень">J</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/web-arch">Веб-архитектура</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>HTTP-обмен — это текстовое сообщение-запрос и сообщение-ответ. REST — набор соглашений, как через HTTP работать с ресурсами. Зная соглашения, можно заранее сказать, какой ответ правильный, — а значит, написать проверку.</p><p class="idea-goal"><strong>Цель главы:</strong> составлять запросы к REST API и по коду, заголовкам и телу ответа определять, корректно ли повёл себя сервер.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Запрос = метод + URL + заголовки + тело; ответ = код статуса + заголовки + тело. <button type="button" class="term" data-term="rest" aria-expanded="false">REST</button> описывает ресурсы существительными в URL и действия — методами <button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button>.</p><h3>Главное</h3><ul class="recall-points"><li>GET читает, POST создаёт, PUT заменяет целиком, PATCH изменяет частично, DELETE удаляет.</li><li>Идемпотентный метод даёт тот же эффект при повторе, но не обязательно тот же статус: GET, PUT, DELETE, HEAD, OPTIONS. POST и PATCH — в общем случае нет.</li><li>2xx — успех, 3xx — перенаправление, 4xx — ошибка клиента, 5xx — ошибка сервера. 500 в ответ на неверные данные — дефект.</li><li>Path-параметр определяет ресурс (<code>/orders/42</code>), query-параметры — фильтрацию, сортировку, страницу (<code>?status=paid&amp;page=2</code>).</li><li>Content-Type описывает формат тела запроса/ответа, Accept — какой формат клиент ожидает, Authorization — учётные данные.</li><li>Пагинация: offset/limit или курсор; проверяют границы, пустую страницу и стабильность порядка. Превышение лимита запросов — 429 и <code>Retry-After</code>.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>HTTP</dt><dd>Протокол «запрос–ответ» без хранения состояния: метод, URL, заголовки и тело запроса; код статуса, заголовки и тело ответа.</dd></div><div><dt>HTTP Method</dt><dd>Намерение запроса: GET — получить, POST — создать, PUT — заменить, PATCH — изменить часть, DELETE — удалить, а также HEAD и OPTIONS.</dd></div><div><dt>Status Code</dt><dd>Трёхзначный код результата: 2xx — успех, 3xx — перенаправление, 4xx — ошибка клиента, 5xx — ошибка сервера.</dd></div><div><dt>Query Parameter</dt><dd>Пара «ключ=значение» после <code>?</code> в URL: фильтры, сортировка, поиск, пагинация.</dd></div><div><dt>Path Parameter</dt><dd>Часть пути URL, идентифицирующая ресурс: <code>/orders/{id}</code>.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Не проверяйте только код 200: тело, заголовки и побочные эффекты (что изменилось в системе) не менее важны.</p><div class="recall-links"><a href="#/http-rest/anatomy">Анатомия HTTP-обмена →</a><a href="#/http-rest/methods">Методы HTTP →</a><a href="#/http-rest/status-codes">Коды ответов →</a><a href="#/http-rest/headers">Заголовки →</a><a href="#/http-rest/body">Тело запроса и ответа →</a><a href="#/http-rest/params">Query и Path параметры →</a><a href="#/http-rest/rest">REST →</a><a href="#/http-rest/idempotency">Идемпотентность →</a><a href="#/http-rest/protocol-corrections">Распространённые заблуждения о HTTP →</a><a href="#/http-rest/pagination">Пагинация →</a><a href="#/http-rest/rate-limit">Rate Limiting →</a><a href="#/http-rest/example">Пример: проверка создания ресурса →</a><a href="#/http-rest/mistakes">Типичные ошибки →</a><a href="#/http-rest/interview">Что важно для собеседования →</a><a href="#/http-rest/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/http-rest/anatomy">Анатомия HTTP-обмена</a><a href="#/http-rest/methods">Методы HTTP</a><a href="#/http-rest/status-codes">Коды ответов</a><a href="#/http-rest/headers">Заголовки</a><a href="#/http-rest/body">Тело запроса и ответа</a><a href="#/http-rest/params">Query и Path параметры</a><a href="#/http-rest/rest">REST</a><a href="#/http-rest/idempotency">Идемпотентность</a><a href="#/http-rest/protocol-corrections">Распространённые заблуждения о HTTP</a><a href="#/http-rest/pagination">Пагинация</a><a href="#/http-rest/rate-limit">Rate Limiting</a><a href="#/http-rest/example">Пример: проверка создания ресурса</a><a href="#/http-rest/mistakes">Типичные ошибки</a><a href="#/http-rest/interview">Что важно для собеседования</a><a href="#/http-rest/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/http-rest/anatomy" data-anchor="anatomy">Анатомия HTTP-обмена<a class="h-anchor" href="#/http-rest/anatomy" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button> — текстовый протокол. Запрос на создание заказа выглядит так:</p>
+<div class="code"><div class="code-head"><span class="code-lang">HTTP</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="nf">POST</span> <span class="nn">/api/orders?notify=true</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">shop.example.com</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Authorization</span><span class="o">:</span> <span class="l">Bearer eyJhbGciOi…</span>
+
+<span class="p">{</span><span class="nt">"productId"</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="nt">"qty"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><strong>Стартовая строка</strong>: метод (<code>POST</code>), путь с query-параметрами, версия протокола.</li>
+<li><strong>Заголовки</strong>: пары <code>Имя: значение</code> с метаданными.</li>
+<li><strong>Пустая строка</strong>, затем <strong>тело</strong> — данные (здесь <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>).</li>
+</ul>
+<p>Ответ:</p>
+<div class="code"><div class="code-head"><span class="code-lang">HTTP</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">201</span> <span class="ne">Created</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Location</span><span class="o">:</span> <span class="l">/api/orders/1042</span>
+<span class="na">X-Request-Id</span><span class="o">:</span> <span class="l">5b2c9e1a</span>
+
+<span class="p">{</span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1042</span><span class="p">,</span><span class="w"> </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"created"</span><span class="p">,</span><span class="w"> </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="mi">9980</span><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><strong>Строка статуса</strong>: версия, <button type="button" class="term" data-term="status-code" aria-expanded="false">Status Code</button> и текстовое пояснение.</li>
+<li><strong>Заголовки</strong>, пустая строка, <strong>тело</strong>.</li>
+</ul>
+<p>HTTP/2 и HTTP/3 передают те же смысловые части в бинарном виде, но для тестов модель «метод, URL, заголовки, тело → статус, заголовки, тело» не меняется.</p>
+<h2 id="/http-rest/methods" data-anchor="methods">Методы HTTP<a class="h-anchor" href="#/http-rest/methods" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="http-method" aria-expanded="false">HTTP Method</button> выражает намерение запроса:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Назначение</th>
+<th>Тело запроса</th>
+<th>Безопасный</th>
+<th>Идемпотентный</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td>Получить ресурс или список</td>
+<td>Нет</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td>Создать ресурс, выполнить действие</td>
+<td>Да</td>
+<td>Нет</td>
+<td>Нет</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td>Заменить ресурс целиком</td>
+<td>Да</td>
+<td>Нет</td>
+<td>Да</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td>Изменить часть ресурса</td>
+<td>Да</td>
+<td>Нет</td>
+<td>Не гарантируется</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td>Удалить ресурс</td>
+<td>Обычно нет</td>
+<td>Нет</td>
+<td>Да</td>
+</tr>
+<tr>
+<td><code>HEAD</code></td>
+<td>Как GET, но без тела (только заголовки)</td>
+<td>Нет</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+<tr>
+<td><code>OPTIONS</code></td>
+<td>Узнать допустимые методы (используется в CORS)</td>
+<td>Нет</td>
+<td>Да</td>
+<td>Да</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Безопасный</strong> метод не предполагает, что клиент просит изменить состояние ресурса (журнал запросов на сервере при этом может вестись). <strong>Идемпотентный</strong> — несколько одинаковых запросов дают тот же предполагаемый эффект, что и один; коды ответов при этом могут отличаться. Подробнее — в разделе «Распространённые заблуждения о <button type="button" class="term" data-term="http" aria-expanded="false">HTTP</button>» ниже.</p>
+<h2 id="/http-rest/status-codes" data-anchor="status-codes">Коды ответов<a class="h-anchor" href="#/http-rest/status-codes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Код</th>
+<th>Значение</th>
+<th>Когда ожидать в тесте</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>200 OK</code></td>
+<td>Успех с телом</td>
+<td>GET, PUT, PATCH</td>
+</tr>
+<tr>
+<td><code>201 Created</code></td>
+<td>Ресурс создан; часто с заголовком <code>Location</code></td>
+<td>POST создания</td>
+</tr>
+<tr>
+<td><code>202 Accepted</code></td>
+<td>Принято в обработку, результат позже</td>
+<td>Асинхронные операции, экспорт</td>
+</tr>
+<tr>
+<td><code>204 No Content</code></td>
+<td>Успех без тела</td>
+<td>DELETE, иногда PUT</td>
+</tr>
+<tr>
+<td><code>301</code> / <code>302</code> / <code>307</code> / <code>308</code></td>
+<td>Перенаправление на <code>Location</code></td>
+<td>Смена адресов, вход</td>
+</tr>
+<tr>
+<td><code>304 Not Modified</code></td>
+<td>Ресурс не изменился (кэш)</td>
+<td>Запросы с <code>If-None-Match</code></td>
+</tr>
+<tr>
+<td><code>400 Bad Request</code></td>
+<td>Некорректный запрос: синтаксис, типы, формат</td>
+<td>Невалидный <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>, неверный тип поля</td>
+</tr>
+<tr>
+<td><code>401 Unauthorized</code></td>
+<td>Нет или неверная аутентификация</td>
+<td>Без токена, истёкший токен</td>
+</tr>
+<tr>
+<td><code>403 Forbidden</code></td>
+<td>Нет прав</td>
+<td>Чужой ресурс, недостаточная роль</td>
+</tr>
+<tr>
+<td><code>404 Not Found</code></td>
+<td>Ресурса нет</td>
+<td>Несуществующий id</td>
+</tr>
+<tr>
+<td><code>405 Method Not Allowed</code></td>
+<td>Метод не поддерживается для URL</td>
+<td><code>DELETE</code> на коллекцию</td>
+</tr>
+<tr>
+<td><code>409 Conflict</code></td>
+<td>Конфликт с текущим состоянием</td>
+<td>Дубликат email, недопустимый переход статуса</td>
+</tr>
+<tr>
+<td><code>415 Unsupported Media Type</code></td>
+<td>Неподдерживаемый <code>Content-Type</code></td>
+<td>XML вместо JSON</td>
+</tr>
+<tr>
+<td><code>422 Unprocessable Content</code></td>
+<td>Формат верный, но данные нарушают правила</td>
+<td>Возраст 17 при минимуме 18</td>
+</tr>
+<tr>
+<td><code>429 Too Many Requests</code></td>
+<td>Превышен лимит запросов</td>
+<td><button type="button" class="term" data-term="rate-limiting" aria-expanded="false">Rate Limiting</button></td>
+</tr>
+<tr>
+<td><code>500 Internal Server Error</code></td>
+<td>Необработанная ошибка сервера</td>
+<td><strong>Всегда дефект</strong>, если вызвана данными клиента</td>
+</tr>
+<tr>
+<td><code>502</code> / <code>503</code> / <code>504</code></td>
+<td>Проблемы прокси, недоступность, таймаут шлюза</td>
+<td>Деплой, перегрузка, падение сервиса</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout c-key"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r=".8"></circle></svg><span>400 или 422?</span></div><div class="callout-body"><p>Разные API используют их по-разному: одни возвращают 400 на любую ошибку валидации, другие разделяют синтаксические (400) и смысловые (422) ошибки. Правильный ответ для теста — тот, что описан в спецификации API (<button type="button" class="term" data-term="openapi" aria-expanded="false">OpenAPI</button>). Неправильно в любом случае — 500 и 200 с текстом ошибки в теле.</p></div></div>
+<h2 id="/http-rest/headers" data-anchor="headers">Заголовки<a class="h-anchor" href="#/http-rest/headers" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="http-header" aria-expanded="false">HTTP Header</button> — метаданные запроса и ответа. Самые важные для тестов:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Заголовок</th>
+<th>Где</th>
+<th>Что проверять или задавать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Content-Type</code></td>
+<td>Запрос и ответ</td>
+<td>Формат тела: <code>application/json; charset=utf-8</code></td>
+</tr>
+<tr>
+<td><code>Accept</code></td>
+<td>Запрос</td>
+<td>Какой формат ответа клиент примет</td>
+</tr>
+<tr>
+<td><code>Authorization</code></td>
+<td>Запрос</td>
+<td><code>Bearer &lt;token&gt;</code>, <code>Basic …</code></td>
+</tr>
+<tr>
+<td><code>Cookie</code> / <code>Set-Cookie</code></td>
+<td>Запрос / ответ</td>
+<td>Сессия, атрибуты <button type="button" class="term" data-term="cookie" aria-expanded="false">Cookie</button></td>
+</tr>
+<tr>
+<td><code>Location</code></td>
+<td>Ответ</td>
+<td>Адрес созданного ресурса (201) или редиректа (3xx)</td>
+</tr>
+<tr>
+<td><code>Cache-Control</code>, <code>ETag</code></td>
+<td>Ответ</td>
+<td>Политика кэширования, версия ресурса</td>
+</tr>
+<tr>
+<td><code>Retry-After</code></td>
+<td>Ответ</td>
+<td>Через сколько повторить (429, 503)</td>
+</tr>
+<tr>
+<td><code>X-Request-Id</code> / <code>traceparent</code></td>
+<td>Оба</td>
+<td>Сквозной идентификатор для поиска в логах сервера</td>
+</tr>
+</tbody>
+</table></div>
+<p>Имена заголовков нечувствительны к регистру. <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> в <code>response.headers()</code> возвращает их в нижнем регистре: <code>headers()['content-type']</code>.</p>
+<h2 id="/http-rest/body" data-anchor="body">Тело запроса и ответа<a class="h-anchor" href="#/http-rest/body" aria-label="Ссылка на раздел">#</a></h2>
+<p>Чаще всего тело — <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>. Другие форматы: <code>application/x-www-form-urlencoded</code> (HTML-формы), <code>multipart/form-data</code> (загрузка файлов), <code>text/plain</code>, бинарные файлы.</p>
+<p>Что проверять в теле ответа:</p>
+<ul>
+<li><strong>структуру</strong> — нужные поля, типы, отсутствие лишних чувствительных полей (хеш пароля!) — схемой (<a href="#/contracts">глава 21</a>);</li>
+<li><strong>значения</strong> — бизнес-результат: статус, сумма, связанные id;</li>
+<li><strong>согласованность</strong> — <code>total</code> равен сумме позиций, <code>id</code> совпадает с <code>Location</code>;</li>
+<li><strong>формат ошибок</strong> — единая структура <code>{ code, message, details }</code> для всех ошибок.</li>
+</ul>
+<h2 id="/http-rest/params" data-anchor="params">Query и Path параметры<a class="h-anchor" href="#/http-rest/params" aria-label="Ссылка на раздел">#</a></h2>
+<ul>
+<li><button type="button" class="term" data-term="path-parameter" aria-expanded="false">Path Parameter</button> — часть пути, идентифицирующая ресурс: <code>/users/17/orders/1042</code>.</li>
+<li><button type="button" class="term" data-term="query-parameter" aria-expanded="false">Query Parameter</button> — пары после <code>?</code>, уточняющие запрос: фильтр, сортировка, страница, поиск: <code>/orders?status=paid&amp;sort=-createdAt&amp;limit=20</code>.</li>
+</ul>
+<p>Значения кодируются: пробел — <code>%20</code> или <code>+</code>, кириллица — UTF-8 байты в процентной записи. В <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> передавайте параметры объектом — он закодирует их сам:</p>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/orders-filter.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'фильтр заказов по статусу'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">request</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/api/orders'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">params</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s1">'paid'</span><span class="p">,</span><span class="w"> </span><span class="nx">sort</span><span class="o">:</span><span class="w"> </span><span class="s1">'-createdAt'</span><span class="p">,</span><span class="w"> </span><span class="nx">limit</span><span class="o">:</span><span class="w"> </span><span class="kt">20</span><span class="p">,</span><span class="w"> </span><span class="nx">q</span><span class="o">:</span><span class="w"> </span><span class="s1">'наушники'</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">200</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">items</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}[]</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">body</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">every</span><span class="p">((</span><span class="nx">o</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">o</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'paid'</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Негативные случаи для параметров: неизвестный параметр, неверный тип (<code>limit=abc</code>), граничные значения (<code>limit=0</code>, <code>limit=1000</code>), инъекции в строке поиска, несуществующий id в пути (404), id чужого пользователя (403/404).</p>
+<h2 id="/http-rest/rest" data-anchor="rest">REST<a class="h-anchor" href="#/http-rest/rest" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="rest" aria-expanded="false">REST</button> — архитектурный стиль, а не стандарт. Основные соглашения:</p>
+<ul>
+<li><strong>Ресурсы — существительные во множественном числе</strong>: <code>/orders</code>, <code>/orders/42</code>, <code>/orders/42/items</code>.</li>
+<li><strong>Действие выражается методом</strong>: <code>DELETE /orders/42</code>, а не <code>POST /deleteOrder?id=42</code>.</li>
+<li><strong>Stateless</strong>: каждый запрос содержит всё нужное (токен, параметры), сервер не хранит контекст между запросами.</li>
+<li><strong>Единообразные коды и форматы</strong>: одинаковая структура ошибок, пагинации, дат.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Задача</th>
+<th>REST-запрос</th>
+<th>Ожидаемый ответ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Список заказов</td>
+<td><code>GET /orders</code></td>
+<td>200 + массив</td>
+</tr>
+<tr>
+<td>Один заказ</td>
+<td><code>GET /orders/42</code></td>
+<td>200 или 404</td>
+</tr>
+<tr>
+<td>Создать заказ</td>
+<td><code>POST /orders</code></td>
+<td>201 + <code>Location</code></td>
+</tr>
+<tr>
+<td>Заменить адрес доставки целиком</td>
+<td><code>PUT /orders/42/address</code></td>
+<td>200 / 204</td>
+</tr>
+<tr>
+<td>Изменить статус</td>
+<td><code>PATCH /orders/42</code> с <code>{"status":"cancelled"}</code></td>
+<td>200 или 409</td>
+</tr>
+<tr>
+<td>Удалить</td>
+<td><code>DELETE /orders/42</code></td>
+<td>204, повторно — 404 или 204</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/http-rest/idempotency" data-anchor="idempotency">Идемпотентность<a class="h-anchor" href="#/http-rest/idempotency" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="idempotency" aria-expanded="false">Idempotency</button> — свойство операции давать одинаковый результат на сервере при повторах. Это важно для надёжности: клиент, не дождавшийся ответа из-за сбоя сети, может безопасно повторить идемпотентный запрос.</p>
+<ul>
+<li><code>PUT /users/17</code> с одним и тем же телом сто раз → пользователь в одном и том же состоянии.</li>
+<li><code>DELETE /orders/42</code> дважды → заказ удалён; второй ответ может быть 404, но состояние сервера то же.</li>
+<li><code>POST /payments</code> дважды → <strong>два платежа</strong>, если API не защищён. Поэтому платёжные API принимают заголовок <code>Idempotency-Key</code>: повтор с тем же ключом возвращает результат первого запроса.</li>
+</ul>
+<p>Тесты идемпотентности: повторить запрос и проверить, что состояние не изменилось (количество записей, сумма, статус), а для POST с <code>Idempotency-Key</code> — что не создан дубликат.</p>
+<div class="sim-mount" data-sim="api-playground" data-preset="http"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>HTTP Inspector: составьте запрос (метод, путь, заголовки, тело) к учебному API магазина и посмотрите сырой HTTP-ответ, код и пояснение — в том числе для повторных и неавторизованных запросов.</div></div>
+<h2 id="/http-rest/protocol-corrections" data-anchor="protocol-corrections">Распространённые заблуждения о HTTP<a class="h-anchor" href="#/http-rest/protocol-corrections" aria-label="Ссылка на раздел">#</a></h2><p>GET запрашивает представление ресурса, POST просит обработать переданное содержимое; создание ресурса — частый, но не единственный результат POST. PUT создаёт или заменяет состояние целевого ресурса согласно контракту. PATCH описывает частичное изменение.</p><p>Safe относится к запрошенной семантике: клиент не просит менять состояние. Логирование запроса не делает GET небезопасным. Idempotent означает одинаковый предполагаемый эффект повторов; статусы ответов могут различаться. POST можно сделать идемпотентным на уровне конкретного API, например с Idempotency-Key.</p><p>Нередко GET и POST сравнивают по числу TCP-пакетов и разрыву соединения. Это неверно: пакетизация и переиспользование соединения не определяются только HTTP-методом. HTTPS защищает транспорт, но не исправляет авторизацию и бизнес-логику.</p><p><button type="button" class="term" data-term="rest" aria-expanded="false">REST</button> — архитектурный стиль; SOAP — протокол сообщений. Stateless не запрещает хранение ресурсов в БД: запрос должен нести необходимый контекст взаимодействия. SOAP не означает обязательную stateful-сессию.</p><p>Первоисточник: <a href="https://www.rfc-editor.org/rfc/rfc9110.html" target="_blank" rel="noopener">RFC 9110, HTTP Semantics</a> (нужен интернет).</p><h2 id="/http-rest/pagination" data-anchor="pagination">Пагинация<a class="h-anchor" href="#/http-rest/pagination" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="pagination" aria-expanded="false">Pagination</button> разбивает большие списки на страницы:</p>
+<ul>
+<li><strong>Offset/limit</strong> (<code>?offset=40&amp;limit=20</code> или <code>?page=3&amp;size=20</code>) — простой, позволяет перейти на любую страницу, но при вставке записей между запросами элементы могут «съехать»: дубли или пропуски.</li>
+<li><strong>Cursor</strong> (<code>?cursor=eyJpZCI6…&amp;limit=20</code>, ответ содержит <code>nextCursor</code>) — стабилен при изменениях данных, но нельзя прыгнуть на произвольную страницу.</li>
+</ul>
+<p>Что проверять: размер страницы не превышает <code>limit</code>; последняя страница неполная или пустая; <code>total</code> соответствует данным; нет дублей и пропусков при обходе всех страниц; стабильный порядок при одинаковых значениях сортировки; некорректные параметры (<code>page=0</code>, <code>limit=-1</code>, огромный <code>limit</code>).</p>
+<h2 id="/http-rest/rate-limit" data-anchor="rate-limit">Rate Limiting<a class="h-anchor" href="#/http-rest/rate-limit" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="rate-limiting" aria-expanded="false">Rate Limiting</button> ограничивает число запросов от клиента за интервал времени — защита от перегрузки и злоупотреблений. При превышении сервер возвращает <code>429 Too Many Requests</code>, часто с <code>Retry-After</code> и заголовками вида <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code> (или <code>RateLimit-*</code>).</p>
+<p>В автотестах Rate Limiting проявляется двояко:</p>
+<ul>
+<li><strong>как объект проверки</strong>: после N запросов — 429, после ожидания — снова 200;</li>
+<li><strong>как помеха</strong>: параллельный прогон сотен API-тестов от одного пользователя упирается в лимит и получает «случайные» 429. Решения — отдельные лимиты для тестового окружения, разные тестовые пользователи, ограничение параллелизма.</li>
+</ul>
+<h2 id="/http-rest/example" data-anchor="example">Пример: проверка создания ресурса<a class="h-anchor" href="#/http-rest/example" aria-label="Ссылка на раздел">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/create-order.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'POST /api/orders создаёт заказ'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">request</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/api/orders'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">7</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">'Idempotency-Key'</span><span class="o">:</span><span class="w"> </span><span class="sb">`test-</span><span class="si">${</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">});</span>
+
+<span class="w">  </span><span class="c1">// 1. статус и заголовки</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">201</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">()[</span><span class="s1">'content-type'</span><span class="p">]).</span><span class="nx">toContain</span><span class="p">(</span><span class="s1">'application/json'</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">()[</span><span class="s1">'location'</span><span class="p">];</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">location</span><span class="p">).</span><span class="nx">toMatch</span><span class="p">(</span><span class="sr">/^\/api\/orders\/\d+$/</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// 2. тело</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span><span class="w"> </span><span class="kr">as</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">total</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">order</span><span class="p">).</span><span class="nx">toMatchObject</span><span class="p">({</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s1">'created'</span><span class="p">,</span><span class="w"> </span><span class="nx">total</span><span class="o">:</span><span class="w"> </span><span class="kt">9980</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">location</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="sb">`/api/orders/</span><span class="si">${</span><span class="nx">order</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+
+<span class="w">  </span><span class="c1">// 3. побочный эффект: заказ действительно доступен</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">check</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">location</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">expect</span><span class="p">(</span><span class="nx">check</span><span class="p">.</span><span class="nx">status</span><span class="p">()).</span><span class="nx">toBe</span><span class="p">(</span><span class="mf">200</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Тот же запрос в <button type="button" class="term" data-term="postman" aria-expanded="false">Postman</button>: метод и URL, вкладка Body → raw → <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>, переменные окружения для <code>{{baseUrl}}</code> и <code>{{token}}</code>, проверки во вкладке Tests (<code>pm.response.to.have.status(201)</code>). Коллекции Postman запускаются из CLI через Newman — так их можно встроить в CI, но для поддерживаемого набора в репозитории удобнее тесты в коде.</p>
+<h2 id="/http-rest/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/http-rest/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Проверять только статус</span></div><div class="callout-body"><p><code>expect(res.status()).toBe(200)</code> пройдёт, даже если в теле <code>{"error":"something went wrong"}</code> или пустой массив. Проверяйте тело и побочные эффекты.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Принимать 500 как «ожидаемую ошибку»</span></div><div class="callout-body"><p>Если невалидные данные приводят к 500, сервер не обработал ошибку ввода — это дефект, даже если «ну, ошибка же».</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Собирать URL конкатенацией строк</span></div><div class="callout-body"><p><code>'/api/search?q=' + text</code> сломается на пробелах, <code>&amp;</code>, <code>#</code> и кириллице. Передавайте параметры объектом <code>params</code> или используйте <code>URLSearchParams</code>.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Забыть про идемпотентность в ретраях</span></div><div class="callout-body"><p>Если тестовый клиент автоматически повторяет неудачный <code>POST</code>, при сетевом сбое можно создать дубликаты данных и получить загадочные падения.</p></div></div>
+<h2 id="/http-rest/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/http-rest/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="http-put-patch" data-level="J" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Чем PUT отличается от PATCH и POST?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>POST создаёт ресурс или выполняет действие; повтор создаст ещё один. PUT заменяет ресурс целиком переданным представлением и идемпотентен. PATCH изменяет часть полей; идемпотентность не гарантируется (например, <code>{"op":"increment"}</code>). В тестах PUT проверяю на «отсутствующие поля сброшены», PATCH — на «остальные поля не изменились».</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="http-codes" data-level="J" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="J">Junior</span><span class="iq-q">Назовите группы кодов ответов и примеры. Когда 500 — дефект?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>1xx — информационные, 2xx — успех (200, 201, 204), 3xx — перенаправления (301, 302, 304), 4xx — ошибки клиента (400, 401, 403, 404, 409, 422, 429), 5xx — ошибки сервера (500, 502, 503, 504). 500 в ответ на данные клиента — всегда дефект: сервер должен валидировать ввод и возвращать 4xx с понятным сообщением.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="http-idempotency" data-level="M" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Что такое идемпотентность и как её протестировать?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Повтор запроса не меняет состояние сервера после первого выполнения. GET, PUT, DELETE идемпотентны, POST — нет. Тест: выполнить запрос дважды и проверить состояние (число записей, сумму, статус). Для POST с <code>Idempotency-Key</code> — повтор с тем же ключом возвращает тот же результат и не создаёт дубликат, а с другим ключом — создаёт новую сущность.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="http-pagination" data-level="M" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как протестировать пагинацию?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Создаю свой изолированный набор данных, затем: размер страницы ≤ limit, корректный total, последняя страница неполная, страница за пределами — пустая (или ошибка по спецификации), при полном обходе нет дублей и пропусков, порядок стабилен при равных значениях сортировки, граничные и некорректные параметры (0, отрицательные, слишком большой limit, нечисловые). Для курсорной пагинации — невалидный и устаревший курсор.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="http-rate-limit" data-level="M+" data-topic="Веб и HTTP"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">API-тесты в CI стали получать случайные 429. Как решать?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Это <button type="button" class="term" data-term="rate-limiting" aria-expanded="false">Rate Limiting</button> от параллельного прогона. Варианты: отдельная политика лимитов для тестового окружения или тестовых клиентов, распределение тестов между несколькими тестовыми пользователями/ключами (лимит часто по пользователю), ограничение числа воркеров для API-проекта, обработка <code>Retry-After</code> в тестовом клиенте только для подготовки данных (не для проверяемого запроса). Отдельно оставляю тест, который проверяет сам лимит: 429 и восстановление после окна.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/http-rest/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/http-rest/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="http-rest:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Какой метод идемпотентен?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>PATCH в общем случае</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>POST</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>PUT</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Ни один</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>PUT заменяет ресурс целиком: повтор с тем же телом оставляет ресурс в том же состоянии. POST создаёт новый ресурс при каждом вызове.</p></div></div><div class="quiz" data-qid="http-rest:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Сервер вернул <code>200 OK</code> с телом <code>{"success": false, "error": "invalid email"}</code>. Что не так?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Должен быть 500</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Код ответа не отражает ошибку: должен быть 4xx</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Тело должно быть пустым</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Всё корректно</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Ошибка валидации — ошибка клиента, ей соответствует 400 или 422. Клиенты и мониторинг ориентируются на код ответа.</p></div></div><div class="quiz" data-qid="http-rest:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Где передать номер страницы списка заказов?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>В query: <code>/orders?page=2</code></span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>В path: <code>/orders/page/2</code></span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>В теле GET-запроса</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>В заголовке <code>Content-Type</code></span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Пагинация уточняет запрос к коллекции, поэтому её параметры передают в query.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему повторный <code>DELETE /orders/42</code> может вернуть 404 и всё равно считаться идемпотентным?</span></summary><div class="check-body"><p>Идемпотентность относится к состоянию сервера, а не к коду ответа. После первого удаления заказа нет; после второго — тоже нет. Состояние то же, поэтому операция идемпотентна, хотя ответы различаются (204, затем 404).</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Как протестировать пагинацию на offset/limit, если данные постоянно меняются другими тестами?</span></summary><div class="check-body"><p>Изолировать данные: создать свой набор записей с уникальной меткой и фильтровать по ней, чтобы чужие записи не влияли. Затем обойти все страницы и проверить отсутствие дублей и пропусков, <code>total</code>, размер последней страницы, порядок сортировки и поведение на граничных параметрах.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/web-arch"><small>← Назад</small><span>Веб-архитектура</span></a><a class="foot-link next" href="#/sql"><small>Дальше →</small><span>SQL и базы данных</span></a></div></footer></article><hr class="nojs-sep">

@@ -1,0 +1,227 @@
+<article class="chapter" id="/optimization" data-chapter="optimization" data-section="infra" aria-labelledby="h1-optimization"><header class="ch-head"><div class="ch-head-main"><div class="ch-kicker">Глава 29 · Раздел VII · Инфраструктура и CI/CD</div><h1 class="ch-title" id="h1-optimization" tabindex="-1">Оптимизация выполнения автотестов</h1><p class="ch-lead">Параллелизация и шардирование, перенос проверок на нижние уровни, ускорение отдельных тестов, безопасное переиспользование окружения, приоритизация и оптимизация pipeline. И главный компромисс: время прогона, стоимость инфраструктуры и скорость обратной связи.</p><div class="ch-meta"><span><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3 2"></path></svg>≈ 9 мин чтения</span><span class="lvl" title="Уровень">M+</span><button type="button" class="btn-read" data-read-toggle aria-pressed="false"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"></path></svg><span>Отметить как изученную</span></button></div><div class="ch-needs">Опирается на: <a href="#/parallel">Параллельность</a><a href="#/cicd">CI/CD</a></div></div><aside class="idea-card"><div class="idea-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"></path></svg>Основная идея</div><p>Оптимизация начинается с измерения: какие тесты самые долгие, где время уходит на подготовку, что можно не запускать на каждом изменении. Самое дешёвое ускорение — не выполнять лишнюю работу, самое дорогое — добавлять машины.</p><p class="idea-goal"><strong>Цель главы:</strong> находить узкие места прогона и выбирать между оптимизацией тестов, параллелизмом, шардированием и приоритизацией с учётом стоимости.</p></aside></header><section class="recall" aria-label="Кратко о главе"><h2>Кратко</h2><p class="recall-core">Время обратной связи = ожидание агента + подготовка + выполнение самого медленного шарда + отчёт. Ускоряют, убирая лишнюю работу, распараллеливая и запуская нужное подмножество раньше.</p><h3>Главное</h3><ul class="recall-points"><li>Сначала измерить: самые медленные тесты (Speedboard/отчёт), время подготовки шарда, загрузку агентов.</li><li>Перенос проверок с UI на API/unit даёт выигрыш в десятки раз и повышает стабильность.</li><li>Ускорение тестов: авторизация через storageState, подготовка данных через API, блокировка сторонних ресурсов, отсутствие лишних переходов и пауз.</li><li>Безопасное переиспользование: worker-фикстуры для дорогих неизменяемых ресурсов, сид-данные только для чтения, <code>reuseExistingServer</code> локально.</li><li>Приоритизация: smoke первым, теги и наборы по рискам, <code>--only-changed</code> и <code>--last-failed</code>, <code>maxFailures</code> для быстрого провала.</li><li>Стоимость ≈ шарды × время шарда × цена минуты; после некоторого числа шардов время почти не падает, а стоимость растёт.</li></ul><h3>Термины</h3><dl class="recall-terms"><div><dt>Test Execution Time</dt><dd>Длительность прогона набора. Для шарда ограничена снизу самым долгим тестом; для pipeline включает очередь, подготовку и сбор отчёта.</dd></div><div><dt>Test Sharding</dt><dd>Разбиение набора на части (<code>--shard=2/4</code>), выполняемые на разных машинах; отчёты затем объединяются.</dd></div><div><dt>Parallel Execution</dt><dd>Одновременный запуск тестов в нескольких воркерах на одной машине и/или в нескольких шардах на разных машинах.</dd></div><div><dt>Test Prioritization</dt><dd>Выбор, какие тесты запускать раньше и какие — на каком событии: smoke первым, наборы по тегам и рискам, изменённые тесты, быстрый провал.</dd></div><div><dt>Feedback Loop</dt><dd>Время от изменения кода до результата проверок, на который можно опереться. Чем короче, тем дешевле исправление.</dd></div></dl><p class="recall-caution"><strong>Важно:</strong> Ускорение за счёт удаления проверок или ослабления ожиданий — не оптимизация, а снижение покрытия. Сначала убирайте лишнюю работу, а не проверки.</p><div class="recall-links"><a href="#/optimization/time">Из чего складывается время →</a><a href="#/optimization/measure">Измерить, прежде чем ускорять →</a><a href="#/optimization/levels">Перенос проверок на нижние уровни →</a><a href="#/optimization/speedup">Ускорение отдельных тестов →</a><a href="#/optimization/reuse">Безопасное переиспользование окружения →</a><a href="#/optimization/prioritization">Приоритизация →</a><a href="#/optimization/pipeline">Оптимизация pipeline →</a><a href="#/optimization/cost">Время, стоимость и обратная связь →</a><a href="#/optimization/example">Пример: с 55 до 11 минут →</a><a href="#/optimization/mistakes">Типичные ошибки →</a><a href="#/optimization/interview">Что важно для собеседования →</a><a href="#/optimization/self-check">Проверьте себя →</a></div></section><div class="src-bar"><button type="button" class="btn btn-sm" data-src-toggle aria-expanded="false"><span>Открыть полный материал</span></button></div><nav class="ch-toc" aria-label="Содержание главы"><div class="ch-toc-label">В этой главе</div><a href="#/optimization/time">Из чего складывается время</a><a href="#/optimization/measure">Измерить, прежде чем ускорять</a><a href="#/optimization/levels">Перенос проверок на нижние уровни</a><a href="#/optimization/speedup">Ускорение отдельных тестов</a><a href="#/optimization/reuse">Безопасное переиспользование окружения</a><a href="#/optimization/prioritization">Приоритизация</a><a href="#/optimization/pipeline">Оптимизация pipeline</a><a href="#/optimization/cost">Время, стоимость и обратная связь</a><a href="#/optimization/example">Пример: с 55 до 11 минут</a><a href="#/optimization/mistakes">Типичные ошибки</a><a href="#/optimization/interview">Что важно для собеседования</a><a href="#/optimization/self-check">Проверьте себя</a></nav><div class="prose"><h2 id="/optimization/time" data-anchor="time">Из чего складывается время<a class="h-anchor" href="#/optimization/time" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="feedback-loop" aria-expanded="false">Feedback Loop</button> — время от push до результата, на который можно опереться. Для набора UI-тестов в CI:</p>
+<div class="code"><div class="code-head"><span class="code-lang">Текст</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code>очередь агента + подготовка (образ, npm ci, окружение) + выполнение (самый долгий шард) + сбор отчёта
+</code></pre></div>
+<p><button type="button" class="term" data-term="test-execution-time" aria-expanded="false">Test Execution Time</button> одного шарда ≈ <code>max(самый долгий тест, сумма длительностей / воркеры) × коэффициент неравномерности</code>.</p>
+<p>Что обычно съедает время, по убыванию частоты:</p>
+<ol>
+<li>Подготовка через UI (вход, создание данных кликами) в каждом тесте.</li>
+<li>Избыточные UI-тесты, дублирующие API- и unit-проверки.</li>
+<li>Фиксированные паузы и лишние ожидания.</li>
+<li>Сторонние ресурсы: аналитика, виджеты, медленные картинки.</li>
+<li>Подготовка агента: установка браузеров и зависимостей без кэша.</li>
+<li>Последовательные части: <code>mode: 'serial'</code>, <code>workers: 1</code>, большие файлы без <code>fullyParallel</code>.</li>
+</ol>
+<h2 id="/optimization/measure" data-anchor="measure">Измерить, прежде чем ускорять<a class="h-anchor" href="#/optimization/measure" aria-label="Ссылка на раздел">#</a></h2>
+<ul>
+<li><strong>HTML-отчёт <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button></strong> показывает длительность каждого теста; в свежих версиях есть вкладка Speedboard с тестами, отсортированными по времени, и шкала выполнения по воркерам.</li>
+<li><strong><button type="button" class="term" data-term="json" aria-expanded="false">JSON</button>- или JUnit-отчёты</strong> за несколько прогонов дают устойчивую статистику (среднее, перцентили).</li>
+<li><strong>Время задач CI</strong> разделяет подготовку и выполнение.</li>
+<li><strong>Загрузка агента</strong> (CPU, память) показывает, не упираются ли воркеры в ресурсы.</li>
+</ul>
+<p>Правило Парето работает и здесь: 10% самых медленных тестов часто занимают половину времени.</p>
+<h2 id="/optimization/levels" data-anchor="levels">Перенос проверок на нижние уровни<a class="h-anchor" href="#/optimization/levels" aria-label="Ссылка на раздел">#</a></h2>
+<p>Самая выгодная оптимизация — проверять на правильном уровне (<a href="#/test-types/pyramid">глава 2</a>):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Проверка</th>
+<th>UI-тест</th>
+<th>API-тест</th>
+<th>Выигрыш</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>20 комбинаций правил скидки</td>
+<td>20 × 8 с = 160 с</td>
+<td>20 × 0,1 с = 2 с</td>
+<td>×80</td>
+</tr>
+<tr>
+<td>Валидация 12 полей формы на сервере</td>
+<td>12 × 6 с</td>
+<td>12 × 0,08 с</td>
+<td>×75</td>
+</tr>
+<tr>
+<td>Права доступа к 30 эндпоинтам</td>
+<td>Невозможно полноценно</td>
+<td>30 × 0,05 с</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI оставляет за собой то, что видит пользователь: что форма показывает ошибку, кнопка доступна, сценарий проходит целиком.</p>
+<h2 id="/optimization/speedup" data-anchor="speedup">Ускорение отдельных тестов<a class="h-anchor" href="#/optimization/speedup" aria-label="Ссылка на раздел">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Приём</th>
+<th>Как</th>
+<th>Типичный выигрыш</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Авторизация через <code>storageState</code></td>
+<td>Setup-проект, вход один раз (<a href="#/pw-advanced/auth">глава 18</a>)</td>
+<td>2–5 с на тест</td>
+</tr>
+<tr>
+<td>Данные через API</td>
+<td>Фикстуры создают заказ, корзину, пользователя запросами</td>
+<td>Секунды–десятки секунд</td>
+</tr>
+<tr>
+<td>Сразу на нужную страницу</td>
+<td><code>page.goto('/cart')</code> вместо навигации через меню</td>
+<td>1–3 с</td>
+</tr>
+<tr>
+<td>Блокировка сторонних ресурсов</td>
+<td><code>page.route</code> → <code>abort</code> для аналитики, чатов, рекламы</td>
+<td>0,5–2 с и меньше оверлеев</td>
+</tr>
+<tr>
+<td>Ожидание состояния вместо пауз</td>
+<td>Web-first assertions вместо <code>waitForTimeout</code></td>
+<td>Вся длина паузы</td>
+</tr>
+<tr>
+<td>Меньше лишних проверок</td>
+<td>Не проверять в каждом тесте то, что проверено отдельно</td>
+<td>Зависит</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code"><div class="code-head"><span class="code-lang">TypeScript</span><span class="code-title">tests/fast-setup.spec.ts</span><button type="button" class="code-copy" aria-label="Скопировать код">Копировать</button></div><pre><code><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@playwright/test'</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">.</span><span class="nx">beforeEach</span><span class="p">(</span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Сторонние скрипты не нужны для проверки корзины</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">route</span><span class="p">(</span><span class="sr">/(google-analytics|googletagmanager|mc\.yandex|widget\.chat)/</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">r</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">abort</span><span class="p">());</span>
+<span class="p">});</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">'промокод в корзине'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Состояние готовится запросом, а не кликами по каталогу</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/api/cart/items'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">productId</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span><span class="w"> </span><span class="nx">qty</span><span class="o">:</span><span class="w"> </span><span class="kt">2</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">res</span><span class="p">).</span><span class="nx">toBeOK</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">'/cart'</span><span class="p">);</span><span class="w">                              </span><span class="c1">// сразу нужная страница</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByLabel</span><span class="p">(</span><span class="s1">'Промокод'</span><span class="p">).</span><span class="nx">fill</span><span class="p">(</span><span class="s1">'SALE10'</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">'button'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">'Применить'</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByTestId</span><span class="p">(</span><span class="s1">'cart-total'</span><span class="p">)).</span><span class="nx">toHaveText</span><span class="p">(</span><span class="s1">'8 982 ₽'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<h2 id="/optimization/reuse" data-anchor="reuse">Безопасное переиспользование окружения<a class="h-anchor" href="#/optimization/reuse" aria-label="Ссылка на раздел">#</a></h2>
+<p>Переиспользование экономит время, но угрожает изоляции. Безопасно переиспользовать то, что <strong>тесты не изменяют</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Можно переиспользовать</th>
+<th>Нельзя (или только с изоляцией)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Браузер в воркере (<button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> делает сам)</td>
+<td>Страницу и контекст между тестами</td>
+</tr>
+<tr>
+<td>Пул подключений к БД, мок-сервер (Worker-фикстура)</td>
+<td>Корзину, профиль, заказы одного пользователя</td>
+</tr>
+<tr>
+<td>Сид-справочники и каталог</td>
+<td>Глобальные настройки, фича-флаги</td>
+</tr>
+<tr>
+<td>Запущенное локально приложение (<code>reuseExistingServer</code>)</td>
+<td>Окружение после теста, который его «испортил»</td>
+</tr>
+<tr>
+<td>Docker-образ с браузерами и <code>node_modules</code> (кэш)</td>
+<td>Общий staging для конфликтующих наборов одновременно</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="/optimization/prioritization" data-anchor="prioritization">Приоритизация<a class="h-anchor" href="#/optimization/prioritization" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="test-prioritization" aria-expanded="false">Test Prioritization</button> — запускать самое важное раньше и не запускать лишнее:</p>
+<ul>
+<li><strong>Smoke первым.</strong> Если стенд не жив, остальное не нужно — <code>maxFailures</code> или отдельная стадия.</li>
+<li><strong>Теги и наборы.</strong> <code>@smoke</code>, <code>@critical</code>, <code>@slow</code> и проекты: на MR — критичное, ночью — всё.</li>
+<li><strong>Изменённые тесты.</strong> <code>npx playwright test --only-changed=origin/main</code> запускает тесты из изменённых файлов и тех, что их импортируют — полезно для быстрой проверки MR тестового репозитория.</li>
+<li><strong>Повтор упавших.</strong> <code>--last-failed</code> — после исправления.</li>
+<li><strong>Быстрый провал.</strong> <code>--max-failures=10</code> (или <code>maxFailures</code> в конфиге) останавливает прогон, когда уже ясно, что сборка сломана.</li>
+<li><strong>Test impact analysis.</strong> Выбор тестов по изменённому коду продукта (по покрытию или карте «модуль → тесты») — мощно, но требует инфраструктуры и честной оценки риска пропуска.</li>
+</ul>
+<h2 id="/optimization/pipeline" data-anchor="pipeline">Оптимизация pipeline<a class="h-anchor" href="#/optimization/pipeline" aria-label="Ссылка на раздел">#</a></h2>
+<p><button type="button" class="term" data-term="pipeline-optimization" aria-expanded="false">Pipeline Optimization</button>:</p>
+<ul>
+<li><strong>Кэш и готовые образы</strong>: образ <button type="button" class="term" data-term="playwright" aria-expanded="false">Playwright</button> с браузерами, кэш npm по <code>package-lock.json</code>.</li>
+<li><strong>Граф <code>needs</code></strong> вместо строгих стадий: задачи стартуют, как только готовы их зависимости.</li>
+<li><strong>Параллельные задачи</strong> для независимых наборов (API и UI одновременно).</li>
+<li><strong>Запуск по изменениям</strong>: <code>rules: changes</code> в GitLab, <code>paths</code> в <button type="button" class="term" data-term="github-actions" aria-expanded="false">GitHub Actions</button> — изменение только документации не запускает E2E.</li>
+<li><strong>Отмена устаревших <button type="button" class="term" data-term="pipeline" aria-expanded="false">Pipeline</button></strong>: новый push в ветку отменяет предыдущий (<code>interruptible</code> в GitLab, <code>concurrency</code> в GitHub Actions).</li>
+<li><strong>Размер артефактов</strong>: trace и видео только для упавших тестов.</li>
+</ul>
+<h2 id="/optimization/cost" data-anchor="cost">Время, стоимость и обратная связь<a class="h-anchor" href="#/optimization/cost" aria-label="Ссылка на раздел">#</a></h2>
+<p>Шардирование уменьшает время, но не бесплатно: каждый шард тратит время на подготовку, а минуты агентов стоят денег.</p>
+<p><code>время ≈ подготовка + max(самый долгий тест, сумма / (шарды × воркеры))</code></p>
+<p><code>стоимость ≈ шарды × время × цена минуты агента</code></p>
+<div class="sim-mount" data-sim="optimization-calc"><div class="sim-fallback"><strong>Интерактив требует JavaScript</strong>Время, стоимость и обратная связь: число тестов, средняя длительность, самый долгий тест, воркеры на агенте, подготовка шарда и цена минуты → график времени прогона и стоимости в зависимости от числа шардов.</div></div>
+<p>Модель показывает типичную картину: первые шарды резко сокращают время почти без роста стоимости, затем время упирается в подготовку и самый долгий тест, а стоимость растёт линейно. Оптимальное число шардов — там, где дальнейшее ускорение уже не стоит денег.</p>
+<h2 id="/optimization/example" data-anchor="example">Пример: с 55 до 11 минут<a class="h-anchor" href="#/optimization/example" aria-label="Ссылка на раздел">#</a></h2>
+<p>UI-набор на MR: 400 тестов, 55 минут на 2 шардах по 4 воркера.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Шаг</th>
+<th>Время</th>
+<th>Комментарий</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Исходно</td>
+<td>55 мин</td>
+<td>Каждый тест логинится через форму</td>
+</tr>
+<tr>
+<td>storageState + setup-проект</td>
+<td>41 мин</td>
+<td>−3,5 с на тест</td>
+</tr>
+<tr>
+<td>Данные через API в 120 тестах</td>
+<td>29 мин</td>
+<td>Убраны «прогулки» по каталогу</td>
+</tr>
+<tr>
+<td>140 UI-тестов бизнес-правил → 160 API-тестов</td>
+<td>18 мин</td>
+<td>UI остался для пользовательских сценариев</td>
+</tr>
+<tr>
+<td>Блокировка аналитики и чата</td>
+<td>16 мин</td>
+<td>И −30% «случайных» падений от оверлеев</td>
+</tr>
+<tr>
+<td><code>fullyParallel</code> + 4 шарда</td>
+<td>11 мин</td>
+<td>Шарды выровнены, подготовка 2 мин</td>
+</tr>
+</tbody>
+</table></div>
+<p>Стоимость минут CI выросла на 20%, время обратной связи сократилось в 5 раз — и большая часть выигрыша получена без добавления машин.</p>
+<h2 id="/optimization/mistakes" data-anchor="mistakes">Типичные ошибки<a class="h-anchor" href="#/optimization/mistakes" aria-label="Ссылка на раздел">#</a></h2>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Масштабировать железом, не измерив</span></div><div class="callout-body"><p>Удвоение шардов при 10-минутном тесте и 4-минутной подготовке почти не даст ускорения, но удвоит стоимость.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Ускорять за счёт проверок</span></div><div class="callout-body"><p>Удалить «долгие» проверки или заменить ожидания короткими паузами — значит снизить покрытие и стабильность.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Переиспользовать то, что тесты изменяют</span></div><div class="callout-body"><p>Общий пользователь «для скорости» превращается в гонки при параллельном запуске.</p></div></div>
+<div class="callout c-mistake"><div class="callout-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 19.5H3z"></path><path d="M12 10v4.5M12 17h.01"></path></svg><span>Один набор на все случаи</span></div><div class="callout-body"><p>Полная регрессия на каждый коммит или, наоборот, только ночью. Разные события — разные наборы.</p></div></div>
+<h2 id="/optimization/interview" data-anchor="interview">Что важно для собеседования<a class="h-anchor" href="#/optimization/interview" aria-label="Ссылка на раздел">#</a></h2>
+<details class="iq" data-iq="opt-slow-suite" data-level="M" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">UI-регрессия идёт 50 минут. Как будете ускорять?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Сначала измерю: топ медленных тестов, подготовка vs выполнение, загрузка агентов. Затем по убыванию выгоды: авторизация через storageState, подготовка данных через API, перенос проверок бизнес-правил на API/unit, убрать паузы и лишнюю навигацию, заблокировать сторонние ресурсы. Потом параллелизм: <code>fullyParallel</code>, воркеры по ресурсам, шардирование с merge-reports. И приоритизация: на MR — критичный набор, полная регрессия — после деплоя и ночью.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="opt-prioritize" data-level="M" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="M">Middle</span><span class="iq-q">Как приоритизировать запуск тестов, если полный набор не помещается в время MR?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Наборы по событиям: на MR — smoke и критичные сценарии по рискам (теги <code>@critical</code>), API-тесты затронутых областей; после слияния — расширенная регрессия; ночью — всё. Быстрый провал (<code>maxFailures</code>) при сломанной сборке. Для тестового репозитория — <code>--only-changed</code>. Test impact analysis — при наличии надёжной карты зависимостей и с осознанием риска пропуска.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="opt-cost" data-level="M+" data-topic="Docker и CI/CD"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">Как выбрать число шардов для набора?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Время ≈ подготовка + max(самый долгий тест, сумма / (шарды × воркеры)), стоимость ≈ шарды × время × цена минуты. Увеличиваю шарды, пока это заметно сокращает время; когда время упирается в подготовку и самый долгий тест, дальнейшие шарды только увеличивают стоимость. Параллельно сокращаю подготовку (кэш, образы) и разбиваю самые долгие тесты.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><details class="iq" data-iq="mp-ui-to-api" data-level="M+" data-topic="Архитектура тестов"><summary><span class="iq-lvl" data-l="M+">Middle+</span><span class="iq-q">UI-регрессия идёт 70 минут, 600 тестов. Как сократить, не потеряв в качестве?</span><svg class="ico chev" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg></summary><div class="iq-body"><h4>Ответ</h4><p>Измерить: какие тесты самые долгие и что в них занимает время. Типичные шаги по убыванию эффекта: вход через storageState и данные через API вместо UI; перенос проверок бизнес-правил (расчёты, валидации, права) на API-уровень, оставив в UI пользовательские сценарии и отображение; блокировка сторонних ресурсов; удаление фиксированных пауз; <button type="button" class="term" data-term="fully-parallel" aria-expanded="false">fullyParallel</button> и выравнивание шардов; приоритизация — быстрый набор на MR, полный — после слияния и по расписанию. Каждое изменение сопровождается проверкой, что ни один риск не остался без проверки.</p><div class="iq-foot"><span class="iq-mark" role="group" aria-label="Отметка"><button type="button" class="btn btn-sm" data-iq-mark="know" aria-pressed="false">Знаю</button><button type="button" class="btn btn-sm" data-iq-mark="repeat" aria-pressed="false">Повторить</button></span></div></div></details><p class="iq-more"><a href="#/interview">Все вопросы по уровням →</a></p>
+<h2 id="/optimization/self-check" data-anchor="self-check">Проверьте себя<a class="h-anchor" href="#/optimization/self-check" aria-label="Ссылка на раздел">#</a></h2>
+<div class="quiz-block"><div class="quiz-head"><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Тест</span><span class="quiz-score" aria-live="polite"></span></div><div class="quiz" data-qid="optimization:1"><div class="quiz-q"><span class="quiz-n">1</span><div>Набор: подготовка шарда 3 минуты, самый долгий тест 6 минут, сумма 120 минут, 4 воркера на шард. Сколько примерно займёт прогон на 10 шардах?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>12 минут</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>3 минуты</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>6 минут</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Около 9 минут</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p><code>120 / (10 × 4) = 3</code> минуты меньше самого долгого теста (6), поэтому выполнение ≈ 6 минут + 3 минуты подготовки ≈ 9.</p></div></div><div class="quiz" data-qid="optimization:2"><div class="quiz-q"><span class="quiz-n">2</span><div>Какая оптимизация обычно даёт наибольший выигрыш при минимальной стоимости?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Включить видео для всех тестов</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="0"><span class="quiz-mark"></span><span>Поднять таймауты</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="1"><span class="quiz-mark"></span><span>Перенести проверки бизнес-правил с UI на API и готовить данные через API</span></button><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Удвоить число агентов CI</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Уровень проверки и подготовка состояния определяют время сильнее, чем число машин.</p></div></div><div class="quiz" data-qid="optimization:3"><div class="quiz-q"><span class="quiz-n">3</span><div>Что из этого безопасно переиспользовать между тестами?</div></div><div class="quiz-opts"><button type="button" class="quiz-opt" data-k="0" data-ok="0"><span class="quiz-mark"></span><span>Корзину общего пользователя</span></button><button type="button" class="quiz-opt" data-k="1" data-ok="0"><span class="quiz-mark"></span><span>Страницу после предыдущего теста</span></button><button type="button" class="quiz-opt" data-k="2" data-ok="1"><span class="quiz-mark"></span><span>Пул подключений к БД в worker-фикстуре</span></button><button type="button" class="quiz-opt" data-k="3" data-ok="0"><span class="quiz-mark"></span><span>Глобальный фича-флаг, который тесты переключают</span></button></div><div class="quiz-expl" hidden><div class="quiz-verdict"></div><p>Тесты не изменяют пул подключений; остальное — изменяемое общее состояние.</p></div></div></div>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Как найти, на что тратится время прогона?</span></summary><div class="check-body"><p>Отсортировать тесты по длительности (HTML-отчёт, Speedboard, <button type="button" class="term" data-term="json" aria-expanded="false">JSON</button> за несколько прогонов), сравнить время подготовки и выполнения задач CI, посмотреть шкалу воркеров (неравномерность, простаивающие слоты), загрузку агента. Затем разобрать топ медленных тестов: подготовка через UI, паузы, лишние переходы, неправильный уровень проверки.</p></div></details>
+<details class="check"><summary><svg class="ico" viewbox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"></circle><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 16.8h.01"></path></svg><span>Почему после некоторого числа шардов время почти перестаёт уменьшаться?</span></summary><div class="check-body"><p>Время шарда ограничено снизу подготовкой (установка, окружение) и самым долгим тестом. Когда сумма длительностей, делённая на число слотов, становится меньше самого долгого теста, дальнейшее деление не помогает, а каждый новый шард добавляет стоимость подготовки.</p></div></details></div><footer class="ch-foot"><div class="ch-foot-nav"><a class="foot-link prev" href="#/cicd"><small>← Назад</small><span>CI/CD</span></a><a class="foot-link next" href="#/flaky"><small>Дальше →</small><span>Flaky Tests</span></a></div></footer></article><hr class="nojs-sep">

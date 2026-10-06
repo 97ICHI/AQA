@@ -1,0 +1,2771 @@
+{
+ "sections": [
+  {
+   "id": "start",
+   "title": "Введение",
+   "label": null,
+   "nav": "Старт",
+   "chapters": [
+    "intro",
+    "first-run"
+   ]
+  },
+  {
+   "id": "basics",
+   "title": "Основы автоматизации",
+   "label": "I",
+   "nav": null,
+   "chapters": [
+    "aqa-intro",
+    "test-types",
+    "test-design",
+    "test-quality"
+   ]
+  },
+  {
+   "id": "prog",
+   "title": "Программирование для AQA",
+   "label": "II",
+   "nav": null,
+   "chapters": [
+    "ts-basics",
+    "async",
+    "code-org",
+    "debugging"
+   ]
+  },
+  {
+   "id": "tech",
+   "title": "Технические основы",
+   "label": "III",
+   "nav": null,
+   "chapters": [
+    "web-arch",
+    "http-rest",
+    "sql",
+    "git-linux",
+    "workstation-tech"
+   ]
+  },
+  {
+   "id": "ui",
+   "title": "UI Automation",
+   "label": "IV",
+   "nav": null,
+   "chapters": [
+    "pw-arch",
+    "locators",
+    "assertions",
+    "fixtures",
+    "pom",
+    "pw-advanced"
+   ]
+  },
+  {
+   "id": "api",
+   "title": "API Automation",
+   "label": "V",
+   "nav": null,
+   "chapters": [
+    "api-basics",
+    "api-auto",
+    "contracts",
+    "mocking"
+   ]
+  },
+  {
+   "id": "arch",
+   "title": "Архитектура автоматизации",
+   "label": "VI",
+   "nav": null,
+   "chapters": [
+    "project-arch",
+    "isolation",
+    "parallel",
+    "reporting"
+   ]
+  },
+  {
+   "id": "infra",
+   "title": "Инфраструктура и CI/CD",
+   "label": "VII",
+   "nav": null,
+   "chapters": [
+    "docker",
+    "cicd",
+    "optimization",
+    "flaky"
+   ]
+  },
+  {
+   "id": "practice",
+   "title": "Практика и проектирование",
+   "label": "VIII",
+   "nav": null,
+   "chapters": [
+    "aqa-design",
+    "shop-e2e",
+    "competence",
+    "alt-stacks"
+   ]
+  },
+  {
+   "id": "ref",
+   "title": "Справочник",
+   "label": null,
+   "nav": "Справочник",
+   "chapters": [
+    "glossary",
+    "interview",
+    "about"
+   ]
+  }
+ ],
+ "chapters": [
+  {
+   "id": "intro",
+   "title": "AQA Lab: от первой проверки до системы автоматизации",
+   "short": "Введение",
+   "section": "start",
+   "num": null,
+   "countable": false
+  },
+  {
+   "id": "first-run",
+   "title": "Первый запуск: от терминала до проверки",
+   "short": "Первый запуск",
+   "section": "start",
+   "num": null,
+   "countable": true
+  },
+  {
+   "id": "aqa-intro",
+   "title": "Введение в AQA",
+   "short": "Введение в AQA",
+   "section": "basics",
+   "num": 1,
+   "countable": true
+  },
+  {
+   "id": "test-types",
+   "title": "Виды автоматизированного тестирования",
+   "short": "Виды тестирования",
+   "section": "basics",
+   "num": 2,
+   "countable": true
+  },
+  {
+   "id": "test-design",
+   "title": "Test Design для автоматизации",
+   "short": "Test Design",
+   "section": "basics",
+   "num": 3,
+   "countable": true
+  },
+  {
+   "id": "test-quality",
+   "title": "Качество и эффективность автотестов",
+   "short": "Качество автотестов",
+   "section": "basics",
+   "num": 4,
+   "countable": true
+  },
+  {
+   "id": "ts-basics",
+   "title": "Основы TypeScript",
+   "short": "Основы TypeScript",
+   "section": "prog",
+   "num": 5,
+   "countable": true
+  },
+  {
+   "id": "async",
+   "title": "Асинхронное программирование",
+   "short": "Асинхронность",
+   "section": "prog",
+   "num": 6,
+   "countable": true
+  },
+  {
+   "id": "code-org",
+   "title": "Структуры данных и организация кода",
+   "short": "Организация кода",
+   "section": "prog",
+   "num": 7,
+   "countable": true
+  },
+  {
+   "id": "debugging",
+   "title": "Debugging",
+   "short": "Debugging",
+   "section": "prog",
+   "num": 8,
+   "countable": true
+  },
+  {
+   "id": "web-arch",
+   "title": "Архитектура веб-приложений",
+   "short": "Веб-архитектура",
+   "section": "tech",
+   "num": 9,
+   "countable": true
+  },
+  {
+   "id": "http-rest",
+   "title": "HTTP и REST API",
+   "short": "HTTP и REST",
+   "section": "tech",
+   "num": 10,
+   "countable": true
+  },
+  {
+   "id": "sql",
+   "title": "SQL и базы данных",
+   "short": "SQL и базы данных",
+   "section": "tech",
+   "num": 11,
+   "countable": true
+  },
+  {
+   "id": "git-linux",
+   "title": "Git и Linux",
+   "short": "Git и Linux",
+   "section": "tech",
+   "num": 12,
+   "countable": true
+  },
+  {
+   "id": "workstation-tech",
+   "title": "Техническая грамотность: рабочее окружение",
+   "short": "Рабочее окружение",
+   "section": "tech",
+   "num": null,
+   "countable": true
+  },
+  {
+   "id": "pw-arch",
+   "title": "Архитектура Playwright",
+   "short": "Архитектура Playwright",
+   "section": "ui",
+   "num": 13,
+   "countable": true
+  },
+  {
+   "id": "locators",
+   "title": "Locators",
+   "short": "Locators",
+   "section": "ui",
+   "num": 14,
+   "countable": true
+  },
+  {
+   "id": "assertions",
+   "title": "Assertions и Synchronization",
+   "short": "Assertions и ожидания",
+   "section": "ui",
+   "num": 15,
+   "countable": true
+  },
+  {
+   "id": "fixtures",
+   "title": "Fixtures и Hooks",
+   "short": "Fixtures и Hooks",
+   "section": "ui",
+   "num": 16,
+   "countable": true
+  },
+  {
+   "id": "pom",
+   "title": "Page Object Model",
+   "short": "Page Object Model",
+   "section": "ui",
+   "num": 17,
+   "countable": true
+  },
+  {
+   "id": "pw-advanced",
+   "title": "Продвинутый Playwright",
+   "short": "Продвинутый Playwright",
+   "section": "ui",
+   "num": 18,
+   "countable": true
+  },
+  {
+   "id": "api-basics",
+   "title": "Основы API Testing",
+   "short": "Основы API Testing",
+   "section": "api",
+   "num": 19,
+   "countable": true
+  },
+  {
+   "id": "api-auto",
+   "title": "Автоматизация API на Playwright",
+   "short": "Автоматизация API",
+   "section": "api",
+   "num": 20,
+   "countable": true
+  },
+  {
+   "id": "contracts",
+   "title": "Schema и Contract Testing",
+   "short": "Schema и Contract",
+   "section": "api",
+   "num": 21,
+   "countable": true
+  },
+  {
+   "id": "mocking",
+   "title": "Mocking и Test Data",
+   "short": "Mocking и Test Data",
+   "section": "api",
+   "num": 22,
+   "countable": true
+  },
+  {
+   "id": "project-arch",
+   "title": "Архитектура тестового проекта",
+   "short": "Архитектура проекта",
+   "section": "arch",
+   "num": 23,
+   "countable": true
+  },
+  {
+   "id": "isolation",
+   "title": "Test Isolation и управление данными",
+   "short": "Изоляция и данные",
+   "section": "arch",
+   "num": 24,
+   "countable": true
+  },
+  {
+   "id": "parallel",
+   "title": "Параллельное выполнение",
+   "short": "Параллельность",
+   "section": "arch",
+   "num": 25,
+   "countable": true
+  },
+  {
+   "id": "reporting",
+   "title": "Reporting и Logging",
+   "short": "Reporting и Logging",
+   "section": "arch",
+   "num": 26,
+   "countable": true
+  },
+  {
+   "id": "docker",
+   "title": "Docker",
+   "short": "Docker",
+   "section": "infra",
+   "num": 27,
+   "countable": true
+  },
+  {
+   "id": "cicd",
+   "title": "CI/CD",
+   "short": "CI/CD",
+   "section": "infra",
+   "num": 28,
+   "countable": true
+  },
+  {
+   "id": "optimization",
+   "title": "Оптимизация выполнения автотестов",
+   "short": "Оптимизация",
+   "section": "infra",
+   "num": 29,
+   "countable": true
+  },
+  {
+   "id": "flaky",
+   "title": "Flaky Tests и диагностика",
+   "short": "Flaky Tests",
+   "section": "infra",
+   "num": 30,
+   "countable": true
+  },
+  {
+   "id": "aqa-design",
+   "title": "AQA System Design",
+   "short": "AQA System Design",
+   "section": "practice",
+   "num": null,
+   "countable": true
+  },
+  {
+   "id": "shop-e2e",
+   "title": "Сквозной пример: учебный интернет-магазин",
+   "short": "Сквозной пример",
+   "section": "practice",
+   "num": null,
+   "countable": true
+  },
+  {
+   "id": "competence",
+   "title": "Практика и критерии инженерной готовности",
+   "short": "Практика Junior → Middle+",
+   "section": "practice",
+   "num": null,
+   "countable": true
+  },
+  {
+   "id": "alt-stacks",
+   "title": "Альтернативные стеки",
+   "short": "Альтернативные стеки",
+   "section": "practice",
+   "num": null,
+   "countable": true
+  },
+  {
+   "id": "glossary",
+   "title": "Глоссарий A–Z",
+   "short": "Глоссарий",
+   "section": "ref",
+   "num": null,
+   "countable": false
+  },
+  {
+   "id": "interview",
+   "title": "Подготовка к собеседованию",
+   "short": "Собеседование",
+   "section": "ref",
+   "num": null,
+   "countable": false
+  },
+  {
+   "id": "about",
+   "title": "О учебнике: версии, источники и проверки",
+   "short": "О учебнике",
+   "section": "ref",
+   "num": null,
+   "countable": false
+  }
+ ],
+ "glossary": {
+  "aqa": {
+   "en": "Automation QA",
+   "ru": "Автоматизированное обеспечение качества",
+   "def": "Направление QA, в котором проверки проектируются и выполняются с помощью кода: автотесты, тестовые данные, запуск в CI и анализ результатов.",
+   "ch": "aqa-intro",
+   "anchor": "role",
+   "aliases": "AQA, автотестировщик, SDET, automation engineer"
+  },
+  "regression-testing": {
+   "en": "Regression Testing",
+   "ru": "Регрессионное тестирование",
+   "def": "Повторная проверка уже работающей функциональности после изменений, чтобы убедиться, что ничего не сломалось.",
+   "ch": "test-types",
+   "anchor": "regression-smoke",
+   "aliases": "регресс, регрессия"
+  },
+  "test-automation-roi": {
+   "en": "Test Automation ROI",
+   "ru": "Окупаемость автоматизации",
+   "def": "Отношение выгоды от автоматизации к вложениям: (экономия − затраты) / затраты. Учитывает разработку, поддержку и инфраструктуру.",
+   "ch": "aqa-intro",
+   "anchor": "economics",
+   "aliases": "ROI, окупаемость"
+  },
+  "checking": {
+   "en": "Checking",
+   "ru": "Проверка по известному ожиданию",
+   "def": "Сравнение фактического результата с заранее известным ожидаемым. Всё, что делает автотест, — checking; исследование продукта человеком называют testing.",
+   "ch": "aqa-intro",
+   "anchor": "testing-checking",
+   "aliases": ""
+  },
+  "exploratory-testing": {
+   "en": "Exploratory Testing",
+   "ru": "Исследовательское тестирование",
+   "def": "Тестирование, в котором проектирование, выполнение и анализ проверок идут одновременно, а следующий шаг выбирается по результатам предыдущего.",
+   "ch": "aqa-intro",
+   "anchor": "testing-checking",
+   "aliases": ""
+  },
+  "test-oracle": {
+   "en": "Test Oracle",
+   "ru": "Тестовый оракул",
+   "def": "Источник правильного ожидаемого результата: требования, спецификация, эталонный расчёт, предыдущая версия системы.",
+   "ch": "aqa-intro",
+   "anchor": "testing-checking",
+   "aliases": "оракул"
+  },
+  "unit-testing": {
+   "en": "Unit Testing",
+   "ru": "Модульное тестирование",
+   "def": "Проверка отдельной функции, метода или класса изолированно от сети, базы данных и других компонентов.",
+   "ch": "test-types",
+   "anchor": "unit",
+   "aliases": "юнит-тест, модульный тест"
+  },
+  "integration-testing": {
+   "en": "Integration Testing",
+   "ru": "Интеграционное тестирование",
+   "def": "Проверка совместной работы нескольких компонентов: сервиса и базы данных, двух модулей, сервиса и очереди.",
+   "ch": "test-types",
+   "anchor": "integration",
+   "aliases": ""
+  },
+  "api-testing": {
+   "en": "API Testing",
+   "ru": "Тестирование API",
+   "def": "Проверка системы через программный интерфейс: отправка запросов и проверка статуса, заголовков, тела ответа и побочных эффектов.",
+   "ch": "test-types",
+   "anchor": "api",
+   "aliases": ""
+  },
+  "ui-testing": {
+   "en": "UI Testing",
+   "ru": "Тестирование интерфейса",
+   "def": "Проверка через пользовательский интерфейс в браузере: действия пользователя и видимый результат.",
+   "ch": "test-types",
+   "anchor": "ui",
+   "aliases": ""
+  },
+  "e2e-testing": {
+   "en": "End-to-end Testing",
+   "ru": "Сквозное тестирование",
+   "def": "Проверка полного пользовательского сценария через все слои системы: интерфейс, бэкенд, базу данных и интеграции.",
+   "ch": "test-types",
+   "anchor": "e2e",
+   "aliases": "E2E, e2e, сквозной тест"
+  },
+  "smoke-testing": {
+   "en": "Smoke Testing",
+   "ru": "Дымовое тестирование",
+   "def": "Короткий набор базовых проверок, что система запускается и ключевые функции работают; выполняется сразу после сборки или деплоя.",
+   "ch": "test-types",
+   "anchor": "regression-smoke",
+   "aliases": "smoke, смоук"
+  },
+  "contract-testing": {
+   "en": "Contract Testing",
+   "ru": "Контрактное тестирование",
+   "def": "Проверка, что поставщик API отвечает так, как ожидает потребитель, без развёртывания всей системы.",
+   "ch": "contracts",
+   "anchor": "cdc",
+   "aliases": ""
+  },
+  "test-pyramid": {
+   "en": "Test Automation Pyramid",
+   "ru": "Пирамида автоматизации тестирования",
+   "def": "Эвристика: много быстрых низкоуровневых тестов, меньше интеграционных и API, мало UI и E2E. Проверяйте риск на самом низком надёжном уровне.",
+   "ch": "test-types",
+   "anchor": "pyramid",
+   "aliases": "пирамида тестирования, testing trophy, ice-cream cone"
+  },
+  "equivalence-partitioning": {
+   "en": "Equivalence Partitioning",
+   "ru": "Разбиение на классы эквивалентности",
+   "def": "Техника Test Design: входные значения делятся на классы с одинаковым поведением системы, из каждого класса берётся один представитель.",
+   "ch": "test-design",
+   "anchor": "ep",
+   "aliases": "классы эквивалентности, EP"
+  },
+  "boundary-value-analysis": {
+   "en": "Boundary Value Analysis",
+   "ru": "Анализ граничных значений",
+   "def": "Техника Test Design: проверяются значения на границах классов эквивалентности и рядом с ними, где ошибки наиболее вероятны.",
+   "ch": "test-design",
+   "anchor": "bva",
+   "aliases": "BVA, граничные значения"
+  },
+  "decision-table": {
+   "en": "Decision Table",
+   "ru": "Таблица решений",
+   "def": "Таблица, где каждое правило — комбинация условий и соответствующее действие. Помогает найти пропущенные комбинации и минимальный набор тестов.",
+   "ch": "test-design",
+   "anchor": "decision-table",
+   "aliases": ""
+  },
+  "state-transition-testing": {
+   "en": "State Transition Testing",
+   "ru": "Тестирование переходов состояний",
+   "def": "Проверка допустимых и недопустимых переходов объекта между состояниями по событиям: заказ, платёж, учётная запись.",
+   "ch": "test-design",
+   "anchor": "state",
+   "aliases": ""
+  },
+  "negative-testing": {
+   "en": "Negative Testing",
+   "ru": "Негативное тестирование",
+   "def": "Проверка реакции системы на некорректные данные и недопустимые действия: понятная ошибка, правильный код ответа, отсутствие побочных эффектов.",
+   "ch": "test-design",
+   "anchor": "positive-negative",
+   "aliases": "негативные тесты, positive testing"
+  },
+  "risk-based-testing": {
+   "en": "Risk-based Testing",
+   "ru": "Тестирование на основе рисков",
+   "def": "Приоритизация проверок по риску: вероятность дефекта × его влияние на бизнес и пользователей.",
+   "ch": "test-design",
+   "anchor": "risk",
+   "aliases": ""
+  },
+  "data-driven-testing": {
+   "en": "Data-driven Testing",
+   "ru": "Тестирование, управляемое данными",
+   "def": "Подход, при котором одна логика теста выполняется для набора входных данных и ожиданий; каждый набор — отдельный тест в отчёте.",
+   "ch": "test-design",
+   "anchor": "bva-code",
+   "aliases": "параметризованные тесты, parameterized tests"
+  },
+  "test-coverage": {
+   "en": "Test Coverage",
+   "ru": "Тестовое покрытие",
+   "def": "Доля требований, сценариев или рисков, для которых существуют проверки. Считается по трассировке «требование → тесты».",
+   "ch": "test-quality",
+   "anchor": "test-coverage",
+   "aliases": "покрытие требований, requirements coverage"
+  },
+  "code-coverage": {
+   "en": "Code Coverage",
+   "ru": "Покрытие кода",
+   "def": "Доля кода приложения, выполненного во время тестов (строки, ветви, функции). Показывает непроверенный код, но не качество проверок.",
+   "ch": "test-quality",
+   "anchor": "code-coverage",
+   "aliases": "line coverage, statement coverage, покрытие кода"
+  },
+  "branch-coverage": {
+   "en": "Branch Coverage",
+   "ru": "Покрытие ветвей",
+   "def": "Доля пройденных ветвей условий (if/else, ?:, &amp;&amp;, ||). Строже покрытия строк.",
+   "ch": "test-quality",
+   "anchor": "code-coverage",
+   "aliases": ""
+  },
+  "mutation-testing": {
+   "en": "Mutation Testing",
+   "ru": "Мутационное тестирование",
+   "def": "Оценка силы тестов: в код вносятся небольшие изменения (мутанты), и проверяется, падают ли тесты. Доля «убитых» мутантов — mutation score.",
+   "ch": "test-quality",
+   "anchor": "mutation",
+   "aliases": "Stryker, mutation score"
+  },
+  "test-maintainability": {
+   "en": "Test Maintainability",
+   "ru": "Поддерживаемость тестов",
+   "def": "Насколько легко понять, изменить и починить тест: читаемость, отсутствие дублирования, устойчивые локаторы, независимость.",
+   "ch": "test-quality",
+   "anchor": "maintainability",
+   "aliases": ""
+  },
+  "test-reliability": {
+   "en": "Test Reliability",
+   "ru": "Надёжность тестов",
+   "def": "Способность теста давать одинаковый результат при одинаковом коде и окружении; падать только при реальной проблеме.",
+   "ch": "test-quality",
+   "anchor": "reliability",
+   "aliases": ""
+  },
+  "typescript": {
+   "en": "TypeScript",
+   "ru": "TypeScript (язык)",
+   "def": "Надстройка над JavaScript со статической типизацией. Типы проверяются компилятором tsc до запуска и удаляются при преобразовании в JavaScript.",
+   "ch": "ts-basics",
+   "anchor": "why",
+   "aliases": "TS, tsc"
+  },
+  "type-annotation": {
+   "en": "Type Annotation",
+   "ru": "Аннотация типа",
+   "def": "Явное указание типа переменной, параметра или результата: <code>let id: number</code>. Там, где тип очевиден из значения, TypeScript выводит его сам.",
+   "ch": "ts-basics",
+   "anchor": "variables",
+   "aliases": ""
+  },
+  "union-type": {
+   "en": "Union Type",
+   "ru": "Объединение типов",
+   "def": "Тип «одно из»: <code>string | null</code> или <code>'paid' | 'shipped'</code>. Ограничивает допустимые значения и ловит опечатки при компиляции.",
+   "ch": "ts-basics",
+   "anchor": "typing",
+   "aliases": ""
+  },
+  "interface-ts": {
+   "en": "Interface",
+   "ru": "Интерфейс",
+   "def": "Описание формы объекта в TypeScript: поля и их типы. Используется для тестовых данных, ответов API и параметров.",
+   "ch": "ts-basics",
+   "anchor": "interfaces",
+   "aliases": ""
+  },
+  "generics": {
+   "en": "Generics",
+   "ru": "Обобщённые типы",
+   "def": "Параметры типа (<code>&lt;T&gt;</code>), позволяющие писать функции и классы, которые работают с любым типом и сохраняют информацию о нём.",
+   "ch": "ts-basics",
+   "anchor": "typing",
+   "aliases": ""
+  },
+  "type-narrowing": {
+   "en": "Type Narrowing",
+   "ru": "Сужение типа",
+   "def": "Проверки (<code>typeof</code>, <code>instanceof</code>, <code>in</code>, type guard), после которых компилятор знает более точный тип значения.",
+   "ch": "ts-basics",
+   "anchor": "narrowing",
+   "aliases": "type guard"
+  },
+  "es-module": {
+   "en": "ES Module",
+   "ru": "Модуль ECMAScript",
+   "def": "Файл с собственной областью видимости; обменивается кодом с другими файлами через <code>import</code> и <code>export</code>.",
+   "ch": "ts-basics",
+   "anchor": "modules",
+   "aliases": "import, export, модуль"
+  },
+  "exception": {
+   "en": "Exception",
+   "ru": "Исключение",
+   "def": "Объект ошибки, выброшенный <code>throw</code>, который прерывает выполнение до ближайшего <code>catch</code>. Неудачная проверка в тесте — тоже исключение.",
+   "ch": "ts-basics",
+   "anchor": "errors",
+   "aliases": "try catch, throw, Error"
+  },
+  "event-loop": {
+   "en": "Event Loop",
+   "ru": "Цикл событий",
+   "def": "Механизм однопоточного JavaScript: берёт задачу из очереди, выполняет её до опустошения стека, затем выполняет все микрозадачи и переходит к следующей задаче.",
+   "ch": "async",
+   "anchor": "event-loop",
+   "aliases": ""
+  },
+  "call-stack": {
+   "en": "Call Stack",
+   "ru": "Стек вызовов",
+   "def": "Стек функций, выполняемых в данный момент. Каждый вызов добавляет кадр, возврат — снимает. Stack trace — снимок стека в момент ошибки.",
+   "ch": "async",
+   "anchor": "event-loop",
+   "aliases": ""
+  },
+  "promise": {
+   "en": "Promise",
+   "ru": "Промис (обещание результата)",
+   "def": "Объект, представляющий результат асинхронной операции: pending, затем fulfilled со значением или rejected с ошибкой.",
+   "ch": "async",
+   "anchor": "promise",
+   "aliases": ""
+  },
+  "async-await": {
+   "en": "async/await",
+   "ru": "Асинхронные функции и ожидание",
+   "def": "Синтаксис поверх Promise: <code>async</code>-функция возвращает Promise, <code>await</code> приостанавливает её до результата, не блокируя поток.",
+   "ch": "async",
+   "anchor": "async-await",
+   "aliases": "await, async"
+  },
+  "microtask": {
+   "en": "Microtask",
+   "ru": "Микрозадача",
+   "def": "Колбэк Promise или продолжение после <code>await</code>. Все микрозадачи выполняются сразу после текущей задачи, раньше таймеров.",
+   "ch": "async",
+   "anchor": "event-loop",
+   "aliases": "macrotask, task queue, очередь задач"
+  },
+  "race-condition": {
+   "en": "Race Condition",
+   "ru": "Состояние гонки",
+   "def": "Ситуация, когда результат зависит от того, какая из параллельных операций завершится первой. Частая причина нестабильных тестов.",
+   "ch": "async",
+   "anchor": "race",
+   "aliases": "гонка"
+  },
+  "floating-promise": {
+   "en": "Floating Promise",
+   "ru": "«Висящий» промис",
+   "def": "Promise, который не ожидается <code>await</code> и не обрабатывается. В тестах приводит к действиям после проверки и потерянным ошибкам.",
+   "ch": "async",
+   "anchor": "errors",
+   "aliases": "забытый await"
+  },
+  "map-set": {
+   "en": "Map / Set",
+   "ru": "Словарь / Множество",
+   "def": "Коллекции JavaScript: <code>Map</code> хранит пары «ключ → значение» с ключами любого типа, <code>Set</code> — уникальные значения.",
+   "ch": "code-org",
+   "anchor": "map-set",
+   "aliases": ""
+  },
+  "json": {
+   "en": "JSON",
+   "ru": "JSON (формат данных)",
+   "def": "Текстовый формат обмена данными (объекты, массивы, строки, числа, true/false, null). Основной формат тел запросов и ответов REST API.",
+   "ch": "code-org",
+   "anchor": "json",
+   "aliases": ""
+  },
+  "oop": {
+   "en": "Object-Oriented Programming",
+   "ru": "Объектно-ориентированное программирование",
+   "def": "Подход, в котором данные и поведение объединяются в объекты (классы). В тестах — page objects, клиенты API, фабрики данных.",
+   "ch": "code-org",
+   "anchor": "oop",
+   "aliases": "ООП, OOP, class, класс"
+  },
+  "composition": {
+   "en": "Composition",
+   "ru": "Композиция",
+   "def": "Построение объекта из других объектов-компонентов («содержит») вместо наследования («является»). Гибче глубоких иерархий.",
+   "ch": "code-org",
+   "anchor": "composition",
+   "aliases": ""
+  },
+  "dry": {
+   "en": "DRY",
+   "ru": "Не повторяйся",
+   "def": "Don't Repeat Yourself: каждое знание описано в одном месте. В тестах применяется к инфраструктуре: локаторам, клиентам, фикстурам.",
+   "ch": "code-org",
+   "anchor": "dry",
+   "aliases": ""
+  },
+  "damp": {
+   "en": "DAMP",
+   "ru": "Описательные и осмысленные фразы",
+   "def": "Descriptive And Meaningful Phrases: тело теста должно читаться как самостоятельный сценарий, даже ценой небольшого повтора.",
+   "ch": "code-org",
+   "anchor": "dry",
+   "aliases": ""
+  },
+  "solid": {
+   "en": "SOLID",
+   "ru": "Принципы SOLID",
+   "def": "Пять принципов проектирования: единственная ответственность, открытость/закрытость, подстановка Лисков, разделение интерфейсов, инверсия зависимостей.",
+   "ch": "code-org",
+   "anchor": "solid",
+   "aliases": ""
+  },
+  "clean-code": {
+   "en": "Clean Code",
+   "ru": "Чистый код",
+   "def": "Код, который легко читать и менять: понятные имена, маленькие функции, отсутствие магических значений и мёртвого кода.",
+   "ch": "code-org",
+   "anchor": "clean-code",
+   "aliases": ""
+  },
+  "breakpoint": {
+   "en": "Breakpoint",
+   "ru": "Точка останова",
+   "def": "Отметка на строке кода, перед выполнением которой отладчик останавливает программу, чтобы можно было изучить переменные и стек.",
+   "ch": "debugging",
+   "anchor": "breakpoints",
+   "aliases": "step over, step into, step out"
+  },
+  "stack-trace": {
+   "en": "Stack Trace",
+   "ru": "Трассировка стека",
+   "def": "Список вызовов функций в момент ошибки: верхний кадр — место выброса, ниже — кто его вызвал. Содержит файлы, строки и колонки.",
+   "ch": "debugging",
+   "anchor": "stack",
+   "aliases": ""
+  },
+  "logging": {
+   "en": "Logging",
+   "ru": "Логирование",
+   "def": "Запись событий во время выполнения. В тестах — привязанные к шагам записи с идентификаторами данных, без секретов, прикреплённые к отчёту.",
+   "ch": "debugging",
+   "anchor": "logging",
+   "aliases": "логи, логи тестов"
+  },
+  "debug-mode": {
+   "en": "Debug Mode",
+   "ru": "Режим отладки",
+   "def": "Запуск тестов с паузами и пошаговым выполнением. В Playwright: <code>--debug</code> (Inspector), <code>--ui</code> (UI Mode), <code>page.pause()</code>.",
+   "ch": "debugging",
+   "anchor": "playwright-debug",
+   "aliases": "PWDEBUG, Playwright Inspector, UI Mode"
+  },
+  "trace-viewer": {
+   "en": "Trace Viewer",
+   "ru": "Просмотрщик трассировки",
+   "def": "Инструмент Playwright для разбора записанного прогона: действия, DOM-снимки до и после, скриншоты, сеть, консоль и исходный код.",
+   "ch": "debugging",
+   "anchor": "playwright-debug",
+   "aliases": "trace, show-trace, трассировка"
+  },
+  "client-server": {
+   "en": "Client-server Architecture",
+   "ru": "Клиент-серверная архитектура",
+   "def": "Модель, в которой клиент (браузер, приложение, тест) отправляет запросы, а сервер их обрабатывает и возвращает ответы.",
+   "ch": "web-arch",
+   "anchor": "client-server",
+   "aliases": ""
+  },
+  "frontend": {
+   "en": "Frontend",
+   "ru": "Клиентская часть",
+   "def": "Часть приложения, выполняемая в браузере: HTML, CSS, JavaScript. Показывает интерфейс и вызывает backend по HTTP.",
+   "ch": "web-arch",
+   "anchor": "client-server",
+   "aliases": "фронтенд, SPA"
+  },
+  "backend": {
+   "en": "Backend",
+   "ru": "Серверная часть",
+   "def": "Серверное приложение: принимает запросы, проверяет права, выполняет бизнес-логику и работает с базой данных.",
+   "ch": "web-arch",
+   "anchor": "client-server",
+   "aliases": "бэкенд, сервер"
+  },
+  "dns": {
+   "en": "DNS",
+   "ru": "Система доменных имён",
+   "def": "Domain Name System: переводит доменное имя (shop.example.com) в IP-адрес. Ответы кэшируются на время TTL.",
+   "ch": "web-arch",
+   "anchor": "dns",
+   "aliases": ""
+  },
+  "tcp-ip": {
+   "en": "TCP/IP",
+   "ru": "Стек протоколов TCP/IP",
+   "def": "Набор протоколов передачи данных: IP доставляет пакеты между компьютерами, TCP — надёжный упорядоченный поток между процессами (портами).",
+   "ch": "web-arch",
+   "anchor": "tcp-ip",
+   "aliases": "TCP, IP, порт, ECONNREFUSED"
+  },
+  "http": {
+   "en": "HTTP",
+   "ru": "Протокол передачи гипертекста",
+   "def": "Протокол «запрос–ответ» без хранения состояния: метод, URL, заголовки и тело запроса; код статуса, заголовки и тело ответа.",
+   "ch": "http-rest",
+   "anchor": "anatomy",
+   "aliases": ""
+  },
+  "https-tls": {
+   "en": "HTTPS / TLS",
+   "ru": "Защищённый HTTP",
+   "def": "HTTP поверх TLS: шифрование трафика, проверка подлинности сервера по сертификату и защита целостности данных.",
+   "ch": "web-arch",
+   "anchor": "http-https",
+   "aliases": "TLS, SSL, сертификат, ignoreHTTPSErrors"
+  },
+  "cookie": {
+   "en": "Cookie",
+   "ru": "Куки",
+   "def": "Небольшие данные, которые сервер сохраняет в браузере заголовком Set-Cookie; браузер отправляет их в последующих запросах к домену.",
+   "ch": "web-arch",
+   "anchor": "cookies-sessions",
+   "aliases": "куки, Set-Cookie, HttpOnly, SameSite"
+  },
+  "session": {
+   "en": "Session",
+   "ru": "Сессия",
+   "def": "Состояние пользователя между запросами. При серверной сессии cookie хранит только идентификатор, а данные лежат на сервере.",
+   "ch": "web-arch",
+   "anchor": "cookies-sessions",
+   "aliases": ""
+  },
+  "authentication": {
+   "en": "Authentication",
+   "ru": "Аутентификация",
+   "def": "Проверка, кто обращается к системе: пароль, токен, второй фактор. Неудача обычно — 401 Unauthorized.",
+   "ch": "web-arch",
+   "anchor": "auth",
+   "aliases": "AuthN, 401, логин"
+  },
+  "authorization": {
+   "en": "Authorization",
+   "ru": "Авторизация",
+   "def": "Проверка прав уже известного пользователя на действие или ресурс. Неудача обычно — 403 Forbidden.",
+   "ch": "web-arch",
+   "anchor": "auth",
+   "aliases": "AuthZ, 403, права доступа, IDOR"
+  },
+  "jwt": {
+   "en": "JWT",
+   "ru": "JSON Web Token",
+   "def": "Подписанный токен с данными пользователя и сроком действия. Сервер проверяет подпись без обращения к хранилищу сессий.",
+   "ch": "web-arch",
+   "anchor": "cookies-sessions",
+   "aliases": "Bearer token, токен"
+  },
+  "http-method": {
+   "en": "HTTP Method",
+   "ru": "HTTP-метод",
+   "def": "Намерение запроса: GET — получить, POST — создать, PUT — заменить, PATCH — изменить часть, DELETE — удалить, а также HEAD и OPTIONS.",
+   "ch": "http-rest",
+   "anchor": "methods",
+   "aliases": "GET, POST, PUT, PATCH, DELETE, verb"
+  },
+  "status-code": {
+   "en": "Status Code",
+   "ru": "Код состояния HTTP",
+   "def": "Трёхзначный код результата: 2xx — успех, 3xx — перенаправление, 4xx — ошибка клиента, 5xx — ошибка сервера.",
+   "ch": "http-rest",
+   "anchor": "status-codes",
+   "aliases": "200, 201, 204, 400, 404, 409, 422, 500, код ответа"
+  },
+  "http-header": {
+   "en": "HTTP Header",
+   "ru": "Заголовок HTTP",
+   "def": "Пара «имя: значение» с метаданными запроса или ответа: Content-Type, Authorization, Location, Retry-After. Имена нечувствительны к регистру.",
+   "ch": "http-rest",
+   "anchor": "headers",
+   "aliases": "headers, Content-Type, Accept, Authorization"
+  },
+  "rest": {
+   "en": "REST",
+   "ru": "Архитектурный стиль REST",
+   "def": "Representational State Transfer: ресурсы адресуются URL-существительными, действия выражаются методами HTTP, сервер не хранит состояние клиента между запросами.",
+   "ch": "http-rest",
+   "anchor": "rest",
+   "aliases": "RESTful, REST API"
+  },
+  "idempotency": {
+   "en": "Idempotency",
+   "ru": "Идемпотентность",
+   "def": "Свойство операции давать одинаковое состояние на сервере при повторах. Идемпотентны GET, PUT, DELETE; POST — нет без Idempotency-Key.",
+   "ch": "http-rest",
+   "anchor": "idempotency",
+   "aliases": "Idempotency-Key, идемпотентный"
+  },
+  "query-parameter": {
+   "en": "Query Parameter",
+   "ru": "Параметр строки запроса",
+   "def": "Пара «ключ=значение» после <code>?</code> в URL: фильтры, сортировка, поиск, пагинация.",
+   "ch": "http-rest",
+   "anchor": "params",
+   "aliases": "query string, параметры запроса"
+  },
+  "path-parameter": {
+   "en": "Path Parameter",
+   "ru": "Параметр пути",
+   "def": "Часть пути URL, идентифицирующая ресурс: <code>/orders/{id}</code>.",
+   "ch": "http-rest",
+   "anchor": "params",
+   "aliases": ""
+  },
+  "pagination": {
+   "en": "Pagination",
+   "ru": "Постраничная выдача",
+   "def": "Разбиение большого списка на страницы: offset/limit (номер страницы) или курсор (указатель на следующую порцию).",
+   "ch": "http-rest",
+   "anchor": "pagination",
+   "aliases": "пагинация, cursor, offset, limit"
+  },
+  "rate-limiting": {
+   "en": "Rate Limiting",
+   "ru": "Ограничение частоты запросов",
+   "def": "Ограничение числа запросов клиента за интервал. При превышении — 429 Too Many Requests и заголовок Retry-After.",
+   "ch": "http-rest",
+   "anchor": "rate-limit",
+   "aliases": "429, throttling, лимит запросов"
+  },
+  "sql": {
+   "en": "SQL",
+   "ru": "Язык структурированных запросов",
+   "def": "Язык запросов к реляционным базам данных: выборка (SELECT), изменение (INSERT, UPDATE, DELETE) и описание структуры (CREATE, ALTER).",
+   "ch": "sql",
+   "anchor": "why",
+   "aliases": "PostgreSQL, запрос, SELECT"
+  },
+  "primary-key": {
+   "en": "Primary Key",
+   "ru": "Первичный ключ",
+   "def": "Столбец или набор столбцов, однозначно идентифицирующий строку таблицы: уникален и не может быть NULL.",
+   "ch": "sql",
+   "anchor": "why",
+   "aliases": "PK"
+  },
+  "foreign-key": {
+   "en": "Foreign Key",
+   "ru": "Внешний ключ",
+   "def": "Столбец, ссылающийся на первичный ключ другой таблицы. База не даёт сослаться на несуществующую строку или удалить строку, на которую есть ссылки.",
+   "ch": "sql",
+   "anchor": "why",
+   "aliases": "FK, REFERENCES"
+  },
+  "join": {
+   "en": "JOIN",
+   "ru": "Соединение таблиц",
+   "def": "Объединение строк нескольких таблиц по условию. INNER JOIN оставляет совпадения, LEFT JOIN — все строки левой таблицы.",
+   "ch": "sql",
+   "anchor": "join",
+   "aliases": "INNER JOIN, LEFT JOIN"
+  },
+  "null-sql": {
+   "en": "NULL",
+   "ru": "Отсутствующее значение",
+   "def": "Маркер неизвестного или отсутствующего значения в SQL. Сравнение с NULL даёт NULL; проверять нужно через IS NULL.",
+   "ch": "sql",
+   "anchor": "null",
+   "aliases": "IS NULL, COALESCE"
+  },
+  "group-by": {
+   "en": "GROUP BY",
+   "ru": "Группировка",
+   "def": "Объединение строк в группы для подсчёта агрегатов (COUNT, SUM, AVG, MIN, MAX). HAVING фильтрует группы после агрегации.",
+   "ch": "sql",
+   "anchor": "group-by",
+   "aliases": "HAVING, агрегатная функция"
+  },
+  "subquery": {
+   "en": "Subquery",
+   "ru": "Подзапрос",
+   "def": "Запрос внутри другого запроса: скалярный, со списком (IN), проверка существования (EXISTS). CTE (WITH) — именованный подзапрос.",
+   "ch": "sql",
+   "anchor": "subquery",
+   "aliases": "EXISTS, CTE, WITH"
+  },
+  "constraint": {
+   "en": "Constraint",
+   "ru": "Ограничение целостности",
+   "def": "Правило, которое база проверяет при каждом изменении: PRIMARY KEY, UNIQUE, NOT NULL, FOREIGN KEY, CHECK.",
+   "ch": "sql",
+   "anchor": "constraints",
+   "aliases": "UNIQUE, CHECK, NOT NULL"
+  },
+  "transaction": {
+   "en": "Transaction",
+   "ru": "Транзакция",
+   "def": "Группа операций, которая выполняется целиком или не выполняется совсем: BEGIN … COMMIT или ROLLBACK.",
+   "ch": "sql",
+   "anchor": "transactions",
+   "aliases": "BEGIN, COMMIT, ROLLBACK"
+  },
+  "acid": {
+   "en": "ACID",
+   "ru": "Свойства транзакций ACID",
+   "def": "Atomicity, Consistency, Isolation, Durability — гарантии транзакций: всё или ничего, соблюдение ограничений, изоляция параллельных транзакций, сохранность после фиксации.",
+   "ch": "sql",
+   "anchor": "transactions",
+   "aliases": ""
+  },
+  "sql-injection": {
+   "en": "SQL Injection",
+   "ru": "SQL-инъекция",
+   "def": "Уязвимость, при которой данные пользователя попадают в текст SQL-запроса и меняют его смысл. Защита — параметризованные запросы.",
+   "ch": "sql",
+   "anchor": "in-tests",
+   "aliases": "параметризованный запрос, $1"
+  },
+  "git": {
+   "en": "Git",
+   "ru": "Система контроля версий Git",
+   "def": "Распределённая система контроля версий: хранит историю изменений как граф коммитов и позволяет вести параллельную работу в ветках.",
+   "ch": "git-linux",
+   "anchor": "basics",
+   "aliases": ""
+  },
+  "commit": {
+   "en": "Commit",
+   "ru": "Коммит",
+   "def": "Снимок состояния проекта с автором, датой, сообщением и ссылкой на родительский коммит.",
+   "ch": "git-linux",
+   "anchor": "basics",
+   "aliases": ""
+  },
+  "branch": {
+   "en": "Branch",
+   "ru": "Ветка",
+   "def": "Подвижный указатель на последний коммит линии разработки. Каждая задача ведётся в своей ветке.",
+   "ch": "git-linux",
+   "anchor": "basics",
+   "aliases": ""
+  },
+  "merge-request": {
+   "en": "Merge Request",
+   "ru": "Запрос на слияние",
+   "def": "Предложение влить изменения ветки в основную с обсуждением, ревью и проверкой CI. В GitHub называется Pull Request.",
+   "ch": "git-linux",
+   "anchor": "workflow",
+   "aliases": "MR, Pull Request, PR, code review"
+  },
+  "rebase": {
+   "en": "Rebase",
+   "ru": "Перебазирование",
+   "def": "Перенос коммитов ветки поверх другого коммита (обычно свежего main) с созданием новых коммитов; даёт линейную историю.",
+   "ch": "git-linux",
+   "anchor": "merge-rebase",
+   "aliases": "merge, squash"
+  },
+  "merge-conflict": {
+   "en": "Merge Conflict",
+   "ru": "Конфликт слияния",
+   "def": "Ситуация, когда обе стороны изменили одни и те же строки и Git не может совместить изменения автоматически.",
+   "ch": "git-linux",
+   "anchor": "conflicts",
+   "aliases": "конфликт"
+  },
+  "gitignore": {
+   "en": ".gitignore",
+   "ru": "Список игнорируемых файлов",
+   "def": "Файл с шаблонами путей, которые Git не отслеживает: зависимости, отчёты, артефакты, секреты.",
+   "ch": "git-linux",
+   "anchor": "gitignore",
+   "aliases": ""
+  },
+  "linux-shell": {
+   "en": "Linux Shell",
+   "ru": "Командная оболочка Linux",
+   "def": "Интерфейс командной строки (bash, sh, zsh) для работы с файлами, процессами, сетью и запуском программ.",
+   "ch": "git-linux",
+   "anchor": "linux",
+   "aliases": "bash, терминал, консоль, grep, tail, curl"
+  },
+  "environment-variable": {
+   "en": "Environment Variable",
+   "ru": "Переменная окружения",
+   "def": "Именованное значение, доступное процессу и его дочерним процессам. Основной способ передать конфигурацию и секреты в тесты и CI.",
+   "ch": "git-linux",
+   "anchor": "linux",
+   "aliases": "env, process.env, export"
+  },
+  "playwright": {
+   "en": "Playwright",
+   "ru": "Playwright (инструмент)",
+   "def": "Инструмент автоматизации браузеров Chromium, Firefox и WebKit с API для JS/TS, Python, Java и .NET.",
+   "ch": "pw-arch",
+   "anchor": "what",
+   "aliases": ""
+  },
+  "playwright-test": {
+   "en": "Playwright Test",
+   "ru": "Тестовый раннер Playwright",
+   "def": "Раннер <code>@playwright/test</code>: параллельный запуск в воркерах, фикстуры, web-first assertions, ретраи, проекты, отчёты и trace.",
+   "ch": "pw-arch",
+   "anchor": "what",
+   "aliases": "@playwright/test, раннер"
+  },
+  "browser-context": {
+   "en": "BrowserContext",
+   "ru": "Контекст браузера",
+   "def": "Изолированная сессия внутри браузера со своими cookies, хранилищем, кэшем и разрешениями. Каждый тест получает новый контекст.",
+   "ch": "pw-arch",
+   "anchor": "hierarchy",
+   "aliases": "context, контекст"
+  },
+  "page-object-pw": {
+   "en": "Page",
+   "ru": "Страница (вкладка)",
+   "def": "Вкладка браузера в контексте. Через неё выполняются навигация, действия и поиск элементов.",
+   "ch": "pw-arch",
+   "anchor": "hierarchy",
+   "aliases": ""
+  },
+  "worker": {
+   "en": "Worker",
+   "ru": "Воркер (рабочий процесс)",
+   "def": "Отдельный процесс ОС, в котором Playwright Test выполняет тесты. Браузер переиспользуется тестами одного воркера; после падения теста воркер перезапускается.",
+   "ch": "parallel",
+   "anchor": "workers",
+   "aliases": "workers, воркеры, workerIndex"
+  },
+  "playwright-config": {
+   "en": "playwright.config.ts",
+   "ru": "Конфигурация Playwright",
+   "def": "Файл настроек раннера: каталог тестов, таймауты, ретраи, воркеры, репортеры, опции браузера (use), проекты и webServer.",
+   "ch": "pw-arch",
+   "anchor": "config",
+   "aliases": "defineConfig, use, baseURL, projects"
+  },
+  "headless": {
+   "en": "Headless Mode",
+   "ru": "Режим без окна",
+   "def": "Запуск браузера без графического окна: быстрее и подходит для CI. Противоположность — headed.",
+   "ch": "pw-arch",
+   "anchor": "cli",
+   "aliases": "headless, headed"
+  },
+  "cdp": {
+   "en": "Chrome DevTools Protocol",
+   "ru": "Протокол инструментов разработчика Chrome",
+   "def": "Протокол управления Chromium по постоянному соединению; через него Playwright управляет Chromium-браузерами.",
+   "ch": "pw-arch",
+   "anchor": "protocol",
+   "aliases": "CDP"
+  },
+  "locator": {
+   "en": "Locator",
+   "ru": "Локатор",
+   "def": "Ленивое описание того, как найти элемент на странице. В Playwright поиск выполняется заново при каждом действии и проверке.",
+   "ch": "locators",
+   "anchor": "what",
+   "aliases": "getByRole, селектор"
+  },
+  "accessible-name": {
+   "en": "Accessible Name",
+   "ru": "Доступное имя",
+   "def": "Имя элемента для вспомогательных технологий: из aria-labelledby, aria-label, связанного label, текста или alt. По нему ищет <code>getByRole(..., { name })</code>.",
+   "ch": "locators",
+   "anchor": "role",
+   "aliases": ""
+  },
+  "aria-role": {
+   "en": "ARIA Role",
+   "ru": "ARIA-роль",
+   "def": "Назначение элемента для вспомогательных технологий: button, link, textbox, checkbox, heading и др. Бывает явной (атрибут role) и неявной (из тега).",
+   "ch": "locators",
+   "anchor": "role",
+   "aliases": "role, роль, accessibility"
+  },
+  "test-id": {
+   "en": "Test ID",
+   "ru": "Тестовый идентификатор",
+   "def": "Атрибут разметки для тестов (по умолчанию data-testid). Устойчив к изменениям текста и вёрстки; ищется через <code>getByTestId</code>.",
+   "ch": "locators",
+   "anchor": "testid",
+   "aliases": "data-testid, getByTestId, testIdAttribute"
+  },
+  "css-selector": {
+   "en": "CSS Selector",
+   "ru": "CSS-селектор",
+   "def": "Выражение выбора элементов по тегам, классам, id, атрибутам и структуре DOM. Проходит через открытый Shadow DOM.",
+   "ch": "locators",
+   "anchor": "css-xpath",
+   "aliases": ""
+  },
+  "xpath": {
+   "en": "XPath",
+   "ru": "Язык путей XPath",
+   "def": "Язык выбора узлов XML/HTML по пути и условиям. Мощный, но привязан к структуре и не проходит через Shadow DOM.",
+   "ch": "locators",
+   "anchor": "css-xpath",
+   "aliases": ""
+  },
+  "strict-mode": {
+   "en": "Strict Mode",
+   "ru": "Строгий режим локаторов",
+   "def": "Правило Playwright: действие с локатором, нашедшим больше одного элемента, завершается ошибкой strict mode violation.",
+   "ch": "locators",
+   "anchor": "strict",
+   "aliases": "strict mode violation"
+  },
+  "shadow-dom": {
+   "en": "Shadow DOM",
+   "ru": "Теневой DOM",
+   "def": "Инкапсулированное поддерево веб-компонента. Локаторы Playwright проходят через открытый Shadow DOM, XPath — нет.",
+   "ch": "locators",
+   "anchor": "frames-shadow",
+   "aliases": "iframe, frameLocator"
+  },
+  "assertion": {
+   "en": "Assertion",
+   "ru": "Проверка (утверждение)",
+   "def": "Сравнение фактического результата с ожидаемым; при несовпадении тест падает. В Playwright — через <code>expect</code>.",
+   "ch": "assertions",
+   "anchor": "assertion",
+   "aliases": "expect, проверка"
+  },
+  "web-first-assertion": {
+   "en": "Web-first Assertion",
+   "ru": "Асинхронная проверка с ожиданием",
+   "def": "Проверка локатора или страницы, которая повторяет поиск и сравнение, пока условие не выполнится или не истечёт таймаут: toBeVisible, toHaveText, toHaveURL.",
+   "ch": "assertions",
+   "anchor": "web-first",
+   "aliases": "toHaveText, toBeVisible, auto-retrying assertion"
+  },
+  "auto-waiting": {
+   "en": "Auto-waiting",
+   "ru": "Автоматическое ожидание",
+   "def": "Встроенное ожидание Playwright: перед действием элемент проверяется на готовность (actionability), web-first проверки повторяются до таймаута.",
+   "ch": "assertions",
+   "anchor": "auto-waiting",
+   "aliases": ""
+  },
+  "actionability": {
+   "en": "Actionability Checks",
+   "ru": "Проверки готовности к действию",
+   "def": "Условия, которые Playwright проверяет перед действием: элемент видим, стабилен, получает события, доступен и (для ввода) редактируем.",
+   "ch": "assertions",
+   "anchor": "auto-waiting",
+   "aliases": "actionability, force"
+  },
+  "explicit-wait": {
+   "en": "Explicit Wait",
+   "ru": "Явное ожидание",
+   "def": "Ожидание конкретного события или условия, заданного тестом: ответа сервера, URL, скачивания, значения через expect.poll.",
+   "ch": "assertions",
+   "anchor": "explicit-wait",
+   "aliases": "waitForResponse, waitForURL, expect.poll, toPass, waitForTimeout"
+  },
+  "timeout": {
+   "en": "Timeout",
+   "ru": "Тайм-аут",
+   "def": "Предел времени ожидания. В Playwright: тест — 30 с, expect — 5 с, действие и навигация — без отдельного лимита по умолчанию.",
+   "ch": "assertions",
+   "anchor": "timeouts",
+   "aliases": "test.setTimeout, test.slow, actionTimeout"
+  },
+  "soft-assertion": {
+   "en": "Soft Assertion",
+   "ru": "Мягкая проверка",
+   "def": "Проверка (<code>expect.soft</code>), которая не прерывает тест при неудаче: ошибки собираются, и тест помечается упавшим в конце.",
+   "ch": "assertions",
+   "anchor": "soft",
+   "aliases": ""
+  },
+  "test-retry": {
+   "en": "Test Retry",
+   "ru": "Повтор теста",
+   "def": "Повторный запуск упавшего теста (<code>retries</code>). Прошедший со второй попытки тест получает статус flaky.",
+   "ch": "assertions",
+   "anchor": "retries",
+   "aliases": "retries, ретрай, повторы"
+  },
+  "flaky-test": {
+   "en": "Flaky Test",
+   "ru": "Нестабильный тест",
+   "def": "Тест, который при одинаковом коде и окружении то проходит, то падает. Подрывает доверие к автоматизации.",
+   "ch": "flaky",
+   "anchor": "what",
+   "aliases": "флаки, нестабильный тест, flaky"
+  },
+  "fixture": {
+   "en": "Fixture",
+   "ru": "Фикстура",
+   "def": "Именованный ресурс, который тест запрашивает в параметрах: фикстура готовит значение, передаёт его через use() и убирает за собой после теста.",
+   "ch": "fixtures",
+   "anchor": "fixtures",
+   "aliases": "test.extend, use, фикстуры"
+  },
+  "hook": {
+   "en": "Hook",
+   "ru": "Хук",
+   "def": "Функция, выполняемая до или после тестов блока: beforeEach, afterEach, beforeAll, afterAll.",
+   "ch": "fixtures",
+   "anchor": "hooks",
+   "aliases": "beforeEach, afterEach, beforeAll, afterAll"
+  },
+  "setup-teardown": {
+   "en": "Setup / Teardown",
+   "ru": "Подготовка / Очистка",
+   "def": "Действия до теста (создать данные, открыть страницу) и после него (удалить данные, закрыть ресурсы). Teardown должен выполняться и при падении теста.",
+   "ch": "fixtures",
+   "anchor": "why",
+   "aliases": ""
+  },
+  "fixture-scope": {
+   "en": "Fixture Scope",
+   "ru": "Область жизни фикстуры",
+   "def": "Как долго живёт значение фикстуры: test — новое для каждого теста, worker — одно на процесс-воркер.",
+   "ch": "fixtures",
+   "anchor": "scope",
+   "aliases": ""
+  },
+  "test-isolation": {
+   "en": "Test Isolation",
+   "ru": "Изоляция тестов",
+   "def": "Независимость тестов: каждый можно запустить отдельно, в любом порядке, параллельно и повторно с тем же результатом.",
+   "ch": "isolation",
+   "anchor": "principles",
+   "aliases": "независимость тестов, изоляция"
+  },
+  "auto-fixture": {
+   "en": "Auto Fixture",
+   "ru": "Автоматическая фикстура",
+   "def": "Фикстура с опцией auto: true, которая выполняется для каждого теста без явного запроса — например, для сбора логов.",
+   "ch": "fixtures",
+   "anchor": "scope",
+   "aliases": ""
+  },
+  "page-object-model": {
+   "en": "Page Object Model",
+   "ru": "Модель объектов страниц",
+   "def": "Паттерн: каждая страница описывается классом с локаторами и действиями пользователя; тесты используют эти методы и не знают о вёрстке.",
+   "ch": "pom",
+   "anchor": "why",
+   "aliases": "POM, Page Object, PageObject"
+  },
+  "page-component": {
+   "en": "Page Component",
+   "ru": "Компонент страницы",
+   "def": "Класс для повторяющейся части интерфейса (шапка, карточка товара, модальное окно), который получает корневой локатор и используется разными страницами.",
+   "ch": "pom",
+   "anchor": "components",
+   "aliases": ""
+  },
+  "separation-of-concerns": {
+   "en": "Separation of Concerns",
+   "ru": "Разделение ответственности",
+   "def": "Принцип: разные задачи — в разных слоях. В тестах: сценарии, фикстуры, страницы, компоненты, API-клиенты и данные меняются независимо.",
+   "ch": "pom",
+   "anchor": "responsibility",
+   "aliases": ""
+  },
+  "storage-state": {
+   "en": "Storage State",
+   "ru": "Сохранённое состояние браузера",
+   "def": "Снимок cookies и localStorage контекста в JSON-файле. Позволяет войти один раз и стартовать тесты уже авторизованными.",
+   "ch": "pw-advanced",
+   "anchor": "auth",
+   "aliases": "storageState, авторизация, setup project"
+  },
+  "network-interception": {
+   "en": "Network Interception",
+   "ru": "Перехват сетевых запросов",
+   "def": "Перехват запросов страницы (<code>page.route</code>) с возможностью подменить ответ, оборвать запрос, изменить его или модифицировать реальный ответ.",
+   "ch": "pw-advanced",
+   "anchor": "network",
+   "aliases": "page.route, route.fulfill, route.abort, HAR"
+  },
+  "project-pw": {
+   "en": "Project",
+   "ru": "Проект Playwright",
+   "def": "Именованная конфигурация запуска набора тестов: браузер, устройство, окружение, роль; проекты могут зависеть друг от друга (setup, teardown).",
+   "ch": "pw-advanced",
+   "anchor": "projects",
+   "aliases": "projects, dependencies"
+  },
+  "visual-testing": {
+   "en": "Visual Testing",
+   "ru": "Визуальное тестирование",
+   "def": "Сравнение скриншота страницы или элемента с эталонным снимком (<code>toHaveScreenshot</code>) с допуском и маскированием изменчивых областей.",
+   "ch": "pw-advanced",
+   "anchor": "screenshots",
+   "aliases": "toHaveScreenshot, скриншот, snapshot"
+  },
+  "clock-api": {
+   "en": "Clock API",
+   "ru": "Управление временем",
+   "def": "API <code>page.clock</code>: подмена Date и таймеров в браузере, перемотка времени для тестов, зависящих от даты и таймаутов.",
+   "ch": "pw-advanced",
+   "anchor": "clock",
+   "aliases": "page.clock, fake timers"
+  },
+  "endpoint": {
+   "en": "Endpoint",
+   "ru": "Конечная точка API",
+   "def": "Комбинация метода и пути, по которой API выполняет операцию: <code>POST /api/orders</code>, <code>GET /api/orders/{id}</code>.",
+   "ch": "api-basics",
+   "anchor": "why",
+   "aliases": "эндпоинт, ручка"
+  },
+  "api-authentication": {
+   "en": "API Authentication",
+   "ru": "Аутентификация в API",
+   "def": "Способ подтвердить, кто обращается к API: API key, Basic, Bearer-токен, OAuth 2.0, cookie сессии.",
+   "ch": "api-basics",
+   "anchor": "auth",
+   "aliases": "Bearer, Basic auth"
+  },
+  "api-key": {
+   "en": "API Key",
+   "ru": "Ключ API",
+   "def": "Секретная строка, идентифицирующая клиента API; передаётся в заголовке (например, X-API-Key).",
+   "ch": "api-basics",
+   "anchor": "auth",
+   "aliases": ""
+  },
+  "oauth2": {
+   "en": "OAuth 2.0",
+   "ru": "Протокол авторизации OAuth 2.0",
+   "def": "Стандарт выдачи токенов доступа. В межсервисном взаимодействии — client credentials: клиент обменивает свой id и секрет на access token.",
+   "ch": "api-basics",
+   "anchor": "auth",
+   "aliases": "OAuth, access token, client credentials"
+  },
+  "response-validation": {
+   "en": "Response Validation",
+   "ru": "Проверка ответа",
+   "def": "Послойная проверка ответа API: статус, заголовки, структура (схема), значения и побочные эффекты.",
+   "ch": "api-basics",
+   "anchor": "validation",
+   "aliases": ""
+  },
+  "error-handling-api": {
+   "en": "Error Handling",
+   "ru": "Обработка ошибок",
+   "def": "Поведение API при ошибках: правильный код 4xx/5xx, единый формат тела с кодом и полем, отсутствие утечек внутренней информации.",
+   "ch": "api-basics",
+   "anchor": "errors",
+   "aliases": ""
+  },
+  "postman": {
+   "en": "Postman",
+   "ru": "Postman (инструмент)",
+   "def": "Инструмент для работы с API: коллекции, окружения, скрипты и проверки; коллекции запускаются из CLI через Newman.",
+   "ch": "api-basics",
+   "anchor": "postman",
+   "aliases": "Newman, коллекция"
+  },
+  "api-request-context": {
+   "en": "APIRequestContext",
+   "ru": "HTTP-контекст Playwright",
+   "def": "HTTP-клиент Playwright (фикстура request, page.request, request.newContext): отправка запросов с baseURL, заголовками и cookies без браузера.",
+   "ch": "api-auto",
+   "anchor": "request",
+   "aliases": "request fixture, APIResponse, toBeOK"
+  },
+  "api-client": {
+   "en": "API Client",
+   "ru": "Клиент API",
+   "def": "Класс с типизированными методами для эндпоинтов одного ресурса; скрывает пути, формат тела и разбор ответов.",
+   "ch": "api-auto",
+   "anchor": "clients",
+   "aliases": ""
+  },
+  "api-fixture": {
+   "en": "API Fixture",
+   "ru": "API-фикстура",
+   "def": "Фикстура, которая даёт тесту авторизованный клиент или созданную через API сущность и удаляет её после теста.",
+   "ch": "api-auto",
+   "anchor": "fixtures",
+   "aliases": ""
+  },
+  "test-data-cleanup": {
+   "en": "Test Data Cleanup",
+   "ru": "Очистка тестовых данных",
+   "def": "Удаление данных, созданных тестом. Надёжнее всего — в teardown фикстуры, который выполняется и при падении.",
+   "ch": "api-auto",
+   "anchor": "fixtures",
+   "aliases": "cleanup, teardown, удаление данных"
+  },
+  "json-schema": {
+   "en": "JSON Schema",
+   "ru": "Схема JSON",
+   "def": "Стандарт описания структуры JSON: типы, обязательные поля, допустимые значения, форматы, вложенные объекты и массивы.",
+   "ch": "contracts",
+   "anchor": "json-schema",
+   "aliases": "schema, required, additionalProperties"
+  },
+  "schema-validation": {
+   "en": "Schema Validation",
+   "ru": "Проверка по схеме",
+   "def": "Проверка, что данные (обычно ответ API) соответствуют JSON Schema; в TypeScript чаще всего выполняется библиотекой Ajv.",
+   "ch": "contracts",
+   "anchor": "validation",
+   "aliases": "Ajv, валидация схемы"
+  },
+  "openapi": {
+   "en": "OpenAPI",
+   "ru": "Спецификация OpenAPI",
+   "def": "Машиночитаемое описание HTTP API: пути, методы, параметры, тела запросов, ответы по кодам и схемы данных. Ранее называлась Swagger.",
+   "ch": "contracts",
+   "anchor": "openapi",
+   "aliases": "Swagger, спецификация API"
+  },
+  "consumer-driven-contracts": {
+   "en": "Consumer-driven Contracts",
+   "ru": "Контракты, управляемые потребителем",
+   "def": "Подход, при котором потребитель фиксирует свои ожидания от API в контракте, а поставщик проверяет, что их выполняет.",
+   "ch": "contracts",
+   "anchor": "cdc",
+   "aliases": "CDC, consumer, provider"
+  },
+  "pact": {
+   "en": "Pact",
+   "ru": "Pact (инструмент)",
+   "def": "Инструмент consumer-driven contract testing: тесты потребителя создают pact-файл, брокер хранит контракты, провайдер их проверяет, can-i-deploy разрешает деплой.",
+   "ch": "contracts",
+   "anchor": "cdc",
+   "aliases": "Pact Broker, can-i-deploy"
+  },
+  "backward-compatibility": {
+   "en": "Backward Compatibility",
+   "ru": "Обратная совместимость",
+   "def": "Свойство новой версии API работать со старыми клиентами. Удаление и переименование полей, смена типов ломают совместимость.",
+   "ch": "contracts",
+   "anchor": "compatibility",
+   "aliases": "breaking change, версионирование API"
+  },
+  "test-double": {
+   "en": "Test Double",
+   "ru": "Тестовый дублёр",
+   "def": "Общее название подмен реальной зависимости в тесте: dummy, stub, spy, mock, fake.",
+   "ch": "mocking",
+   "anchor": "test-doubles",
+   "aliases": "дублёр, подмена"
+  },
+  "stub": {
+   "en": "Stub",
+   "ru": "Заглушка",
+   "def": "Test double, который возвращает заранее заданные ответы, чтобы код мог выполниться в нужном сценарии.",
+   "ch": "mocking",
+   "anchor": "test-doubles",
+   "aliases": "стаб, stubbing"
+  },
+  "mock-object": {
+   "en": "Mock Object",
+   "ru": "Мок-объект",
+   "def": "Test double, который заранее знает ожидаемые вызовы (сколько раз, с какими аргументами) и проверяет их.",
+   "ch": "mocking",
+   "anchor": "test-doubles",
+   "aliases": ""
+  },
+  "spy": {
+   "en": "Spy",
+   "ru": "Шпион",
+   "def": "Test double, который записывает вызовы зависимости для последующей проверки в тесте.",
+   "ch": "mocking",
+   "anchor": "test-doubles",
+   "aliases": ""
+  },
+  "fake": {
+   "en": "Fake",
+   "ru": "Упрощённая реализация",
+   "def": "Test double с работающей, но упрощённой логикой: in-memory база, локальный SMTP, фейковый платёжный шлюз.",
+   "ch": "mocking",
+   "anchor": "test-doubles",
+   "aliases": ""
+  },
+  "mocking": {
+   "en": "Mocking",
+   "ru": "Подмена зависимостей",
+   "def": "Замена реальной зависимости (сервиса, ответа сети, модуля) управляемой подменой ради скорости, стабильности и проверки редких сценариев.",
+   "ch": "mocking",
+   "anchor": "why",
+   "aliases": "моки, mock, замокать"
+  },
+  "service-virtualization": {
+   "en": "Service Virtualization",
+   "ru": "Виртуализация сервисов",
+   "def": "Мок-сервер, имитирующий внешний сервис по сети (WireMock, MSW, Mockoon, Prism), чтобы тестировать систему без реальных соседей.",
+   "ch": "mocking",
+   "anchor": "levels",
+   "aliases": "мок-сервер, WireMock, MSW"
+  },
+  "test-data-management": {
+   "en": "Test Data Management",
+   "ru": "Управление тестовыми данными",
+   "def": "Подходы к созданию, хранению, изоляции и удалению тестовых данных: создание в тесте, сиды, генерация, обезличенные копии, снимки.",
+   "ch": "mocking",
+   "anchor": "tdm",
+   "aliases": "TDM, тестовые данные, seed, Faker"
+  },
+  "determinism": {
+   "en": "Determinism",
+   "ru": "Детерминированность",
+   "def": "Свойство теста давать одинаковый результат при одинаковом коде и данных: контролируемые время, случайность, внешние сервисы и данные.",
+   "ch": "mocking",
+   "anchor": "determinism",
+   "aliases": ""
+  },
+  "test-framework": {
+   "en": "Test Framework",
+   "ru": "Тестовый фреймворк (проекта)",
+   "def": "Код проекта вокруг инструмента: конфигурация, фикстуры, клиенты API, page objects, фабрики данных, отчётность — общий язык предметной области для тестов.",
+   "ch": "project-arch",
+   "anchor": "what",
+   "aliases": "фреймворк автотестов"
+  },
+  "project-structure": {
+   "en": "Project Structure",
+   "ru": "Структура проекта",
+   "def": "Раскладка репозитория автотестов по слоям: tests, fixtures, api, pages, components, data, schemas, config, utils.",
+   "ch": "project-arch",
+   "anchor": "structure",
+   "aliases": ""
+  },
+  "config-management": {
+   "en": "Configuration Management",
+   "ru": "Управление конфигурацией",
+   "def": "Получение настроек окружения (адреса, учётные данные, флаги) из одного модуля с проверкой обязательных значений и типами.",
+   "ch": "project-arch",
+   "anchor": "config",
+   "aliases": "env.ts, конфигурация окружений"
+  },
+  "helper-utility": {
+   "en": "Helper / Utility",
+   "ru": "Хелпер / Утилита",
+   "def": "Helper — вспомогательная функция, знающая предметную область (создать оплаченный заказ); utility — общая функция без знания продукта (форматирование, генерация строк).",
+   "ch": "project-arch",
+   "anchor": "helpers",
+   "aliases": ""
+  },
+  "lint": {
+   "en": "Linter",
+   "ru": "Статический анализатор кода",
+   "def": "Инструмент (ESLint), находящий ошибки и нарушения правил без запуска: забытые await, test.only, waitForTimeout, неиспользуемый код.",
+   "ch": "project-arch",
+   "anchor": "quality",
+   "aliases": "ESLint, eslint-plugin-playwright, Prettier"
+  },
+  "test-environment": {
+   "en": "Test Environment",
+   "ru": "Тестовое окружение",
+   "def": "Развёрнутая система для выполнения тестов: локальная, эфемерная в CI, preview на MR, общий staging.",
+   "ch": "isolation",
+   "anchor": "environments",
+   "aliases": "стенд, staging, окружение"
+  },
+  "ephemeral-environment": {
+   "en": "Ephemeral Environment",
+   "ru": "Временное окружение",
+   "def": "Окружение, которое создаётся под конкретный прогон или Merge Request и удаляется после: чистые данные и полная изоляция между прогонами.",
+   "ch": "isolation",
+   "anchor": "environments",
+   "aliases": "preview environment, review app"
+  },
+  "secrets-management": {
+   "en": "Secrets Management",
+   "ru": "Управление секретами",
+   "def": "Хранение и передача паролей, токенов и ключей вне репозитория: защищённые переменные CI, Vault; маскирование в логах и регулярная ротация.",
+   "ch": "isolation",
+   "anchor": "config-secrets",
+   "aliases": "секреты, Vault, CI variables"
+  },
+  "dotenv": {
+   "en": "dotenv",
+   "ru": "Загрузка .env-файла",
+   "def": "Пакет, загружающий переменные из файла .env в process.env. По умолчанию не перезаписывает уже заданные переменные окружения.",
+   "ch": "isolation",
+   "anchor": "config-secrets",
+   "aliases": ".env, .env.example"
+  },
+  "parallel-execution": {
+   "en": "Parallel Execution",
+   "ru": "Параллельное выполнение",
+   "def": "Одновременный запуск тестов в нескольких воркерах на одной машине и/или в нескольких шардах на разных машинах.",
+   "ch": "parallel",
+   "anchor": "workers",
+   "aliases": "параллельный запуск, параллелизм"
+  },
+  "fully-parallel": {
+   "en": "fullyParallel",
+   "ru": "Полностью параллельный режим",
+   "def": "Опция Playwright, при которой между воркерами распределяются отдельные тесты, а не файлы.",
+   "ch": "parallel",
+   "anchor": "workers",
+   "aliases": "describe.configure, mode serial, mode parallel"
+  },
+  "sharding": {
+   "en": "Test Sharding",
+   "ru": "Шардирование тестов",
+   "def": "Разбиение набора на части (<code>--shard=2/4</code>), выполняемые на разных машинах; отчёты затем объединяются.",
+   "ch": "parallel",
+   "anchor": "sharding",
+   "aliases": "shard, шард"
+  },
+  "shared-state": {
+   "en": "Shared State",
+   "ru": "Общее состояние",
+   "def": "Данные или ресурсы, которые несколько тестов читают и изменяют одновременно: один аккаунт, глобальная настройка, файл, порт. Источник гонок при параллельном запуске.",
+   "ch": "parallel",
+   "anchor": "shared-state",
+   "aliases": ""
+  },
+  "merge-reports": {
+   "en": "Merge Reports",
+   "ru": "Объединение отчётов",
+   "def": "Сборка единого отчёта из blob-отчётов шардов командой <code>npx playwright merge-reports</code>.",
+   "ch": "parallel",
+   "anchor": "sharding",
+   "aliases": "blob reporter"
+  },
+  "reporter": {
+   "en": "Reporter",
+   "ru": "Репортер",
+   "def": "Компонент раннера, который превращает результаты прогона в отчёт: list, html, junit, json, blob, allure-playwright.",
+   "ch": "reporting",
+   "anchor": "reporters",
+   "aliases": "отчёт, HTML report, JUnit"
+  },
+  "allure-report": {
+   "en": "Allure Report",
+   "ru": "Отчёт Allure",
+   "def": "Инструмент отчётности: шаги, вложения, история и тренды прогонов, категории падений, метки feature/severity/owner.",
+   "ch": "reporting",
+   "anchor": "allure",
+   "aliases": "Allure, allure-playwright, Allure TestOps"
+  },
+  "test-step": {
+   "en": "Test Step",
+   "ru": "Шаг теста",
+   "def": "Именованная группа действий (<code>test.step</code>), которая отображается в отчёте и trace и показывает, на каком этапе произошло падение.",
+   "ch": "reporting",
+   "anchor": "steps",
+   "aliases": ""
+  },
+  "attachment": {
+   "en": "Attachment",
+   "ru": "Вложение",
+   "def": "Данные, приложенные к результату теста (<code>testInfo.attach</code>): JSON ответа, лог, скриншот, файл.",
+   "ch": "reporting",
+   "anchor": "steps",
+   "aliases": ""
+  },
+  "structured-logging": {
+   "en": "Structured Logging",
+   "ru": "Структурированное логирование",
+   "def": "Логи в машиночитаемом формате (JSON) с постоянными полями: время, уровень, тест, шаг, идентификаторы — без секретов.",
+   "ch": "reporting",
+   "anchor": "logging",
+   "aliases": ""
+  },
+  "test-artifacts": {
+   "en": "Test Artifacts",
+   "ru": "Артефакты тестов",
+   "def": "Файлы, сохраняемые при прогоне для диагностики и отчётности: скриншоты, видео, trace, вложения, отчёты.",
+   "ch": "reporting",
+   "anchor": "artifacts",
+   "aliases": "артефакты, screenshot, video"
+  },
+  "correlation-id": {
+   "en": "Correlation ID",
+   "ru": "Сквозной идентификатор запроса",
+   "def": "Идентификатор (X-Request-Id, traceparent), который передаётся через все сервисы и позволяет найти запрос в их логах.",
+   "ch": "reporting",
+   "anchor": "logging",
+   "aliases": "X-Request-Id, trace id, traceparent"
+  },
+  "failure-triage": {
+   "en": "Failure Triage",
+   "ru": "Разбор падений",
+   "def": "Классификация упавших тестов: дефект продукта, ошибка теста, нестабильность, проблема окружения или данных — с соответствующим действием.",
+   "ch": "reporting",
+   "anchor": "triage",
+   "aliases": "triage, анализ падений"
+  },
+  "docker-image": {
+   "en": "Docker Image",
+   "ru": "Образ Docker",
+   "def": "Неизменяемый шаблон из слоёв файловой системы с программой, зависимостями и настройками запуска; из него создаются контейнеры.",
+   "ch": "docker",
+   "anchor": "images",
+   "aliases": "образ, image, слой"
+  },
+  "container": {
+   "en": "Container",
+   "ru": "Контейнер",
+   "def": "Запущенный из образа изолированный процесс со своей файловой системой, сетью и переменными окружения; использует ядро хоста.",
+   "ch": "docker",
+   "anchor": "images",
+   "aliases": "контейнер, docker run"
+  },
+  "dockerfile": {
+   "en": "Dockerfile",
+   "ru": "Инструкция сборки образа",
+   "def": "Файл с инструкциями FROM, WORKDIR, COPY, RUN, ENV, CMD, по которым собирается образ; каждая инструкция — кэшируемый слой.",
+   "ch": "docker",
+   "anchor": "dockerfile",
+   "aliases": ".dockerignore, docker build"
+  },
+  "docker-compose": {
+   "en": "Docker Compose",
+   "ru": "Оркестрация контейнеров Compose",
+   "def": "Инструмент описания и запуска многоконтейнерного окружения в одном YAML-файле: сервисы, сети, тома, зависимости и проверки готовности.",
+   "ch": "docker",
+   "anchor": "compose",
+   "aliases": "compose, docker-compose.yml, depends_on"
+  },
+  "volume": {
+   "en": "Volume",
+   "ru": "Том",
+   "def": "Хранилище данных вне файловой системы контейнера: bind mount каталога хоста или именованный том Docker.",
+   "ch": "docker",
+   "anchor": "volumes",
+   "aliases": "bind mount, том"
+  },
+  "docker-network": {
+   "en": "Docker Network",
+   "ru": "Сеть Docker",
+   "def": "Виртуальная сеть контейнеров; в сети Compose сервисы доступны друг другу по именам сервисов.",
+   "ch": "docker",
+   "anchor": "networks",
+   "aliases": "host.docker.internal, сеть"
+  },
+  "healthcheck": {
+   "en": "Healthcheck",
+   "ru": "Проверка готовности",
+   "def": "Команда, по которой Docker определяет, готов ли сервис принимать запросы; используется в depends_on с condition: service_healthy.",
+   "ch": "docker",
+   "anchor": "compose",
+   "aliases": "health check, readiness, pg_isready"
+  },
+  "docker-registry": {
+   "en": "Container Registry",
+   "ru": "Реестр образов",
+   "def": "Хранилище образов Docker: Docker Hub, GitLab Container Registry, mcr.microsoft.com. Образ адресуется именем и тегом.",
+   "ch": "docker",
+   "anchor": "images",
+   "aliases": "registry, Docker Hub, тег образа"
+  },
+  "continuous-integration": {
+   "en": "Continuous Integration",
+   "ru": "Непрерывная интеграция",
+   "def": "Практика частого слияния изменений в общую ветку с автоматической сборкой и тестами на каждое изменение.",
+   "ch": "cicd",
+   "anchor": "ci-cd",
+   "aliases": "CI, CI/CD"
+  },
+  "continuous-delivery": {
+   "en": "Continuous Delivery",
+   "ru": "Непрерывная поставка",
+   "def": "Каждое изменение, прошедшее pipeline, готово к выпуску; релиз в продакшен выполняется по решению человека.",
+   "ch": "cicd",
+   "anchor": "ci-cd",
+   "aliases": ""
+  },
+  "continuous-deployment": {
+   "en": "Continuous Deployment",
+   "ru": "Непрерывное развёртывание",
+   "def": "Каждое изменение, прошедшее pipeline, автоматически выпускается в продакшен без ручного шага.",
+   "ch": "cicd",
+   "anchor": "ci-cd",
+   "aliases": ""
+  },
+  "pipeline": {
+   "en": "Pipeline",
+   "ru": "Конвейер CI/CD",
+   "def": "Набор задач, сгруппированных в стадии или граф зависимостей, который выполняется автоматически при изменениях, по расписанию или вручную.",
+   "ch": "cicd",
+   "anchor": "pipeline",
+   "aliases": "пайплайн, конвейер, stages"
+  },
+  "ci-job": {
+   "en": "CI Job",
+   "ru": "Задача CI",
+   "def": "Отдельный шаг pipeline (lint, тесты, сборка, деплой), выполняемый на runner, обычно в Docker-образе, с артефактами и кэшем.",
+   "ch": "cicd",
+   "anchor": "pipeline",
+   "aliases": "job, задача, needs, rules"
+  },
+  "ci-runner": {
+   "en": "CI Runner",
+   "ru": "Исполнитель задач CI",
+   "def": "Машина или контейнер, на которых выполняются задачи pipeline (GitLab Runner, GitHub-hosted runner).",
+   "ch": "cicd",
+   "anchor": "pipeline",
+   "aliases": "runner, агент, executor"
+  },
+  "quality-gate": {
+   "en": "Quality Gate",
+   "ru": "Ворота качества",
+   "def": "Автоматическое обязательное условие пропуска изменения дальше: зелёные тесты, ноль ошибок линтера, порог нестабильности или покрытия.",
+   "ch": "cicd",
+   "anchor": "quality-gates",
+   "aliases": "required checks, protected branch"
+  },
+  "gitlab-ci": {
+   "en": "GitLab CI",
+   "ru": "GitLab CI/CD",
+   "def": "Встроенная система CI/CD GitLab; pipeline описывается в <code>.gitlab-ci.yml</code>: stages, jobs, rules, artifacts, parallel.",
+   "ch": "cicd",
+   "anchor": "gitlab",
+   "aliases": ".gitlab-ci.yml"
+  },
+  "github-actions": {
+   "en": "GitHub Actions",
+   "ru": "GitHub Actions",
+   "def": "Система автоматизации GitHub: workflows в <code>.github/workflows</code>, jobs, steps, matrix, secrets и артефакты.",
+   "ch": "cicd",
+   "anchor": "github",
+   "aliases": "workflow, matrix"
+  },
+  "test-execution-time": {
+   "en": "Test Execution Time",
+   "ru": "Время выполнения тестов",
+   "def": "Длительность прогона набора. Для шарда ограничена снизу самым долгим тестом; для pipeline включает очередь, подготовку и сбор отчёта.",
+   "ch": "optimization",
+   "anchor": "time",
+   "aliases": ""
+  },
+  "test-prioritization": {
+   "en": "Test Prioritization",
+   "ru": "Приоритизация тестов",
+   "def": "Выбор, какие тесты запускать раньше и какие — на каком событии: smoke первым, наборы по тегам и рискам, изменённые тесты, быстрый провал.",
+   "ch": "optimization",
+   "anchor": "prioritization",
+   "aliases": "only-changed, last-failed, max-failures, test impact analysis"
+  },
+  "feedback-loop": {
+   "en": "Feedback Loop",
+   "ru": "Цикл обратной связи",
+   "def": "Время от изменения кода до результата проверок, на который можно опереться. Чем короче, тем дешевле исправление.",
+   "ch": "optimization",
+   "anchor": "time",
+   "aliases": "время обратной связи"
+  },
+  "pipeline-optimization": {
+   "en": "Pipeline Optimization",
+   "ru": "Оптимизация pipeline",
+   "def": "Сокращение времени CI: кэш и готовые образы, граф needs, параллельные задачи, запуск по изменениям, отмена устаревших pipeline.",
+   "ch": "optimization",
+   "anchor": "pipeline",
+   "aliases": ""
+  },
+  "order-dependency": {
+   "en": "Test Order Dependency",
+   "ru": "Зависимость от порядка тестов",
+   "def": "Ситуация, когда результат теста зависит от того, какие тесты выполнялись до него и что они оставили в системе.",
+   "ch": "flaky",
+   "anchor": "causes",
+   "aliases": ""
+  },
+  "test-quarantine": {
+   "en": "Test Quarantine",
+   "ru": "Карантин тестов",
+   "def": "Временная изоляция нестабильного теста от блокирующих наборов с задачей, владельцем и сроком; тест продолжает запускаться в неблокирующей задаче.",
+   "ch": "flaky",
+   "anchor": "quarantine",
+   "aliases": "@quarantine, карантин, test.fixme"
+  },
+  "flaky-rate": {
+   "en": "Flaky Rate",
+   "ru": "Доля нестабильности",
+   "def": "Доля прогонов, в которых тест был нестабилен (упал и прошёл при повторе). Метрика для отдельных тестов и набора.",
+   "ch": "flaky",
+   "anchor": "detection",
+   "aliases": ""
+  },
+  "repeat-each": {
+   "en": "Repeat Each",
+   "ru": "Многократный повтор теста",
+   "def": "Опция <code>--repeat-each=N</code>: каждый тест выполняется N раз; используется для поиска нестабильности и burn-in новых тестов.",
+   "ch": "flaky",
+   "anchor": "detection",
+   "aliases": "burn-in, --repeat-each"
+  },
+  "aqa-system-design": {
+   "en": "AQA System Design",
+   "ru": "Проектирование автоматизации тестирования",
+   "def": "Проектирование автоматизации как системы: цели, уровни, стек, архитектура, данные, окружения, CI, отчёты и поддержка доверия к результатам.",
+   "ch": "aqa-design",
+   "anchor": "what",
+   "aliases": "test automation strategy, стратегия автоматизации"
+  },
+  "test-strategy": {
+   "en": "Test Strategy",
+   "ru": "Стратегия тестирования",
+   "def": "Документ и договорённость о подходе к тестированию: цели, область, уровни, наборы, инструменты, данные, окружения, quality gates и роли.",
+   "ch": "aqa-design",
+   "anchor": "strategy-doc",
+   "aliases": ""
+  },
+  "eventual-consistency": {
+   "en": "Eventual Consistency",
+   "ru": "Согласованность в конечном счёте",
+   "def": "Изменение становится наблюдаемым не мгновенно; тест ждёт конечное состояние с ограниченным timeout.",
+   "ch": "api-basics",
+   "anchor": "eventual",
+   "aliases": ""
+  },
+  "readiness": {
+   "en": "Readiness",
+   "ru": "Готовность принимать запросы",
+   "def": "Проверяемая готовность приложения обслужить нужный запрос; отличается от факта запуска процесса.",
+   "ch": "docker",
+   "anchor": "readiness-network",
+   "aliases": ""
+  },
+  "runtime-validation": {
+   "en": "Runtime Validation",
+   "ru": "Проверка данных во время выполнения",
+   "def": "Проверка реального JSON или другого значения по схеме; TypeScript-типы её не выполняют.",
+   "ch": "api-auto",
+   "anchor": "layers",
+   "aliases": ""
+  },
+  "elapsed-time": {
+   "en": "Elapsed Time",
+   "ru": "Прошедшее время",
+   "def": "Время с запуска процесса; отличается от накопленного процессорного времени.",
+   "ch": "git-linux",
+   "anchor": "linux-diagnostics",
+   "aliases": ""
+  },
+  "har": {
+   "en": "HAR",
+   "ru": "Архив HTTP-сессии",
+   "def": "Формат данных о сетевых запросах браузера; может содержать чувствительные сведения.",
+   "ch": "workstation-tech",
+   "anchor": "devtools",
+   "aliases": ""
+  },
+  "severity": {
+   "en": "Severity",
+   "ru": "Серьёзность дефекта",
+   "def": "Степень влияния дефекта на систему или пользователя.",
+   "ch": "test-design",
+   "anchor": "defect-evidence",
+   "aliases": ""
+  },
+  "priority": {
+   "en": "Priority",
+   "ru": "Приоритет исправления",
+   "def": "Очередность работы над дефектом с учётом бизнес-контекста.",
+   "ch": "test-design",
+   "anchor": "defect-evidence",
+   "aliases": ""
+  },
+  "run-id": {
+   "en": "Run ID",
+   "ru": "Идентификатор запуска",
+   "def": "Уникальная метка запуска для изоляции данных, диагностики и безопасного cleanup.",
+   "ch": "fixtures",
+   "anchor": "cleanup-limits",
+   "aliases": ""
+  },
+  "cpu-time": {
+   "en": "CPU Time",
+   "ru": "Процессорное время",
+   "def": "Накопленное время использования процессора; не равно времени жизни процесса.",
+   "ch": "git-linux",
+   "anchor": "linux-diagnostics",
+   "aliases": ""
+  },
+  "quality-evidence": {
+   "en": "Quality Evidence",
+   "ru": "Свидетельства качества",
+   "def": "Артефакты и наблюдения, позволяющие оценить проверки, дефекты и ограничения.",
+   "ch": "competence",
+   "anchor": "evidence",
+   "aliases": ""
+  }
+ },
+ "design": {
+  "phases": [
+   {
+    "id": "understand",
+    "title": "Понимание"
+   },
+   {
+    "id": "strategy",
+    "title": "Стратегия"
+   },
+   {
+    "id": "build",
+    "title": "Построение"
+   },
+   {
+    "id": "operate",
+    "title": "Эксплуатация"
+   }
+  ],
+  "stages": [
+   {
+    "id": "product",
+    "title": "Изучение продукта",
+    "phase": "understand",
+    "goal": "Понять, что делает продукт, для кого, как устроен и где деньги и риски.",
+    "inputs": [
+     "Демо и документация продукта",
+     "Архитектурная схема",
+     "Аналитика использования",
+     "История инцидентов и дефектов"
+    ],
+    "actions": [
+     "Пройти ключевые пользовательские сценарии вручную",
+     "Нарисовать карту компонентов: фронтенд, сервисы, БД, интеграции",
+     "Найти критические бизнес-потоки (оплата, регистрация)",
+     "Поговорить с разработчиками, аналитиками, поддержкой"
+    ],
+    "tools": [
+     "Exploratory Testing",
+     "DevTools: сеть и консоль",
+     "Swagger/OpenAPI",
+     "Логи и мониторинг"
+    ],
+    "decisions": [
+     "Какие потоки критичны для бизнеса",
+     "Какие интеграции внешние и неуправляемые"
+    ],
+    "result": "Карта продукта: компоненты, ключевые сценарии, интеграции, известные проблемные зоны.",
+    "problems": [
+     "Сразу писать тесты, не понимая продукт",
+     "Опираться только на устаревшую документацию"
+    ],
+    "links": [
+     "requirements",
+     "levels"
+    ],
+    "chapters": [
+     "web-arch/request-path",
+     "aqa-intro/role",
+     "api-basics/why"
+    ]
+   },
+   {
+    "id": "requirements",
+    "title": "Анализ требований",
+    "phase": "understand",
+    "goal": "Понять ожидаемое поведение и его источники, чтобы у проверок были однозначные ожидания.",
+    "inputs": [
+     "Требования и пользовательские истории",
+     "Спецификации API (OpenAPI)",
+     "Макеты интерфейса",
+     "Нефункциональные требования"
+    ],
+    "actions": [
+     "Выделить проверяемые правила и ограничения",
+     "Найти неоднозначности и пропуски — вопросы аналитику",
+     "Применить техники Test Design: классы, границы, таблицы решений, состояния",
+     "Оценить риски по вероятности и влиянию"
+    ],
+    "tools": [
+     "Test Design",
+     "Risk-based Testing",
+     "Таблицы решений",
+     "Диаграммы состояний"
+    ],
+    "decisions": [
+     "Что является test oracle для каждой области",
+     "Какие риски высокие"
+    ],
+    "result": "Список проверяемых правил и рисков с приоритетами; закрытые вопросы по требованиям.",
+    "problems": [
+     "Автоматизировать неоднозначные требования",
+     "Не фиксировать источник ожидаемого результата"
+    ],
+    "links": [
+     "product",
+     "goals"
+    ],
+    "chapters": [
+     "test-design/risk",
+     "test-design/decision-table",
+     "contracts/openapi"
+    ]
+   },
+   {
+    "id": "goals",
+    "title": "Цели автоматизации",
+    "phase": "strategy",
+    "goal": "Договориться, зачем автоматизация нужна именно этому проекту и как будет измеряться успех.",
+    "inputs": [
+     "Риски и критические потоки",
+     "Частота релизов",
+     "Текущая регрессия и её стоимость",
+     "Ожидания команды и бизнеса"
+    ],
+    "actions": [
+     "Сформулировать цели: быстрая обратная связь на MR, регрессия перед релизом, smoke после деплоя",
+     "Определить метрики успеха",
+     "Оценить окупаемость и ресурсы",
+     "Зафиксировать, что не автоматизируем"
+    ],
+    "tools": [
+     "ROI-оценка",
+     "Метрики: время обратной связи, доля flaky, defect escape"
+    ],
+    "decisions": [
+     "Приоритет: скорость сигнала, широта регрессии или конкретные риски",
+     "Бюджет времени и людей"
+    ],
+    "result": "Согласованные цели, метрики и границы автоматизации.",
+    "problems": [
+     "Цель «покрыть 100%»",
+     "Метрика «количество тестов»"
+    ],
+    "links": [
+     "requirements",
+     "levels",
+     "strategy"
+    ],
+    "chapters": [
+     "aqa-intro/economics",
+     "test-quality/metrics"
+    ]
+   },
+   {
+    "id": "levels",
+    "title": "Выбор уровней тестирования",
+    "phase": "strategy",
+    "goal": "Для каждого риска выбрать самый дешёвый уровень, который его надёжно ловит.",
+    "inputs": [
+     "Карта компонентов",
+     "Риски и правила",
+     "Существующие unit- и интеграционные тесты разработчиков"
+    ],
+    "actions": [
+     "Разложить риски по уровням: unit, API, contract, UI, E2E",
+     "Договориться с разработчиками, кто покрывает нижние уровни",
+     "Определить немногочисленные E2E-сценарии",
+     "Выявить стыки сервисов для контрактных проверок"
+    ],
+    "tools": [
+     "Test Automation Pyramid",
+     "Contract Testing",
+     "Матрица «риск → уровень»"
+    ],
+    "decisions": [
+     "Форма набора: пирамида, honeycomb, trophy",
+     "Где нужны контракты"
+    ],
+    "result": "Распределение проверок по уровням без дублирования.",
+    "problems": [
+     "Всё через UI",
+     "Дублирование одних проверок на всех уровнях"
+    ],
+    "links": [
+     "goals",
+     "strategy",
+     "stack"
+    ],
+    "chapters": [
+     "test-types/pyramid",
+     "test-types/example",
+     "contracts/cdc"
+    ]
+   },
+   {
+    "id": "strategy",
+    "title": "Test Strategy",
+    "phase": "strategy",
+    "goal": "Оформить подход к тестированию в документ, который понимают все участники.",
+    "inputs": [
+     "Цели и метрики",
+     "Распределение по уровням",
+     "Ограничения окружений и данных"
+    ],
+    "actions": [
+     "Описать область автоматизации и вне её",
+     "Определить наборы и когда они запускаются",
+     "Правила для данных, окружений, нестабильности",
+     "Роли и ответственность, критерии готовности (Definition of Done) для тестов"
+    ],
+    "tools": [
+     "Документ Test Strategy",
+     "Чек-листы ревью",
+     "Definition of Done"
+    ],
+    "decisions": [
+     "Политика ретраев и карантина",
+     "Какие наборы блокируют слияние и релиз"
+    ],
+    "result": "Test Strategy: что, где, когда и кем проверяется; правила качества тестового кода.",
+    "problems": [
+     "Стратегия только в голове одного человека",
+     "Документ, который никто не обновляет"
+    ],
+    "links": [
+     "levels",
+     "stack",
+     "architecture",
+     "cicd"
+    ],
+    "chapters": [
+     "cicd/quality-gates",
+     "flaky/quarantine"
+    ]
+   },
+   {
+    "id": "stack",
+    "title": "Выбор технологического стека",
+    "phase": "strategy",
+    "goal": "Выбрать инструменты, которые подходят продукту, команде и инфраструктуре.",
+    "inputs": [
+     "Технологии продукта",
+     "Навыки команды",
+     "Требования к браузерам и платформам",
+     "Существующий CI и инфраструктура"
+    ],
+    "actions": [
+     "Сравнить кандидатов на прототипе (Proof of Concept) на реальных сценариях",
+     "Проверить поддержку браузеров, параллелизма, отчётов, CI",
+     "Оценить порог входа и сообщество",
+     "Зафиксировать решение и причины"
+    ],
+    "tools": [
+     "Playwright + TypeScript",
+     "Альтернативы: pytest, Selenium, Cypress",
+     "Allure",
+     "Docker"
+    ],
+    "decisions": [
+     "Язык: тот же, что у фронтенда, или знакомый команде QA",
+     "Репозиторий: рядом с кодом или отдельно"
+    ],
+    "result": "Выбранный стек с обоснованием и работающим прототипом.",
+    "problems": [
+     "Выбор по моде без прототипа",
+     "Зоопарк инструментов для одной задачи"
+    ],
+    "links": [
+     "strategy",
+     "architecture"
+    ],
+    "chapters": [
+     "pw-arch/protocol",
+     "alt-stacks/compare",
+     "project-arch/repo"
+    ]
+   },
+   {
+    "id": "architecture",
+    "title": "Архитектура тестового проекта",
+    "phase": "build",
+    "goal": "Заложить структуру, в которой тесты остаются поддерживаемыми при росте набора.",
+    "inputs": [
+     "Стек",
+     "Стратегия",
+     "Карта продукта"
+    ],
+    "actions": [
+     "Создать каркас: конфиг окружений, проекты, фикстуры, клиенты API, страницы и компоненты",
+     "Настроить линтер, проверку типов, форматирование",
+     "Написать README и правила",
+     "Сделать первые эталонные тесты как образец"
+    ],
+    "tools": [
+     "Playwright Test: projects, fixtures, mergeTests",
+     "Page Object Model",
+     "ESLint + eslint-plugin-playwright",
+     "TypeScript strict"
+    ],
+    "decisions": [
+     "Слои и правила зависимостей",
+     "Конвенции имён, тегов, локаторов (test id)"
+    ],
+    "result": "Каркас проекта с эталонными тестами, правилами и проверками качества кода.",
+    "problems": [
+     "Фреймворк «на вырост» с десятью слоями",
+     "Нет правил — каждый пишет по-своему"
+    ],
+    "links": [
+     "stack",
+     "data-env",
+     "implementation"
+    ],
+    "chapters": [
+     "project-arch/structure",
+     "pom/responsibility",
+     "fixtures/fixtures"
+    ]
+   },
+   {
+    "id": "data-env",
+    "title": "Тестовые данные и окружения",
+    "phase": "build",
+    "goal": "Обеспечить тестам воспроизводимые данные и окружения без конфликтов.",
+    "inputs": [
+     "Окружения компании",
+     "Возможности API для подготовки данных",
+     "Ограничения внешних интеграций"
+    ],
+    "actions": [
+     "Выбрать стратегию данных: сиды, создание через API, фабрики",
+     "Настроить эфемерное окружение для MR (Docker Compose)",
+     "Подменить внешние зависимости мок-серверами или песочницами",
+     "Организовать секреты и конфигурацию"
+    ],
+    "tools": [
+     "Фикстуры с teardown",
+     "Docker Compose",
+     "Мок-серверы (WireMock, MSW)",
+     "Vault / CI variables"
+    ],
+    "decisions": [
+     "Где допустимы общие данные",
+     "Какие интеграции мокаются, а какие проверяются в песочницах"
+    ],
+    "result": "Изолированные данные и окружения: тесты запускаются в любом порядке и параллельно.",
+    "problems": [
+     "Общий тестовый пользователь",
+     "Зависимость от данных staging",
+     "Секреты в репозитории"
+    ],
+    "links": [
+     "architecture",
+     "implementation",
+     "cicd"
+    ],
+    "chapters": [
+     "isolation/data-setup",
+     "mocking/tdm",
+     "docker/compose"
+    ]
+   },
+   {
+    "id": "implementation",
+    "title": "Реализация проверок",
+    "phase": "build",
+    "goal": "Покрыть риски по приоритету устойчивыми, понятными и быстрыми тестами.",
+    "inputs": [
+     "Приоритизированные риски",
+     "Каркас проекта",
+     "Данные и окружения"
+    ],
+    "actions": [
+     "Smoke и критические пути первыми",
+     "API-тесты бизнес-правил, затем UI-сценарии",
+     "Ревью каждого теста по чек-листу",
+     "Burn-in новых тестов с --repeat-each"
+    ],
+    "tools": [
+     "Locators по ролям и test id",
+     "Web-first assertions",
+     "Фикстуры, API-клиенты",
+     "Schema validation"
+    ],
+    "decisions": [
+     "Порядок покрытия областей",
+     "Что оставить для ручного и исследовательского тестирования"
+    ],
+    "result": "Набор тестов, покрывающий приоритетные риски, проходящий стабильно.",
+    "problems": [
+     "Гонка за количеством",
+     "Хрупкие локаторы и паузы",
+     "Тесты без очистки данных"
+    ],
+    "links": [
+     "data-env",
+     "cicd",
+     "reporting"
+    ],
+    "chapters": [
+     "locators/user-facing",
+     "assertions/web-first",
+     "api-auto/clients"
+    ]
+   },
+   {
+    "id": "cicd",
+    "title": "Организация CI/CD",
+    "phase": "operate",
+    "goal": "Сделать тесты автоматическими воротами качества на нужных этапах поставки.",
+    "inputs": [
+     "Наборы тестов",
+     "Pipeline продукта",
+     "Окружения"
+    ],
+    "actions": [
+     "Встроить наборы в pipeline: MR, после деплоя, ночью",
+     "Настроить параллелизм и шардирование",
+     "Сохранять артефакты при падении",
+     "Сделать проверки обязательными для слияния и релиза"
+    ],
+    "tools": [
+     "GitLab CI / GitHub Actions",
+     "Docker-образ Playwright",
+     "Шардирование и merge-reports",
+     "Quality gates"
+    ],
+    "decisions": [
+     "Какие наборы блокируют слияние",
+     "Бюджет времени pipeline на MR"
+    ],
+    "result": "Автоматический запуск тестов с понятным статусом и артефактами.",
+    "problems": [
+     "Тесты запускаются вручную",
+     "Артефакты только при успехе",
+     "Необязательные проверки"
+    ],
+    "links": [
+     "implementation",
+     "reporting",
+     "monitoring"
+    ],
+    "chapters": [
+     "cicd/pipeline",
+     "cicd/gitlab",
+     "parallel/sharding"
+    ]
+   },
+   {
+    "id": "reporting",
+    "title": "Отчётность",
+    "phase": "operate",
+    "goal": "Сделать результаты прогонов понятными для разработчиков, QA и бизнеса.",
+    "inputs": [
+     "Результаты прогонов",
+     "Потребности аудиторий"
+    ],
+    "actions": [
+     "Настроить репортеры: JUnit для CI, HTML/Allure для людей",
+     "Шаги, вложения, trace при падении",
+     "Категории падений и уведомления",
+     "Сводка для релизного решения"
+    ],
+    "tools": [
+     "Playwright HTML report",
+     "Allure Report",
+     "Trace Viewer",
+     "Чат-уведомления"
+    ],
+    "decisions": [
+     "Где хранить отчёты и сколько",
+     "Кто и когда разбирает падения"
+    ],
+    "result": "Каждое падение диагностируется по отчёту без перезапуска.",
+    "problems": [
+     "«Expected true, received false»",
+     "Отчёты теряются вместе с агентом"
+    ],
+    "links": [
+     "cicd",
+     "monitoring"
+    ],
+    "chapters": [
+     "reporting/good-report",
+     "reporting/allure",
+     "reporting/triage"
+    ]
+   },
+   {
+    "id": "monitoring",
+    "title": "Мониторинг стабильности",
+    "phase": "operate",
+    "goal": "Удерживать доверие к сигналу: замечать и устранять нестабильность и деградацию набора.",
+    "inputs": [
+     "История прогонов",
+     "Статусы flaky",
+     "Время выполнения"
+    ],
+    "actions": [
+     "Отслеживать долю flaky, время прогона, defect escape",
+     "Карантин нестабильных тестов с задачами и сроками",
+     "Разбор системных причин (окружение, данные)",
+     "Регулярный разбор падений"
+    ],
+    "tools": [
+     "Статистика отчётов и дашборды",
+     "--repeat-each",
+     "Allure history, TestOps"
+    ],
+    "decisions": [
+     "Порог допустимой нестабильности",
+     "Политика карантина"
+    ],
+    "result": "Стабильный набор с известными метриками и процессом реагирования.",
+    "problems": [
+     "Привычка перезапускать",
+     "Растущий карантин без владельцев"
+    ],
+    "links": [
+     "reporting",
+     "optimization",
+     "strategy"
+    ],
+    "chapters": [
+     "flaky/detection",
+     "flaky/quarantine",
+     "test-quality/metrics"
+    ]
+   },
+   {
+    "id": "optimization",
+    "title": "Оптимизация и поддержка",
+    "phase": "operate",
+    "goal": "Сохранять скорость и ценность набора по мере роста продукта.",
+    "inputs": [
+     "Метрики времени и стабильности",
+     "Изменения продукта",
+     "Найденные и пропущенные дефекты"
+    ],
+    "actions": [
+     "Ускорять: подготовка через API, перенос на нижние уровни, шардирование",
+     "Удалять устаревшие и дублирующие тесты",
+     "Обновлять стратегию по пропущенным дефектам",
+     "Обновлять зависимости и Playwright"
+    ],
+    "tools": [
+     "Speedboard, отчёты длительности",
+     "Приоритизация и теги",
+     "Рефакторинг фреймворка"
+    ],
+    "decisions": [
+     "Что ускорять, а что удалить",
+     "Когда пересматривать стратегию"
+    ],
+    "result": "Набор остаётся быстрым, стабильным и соответствует текущим рискам продукта.",
+    "problems": [
+     "Набор только растёт",
+     "Масштабирование железом без анализа"
+    ],
+    "links": [
+     "monitoring",
+     "goals",
+     "levels"
+    ],
+    "chapters": [
+     "optimization/measure",
+     "optimization/cost",
+     "test-quality/metrics"
+    ]
+   }
+  ]
+ }
+}
