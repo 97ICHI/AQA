@@ -4,6 +4,10 @@
 
 ## Запуск
 
+Проще всего: установите Node.js 20+ (nodejs.org) и дважды щёлкните `start-windows.bat` (Windows) или `start-mac.command` (macOS). Скрипт установит зависимости, соберёт приложение и откроет его в браузере.
+
+Вручную:
+
 ```bash
 cd aqa-lab-app
 npm ci
